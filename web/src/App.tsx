@@ -1,5 +1,13 @@
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router";
+import routers from "./routes";
+import { useMemo } from "react";
+
 function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+  const rs = useMemo(() => {
+    return createBrowserRouter(routers);
+  }, []);
+  return <RouterProvider router={rs} />;
 }
 
 export default App;
