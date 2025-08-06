@@ -1,11 +1,12 @@
 package main
 
 import (
+	"api-server/internal/conf"
+	"api-server/internal/service"
 	"flag"
 	"os"
 
-	"api-server/internal/conf"
-
+	kzlog "github.com/go-kratos/kratos/contrib/log/zerolog/v2"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
@@ -13,7 +14,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-
+	zlog "github.com/rs/zerolog/log"
 	_ "go.uber.org/automaxprocs"
 )
 
@@ -25,15 +26,21 @@ var (
 	Version string
 	// flagconf is the config flag.
 	flagconf string
-
-	id, _ = os.Hostname()
+	id, _    = os.Hostname()
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "/Users/zz/vscodeProjects/kubeland/api-server/configs/config.yaml", "config path, eg: -conf config.yaml")
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(logger log.Logger,
+	services []service.Service,
+	gs *grpc.Server,
+	hs *http.Server,
+) *kratos.App {
+	for _, svc := range services {
+		svc.Register(gs, hs)
+	}
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -49,7 +56,9 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 func main() {
 	flag.Parse()
-	logger := log.With(log.NewStdLogger(os.Stdout),
+
+	zlog.Logger = zlog.With().Caller().Logger()
+	logger := log.With(kzlog.NewLogger(&zlog.Logger),
 		"ts", log.DefaultTimestamp,
 		"caller", log.DefaultCaller,
 		"service.id", id,
@@ -63,7 +72,11 @@ func main() {
 			file.NewSource(flagconf),
 		),
 	)
-	defer c.Close()
+	defer func(c config.Config) {
+		if err := c.Close(); err != nil {
+			panic(err)
+		}
+	}(c)
 
 	if err := c.Load(); err != nil {
 		panic(err)
@@ -74,7 +87,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(&bc, logger)
 	if err != nil {
 		panic(err)
 	}

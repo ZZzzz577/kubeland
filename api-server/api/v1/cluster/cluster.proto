@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package api.v1.cluster;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "api-server/api/v1/cluster;cluster";
+
+
+service ClusterService {
+  rpc ListClusters (ListClustersRequest) returns (ListClustersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/clusters"
+    };
+  }
+}
+
+message Cluster {
+  uint64 id = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+message ListClustersRequest {}
+
+message ListClustersResponse {
+  repeated Cluster clusters = 1;
+}
+

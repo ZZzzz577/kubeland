@@ -3,37 +3,35 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: ClusterService API
     version: 0.0.1
 paths:
-    /helloworld/{name}:
+    /api/v1/clusters:
         get:
             tags:
-                - Greeter
-                - subgroup
-            description: Sends a greeting
-            operationId: Greeter_SayHello
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - ClusterService
+            operationId: ClusterService_ListClusters
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/api.v1.cluster.ListClustersResponse'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        api.v1.cluster.Cluster:
             type: object
             properties:
-                message:
+                id:
+                    readOnly: true
                     type: string
-            description: The response message containing the greetings
+        api.v1.cluster.ListClustersResponse:
+            type: object
+            properties:
+                clusters:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.cluster.Cluster'
 tags:
-    - name: Greeter
+    - name: ClusterService
