@@ -2,39 +2,4 @@
 
 package generated
 
-import (
-	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/schema"
-)
-
-// The init function reads all schema descriptors with runtime code
-// (default values, validators, hooks and policies) and stitches it
-// to their package variables.
-func init() {
-	clusterFields := schema.Cluster{}.Fields()
-	_ = clusterFields
-	// clusterDescName is the schema descriptor for name field.
-	clusterDescName := clusterFields[0].Descriptor()
-	// cluster.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	cluster.NameValidator = func() func(string) error {
-		validators := clusterDescName.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(name string) error {
-			for _, fn := range fns {
-				if err := fn(name); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// clusterDescDescription is the schema descriptor for description field.
-	clusterDescDescription := clusterFields[1].Descriptor()
-	// cluster.DefaultDescription holds the default value on creation for the description field.
-	cluster.DefaultDescription = clusterDescDescription.Default.(string)
-	// cluster.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	cluster.DescriptionValidator = clusterDescDescription.Validators[0].(func(string) error)
-}
+// The schema-stitching logic is generated in api-server/internal/data/generated/runtime/runtime.go

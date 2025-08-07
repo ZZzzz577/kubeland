@@ -307,12 +307,14 @@ func (c *ClusterClient) GetX(ctx context.Context, id uint64) *Cluster {
 
 // Hooks returns the client hooks.
 func (c *ClusterClient) Hooks() []Hook {
-	return c.hooks.Cluster
+	hooks := c.hooks.Cluster
+	return append(hooks[:len(hooks):len(hooks)], cluster.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *ClusterClient) Interceptors() []Interceptor {
-	return c.inters.Cluster
+	inters := c.inters.Cluster
+	return append(inters[:len(inters):len(inters)], cluster.Interceptors[:]...)
 }
 
 func (c *ClusterClient) mutate(ctx context.Context, m *ClusterMutation) (Value, error) {

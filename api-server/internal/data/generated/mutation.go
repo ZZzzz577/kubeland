@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -32,6 +33,9 @@ type ClusterMutation struct {
 	op            Op
 	typ           string
 	id            *uint64
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_at     *time.Time
 	name          *string
 	description   *string
 	clearedFields map[string]struct{}
@@ -136,6 +140,127 @@ func (m *ClusterMutation) IDs(ctx context.Context) ([]uint64, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ClusterMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ClusterMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ClusterMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ClusterMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ClusterMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ClusterMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (m *ClusterMutation) SetDeleteAt(t time.Time) {
+	m.delete_at = &t
+}
+
+// DeleteAt returns the value of the "delete_at" field in the mutation.
+func (m *ClusterMutation) DeleteAt() (r time.Time, exists bool) {
+	v := m.delete_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteAt returns the old "delete_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldDeleteAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteAt: %w", err)
+	}
+	return oldValue.DeleteAt, nil
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (m *ClusterMutation) ClearDeleteAt() {
+	m.delete_at = nil
+	m.clearedFields[cluster.FieldDeleteAt] = struct{}{}
+}
+
+// DeleteAtCleared returns if the "delete_at" field was cleared in this mutation.
+func (m *ClusterMutation) DeleteAtCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldDeleteAt]
+	return ok
+}
+
+// ResetDeleteAt resets all changes to the "delete_at" field.
+func (m *ClusterMutation) ResetDeleteAt() {
+	m.delete_at = nil
+	delete(m.clearedFields, cluster.FieldDeleteAt)
 }
 
 // SetName sets the "name" field.
@@ -244,7 +369,16 @@ func (m *ClusterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClusterMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, cluster.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, cluster.FieldUpdatedAt)
+	}
+	if m.delete_at != nil {
+		fields = append(fields, cluster.FieldDeleteAt)
+	}
 	if m.name != nil {
 		fields = append(fields, cluster.FieldName)
 	}
@@ -259,6 +393,12 @@ func (m *ClusterMutation) Fields() []string {
 // schema.
 func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case cluster.FieldCreatedAt:
+		return m.CreatedAt()
+	case cluster.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case cluster.FieldDeleteAt:
+		return m.DeleteAt()
 	case cluster.FieldName:
 		return m.Name()
 	case cluster.FieldDescription:
@@ -272,6 +412,12 @@ func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case cluster.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case cluster.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case cluster.FieldDeleteAt:
+		return m.OldDeleteAt(ctx)
 	case cluster.FieldName:
 		return m.OldName(ctx)
 	case cluster.FieldDescription:
@@ -285,6 +431,27 @@ func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *ClusterMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case cluster.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case cluster.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case cluster.FieldDeleteAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteAt(v)
+		return nil
 	case cluster.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -328,7 +495,11 @@ func (m *ClusterMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ClusterMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(cluster.FieldDeleteAt) {
+		fields = append(fields, cluster.FieldDeleteAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -341,6 +512,11 @@ func (m *ClusterMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ClusterMutation) ClearField(name string) error {
+	switch name {
+	case cluster.FieldDeleteAt:
+		m.ClearDeleteAt()
+		return nil
+	}
 	return fmt.Errorf("unknown Cluster nullable field %s", name)
 }
 
@@ -348,6 +524,15 @@ func (m *ClusterMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ClusterMutation) ResetField(name string) error {
 	switch name {
+	case cluster.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case cluster.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case cluster.FieldDeleteAt:
+		m.ResetDeleteAt()
+		return nil
 	case cluster.FieldName:
 		m.ResetName()
 		return nil

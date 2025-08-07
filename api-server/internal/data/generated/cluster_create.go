@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -17,6 +18,48 @@ type ClusterCreate struct {
 	config
 	mutation *ClusterMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *ClusterCreate) SetCreatedAt(v time.Time) *ClusterCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *ClusterCreate) SetNillableCreatedAt(v *time.Time) *ClusterCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *ClusterCreate) SetUpdatedAt(v time.Time) *ClusterCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *ClusterCreate) SetNillableUpdatedAt(v *time.Time) *ClusterCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (_c *ClusterCreate) SetDeleteAt(v time.Time) *ClusterCreate {
+	_c.mutation.SetDeleteAt(v)
+	return _c
+}
+
+// SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
+func (_c *ClusterCreate) SetNillableDeleteAt(v *time.Time) *ClusterCreate {
+	if v != nil {
+		_c.SetDeleteAt(*v)
+	}
+	return _c
 }
 
 // SetName sets the "name" field.
@@ -46,7 +89,9 @@ func (_c *ClusterCreate) Mutation() *ClusterMutation {
 
 // Save creates the Cluster in the database.
 func (_c *ClusterCreate) Save(ctx context.Context) (*Cluster, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -73,15 +118,36 @@ func (_c *ClusterCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *ClusterCreate) defaults() {
+func (_c *ClusterCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if cluster.DefaultCreatedAt == nil {
+			return fmt.Errorf("generated: uninitialized cluster.DefaultCreatedAt (forgotten import generated/runtime?)")
+		}
+		v := cluster.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if cluster.DefaultUpdatedAt == nil {
+			return fmt.Errorf("generated: uninitialized cluster.DefaultUpdatedAt (forgotten import generated/runtime?)")
+		}
+		v := cluster.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := _c.mutation.Description(); !ok {
 		v := cluster.DefaultDescription
 		_c.mutation.SetDescription(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ClusterCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`generated: missing required field "Cluster.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`generated: missing required field "Cluster.updated_at"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`generated: missing required field "Cluster.name"`)}
 	}
@@ -124,6 +190,18 @@ func (_c *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 		_node = &Cluster{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(cluster.Table, sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeUint64))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(cluster.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteAt(); ok {
+		_spec.SetField(cluster.FieldDeleteAt, field.TypeTime, value)
+		_node.DeleteAt = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)
 		_node.Name = value

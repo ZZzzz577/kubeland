@@ -4,6 +4,7 @@ package cluster
 
 import (
 	"api-server/internal/data/generated/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -53,6 +54,21 @@ func IDLTE(id uint64) predicate.Cluster {
 	return predicate.Cluster(sql.FieldLTE(FieldID, id))
 }
 
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// DeleteAt applies equality check predicate on the "delete_at" field. It's identical to DeleteAtEQ.
+func DeleteAt(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldDeleteAt, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldName, v))
@@ -61,6 +77,136 @@ func Name(v string) predicate.Cluster {
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldDescription, v))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// DeleteAtEQ applies the EQ predicate on the "delete_at" field.
+func DeleteAtEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldDeleteAt, v))
+}
+
+// DeleteAtNEQ applies the NEQ predicate on the "delete_at" field.
+func DeleteAtNEQ(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNEQ(FieldDeleteAt, v))
+}
+
+// DeleteAtIn applies the In predicate on the "delete_at" field.
+func DeleteAtIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldIn(FieldDeleteAt, vs...))
+}
+
+// DeleteAtNotIn applies the NotIn predicate on the "delete_at" field.
+func DeleteAtNotIn(vs ...time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotIn(FieldDeleteAt, vs...))
+}
+
+// DeleteAtGT applies the GT predicate on the "delete_at" field.
+func DeleteAtGT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGT(FieldDeleteAt, v))
+}
+
+// DeleteAtGTE applies the GTE predicate on the "delete_at" field.
+func DeleteAtGTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGTE(FieldDeleteAt, v))
+}
+
+// DeleteAtLT applies the LT predicate on the "delete_at" field.
+func DeleteAtLT(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLT(FieldDeleteAt, v))
+}
+
+// DeleteAtLTE applies the LTE predicate on the "delete_at" field.
+func DeleteAtLTE(v time.Time) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLTE(FieldDeleteAt, v))
+}
+
+// DeleteAtIsNil applies the IsNil predicate on the "delete_at" field.
+func DeleteAtIsNil() predicate.Cluster {
+	return predicate.Cluster(sql.FieldIsNull(FieldDeleteAt))
+}
+
+// DeleteAtNotNil applies the NotNil predicate on the "delete_at" field.
+func DeleteAtNotNil() predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotNull(FieldDeleteAt))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

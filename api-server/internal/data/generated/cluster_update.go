@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -24,6 +25,32 @@ type ClusterUpdate struct {
 // Where appends a list predicates to the ClusterUpdate builder.
 func (_u *ClusterUpdate) Where(ps ...predicate.Cluster) *ClusterUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *ClusterUpdate) SetUpdatedAt(v time.Time) *ClusterUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (_u *ClusterUpdate) SetDeleteAt(v time.Time) *ClusterUpdate {
+	_u.mutation.SetDeleteAt(v)
+	return _u
+}
+
+// SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
+func (_u *ClusterUpdate) SetNillableDeleteAt(v *time.Time) *ClusterUpdate {
+	if v != nil {
+		_u.SetDeleteAt(*v)
+	}
+	return _u
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (_u *ClusterUpdate) ClearDeleteAt() *ClusterUpdate {
+	_u.mutation.ClearDeleteAt()
 	return _u
 }
 
@@ -62,6 +89,9 @@ func (_u *ClusterUpdate) Mutation() *ClusterMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *ClusterUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -85,6 +115,18 @@ func (_u *ClusterUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *ClusterUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if cluster.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("generated: uninitialized cluster.UpdateDefaultUpdatedAt (forgotten import generated/runtime?)")
+		}
+		v := cluster.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -114,6 +156,15 @@ func (_u *ClusterUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteAt(); ok {
+		_spec.SetField(cluster.FieldDeleteAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeleteAtCleared() {
+		_spec.ClearField(cluster.FieldDeleteAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)
 	}
@@ -138,6 +189,32 @@ type ClusterUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ClusterMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *ClusterUpdateOne) SetUpdatedAt(v time.Time) *ClusterUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (_u *ClusterUpdateOne) SetDeleteAt(v time.Time) *ClusterUpdateOne {
+	_u.mutation.SetDeleteAt(v)
+	return _u
+}
+
+// SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
+func (_u *ClusterUpdateOne) SetNillableDeleteAt(v *time.Time) *ClusterUpdateOne {
+	if v != nil {
+		_u.SetDeleteAt(*v)
+	}
+	return _u
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (_u *ClusterUpdateOne) ClearDeleteAt() *ClusterUpdateOne {
+	_u.mutation.ClearDeleteAt()
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -188,6 +265,9 @@ func (_u *ClusterUpdateOne) Select(field string, fields ...string) *ClusterUpdat
 
 // Save executes the query and returns the updated Cluster entity.
 func (_u *ClusterUpdateOne) Save(ctx context.Context) (*Cluster, error) {
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -211,6 +291,18 @@ func (_u *ClusterUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *ClusterUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if cluster.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("generated: uninitialized cluster.UpdateDefaultUpdatedAt (forgotten import generated/runtime?)")
+		}
+		v := cluster.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -256,6 +348,15 @@ func (_u *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err er
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteAt(); ok {
+		_spec.SetField(cluster.FieldDeleteAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeleteAtCleared() {
+		_spec.ClearField(cluster.FieldDeleteAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)

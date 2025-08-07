@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"api-server/internal/data/mixin"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -24,4 +25,11 @@ func (Cluster) Fields() []ent.Field {
 
 func (Cluster) Edges() []ent.Edge {
 	return nil
+}
+
+func (Cluster) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.TimeMixin{},
+		mixin.SoftDeleteMixin{},
+	}
 }

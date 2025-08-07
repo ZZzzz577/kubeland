@@ -2,7 +2,60 @@
 
 package runtime
 
-// The schema-stitching logic is generated in api-server/internal/data/generated/runtime.go
+import (
+	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/schema"
+	"time"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	clusterMixin := schema.Cluster{}.Mixin()
+	clusterMixinHooks1 := clusterMixin[1].Hooks()
+	cluster.Hooks[0] = clusterMixinHooks1[0]
+	clusterMixinInters1 := clusterMixin[1].Interceptors()
+	cluster.Interceptors[0] = clusterMixinInters1[0]
+	clusterMixinFields0 := clusterMixin[0].Fields()
+	_ = clusterMixinFields0
+	clusterFields := schema.Cluster{}.Fields()
+	_ = clusterFields
+	// clusterDescCreatedAt is the schema descriptor for created_at field.
+	clusterDescCreatedAt := clusterMixinFields0[0].Descriptor()
+	// cluster.DefaultCreatedAt holds the default value on creation for the created_at field.
+	cluster.DefaultCreatedAt = clusterDescCreatedAt.Default.(func() time.Time)
+	// clusterDescUpdatedAt is the schema descriptor for updated_at field.
+	clusterDescUpdatedAt := clusterMixinFields0[1].Descriptor()
+	// cluster.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	cluster.DefaultUpdatedAt = clusterDescUpdatedAt.Default.(func() time.Time)
+	// cluster.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	cluster.UpdateDefaultUpdatedAt = clusterDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// clusterDescName is the schema descriptor for name field.
+	clusterDescName := clusterFields[0].Descriptor()
+	// cluster.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	cluster.NameValidator = func() func(string) error {
+		validators := clusterDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// clusterDescDescription is the schema descriptor for description field.
+	clusterDescDescription := clusterFields[1].Descriptor()
+	// cluster.DefaultDescription holds the default value on creation for the description field.
+	cluster.DefaultDescription = clusterDescDescription.Default.(string)
+	// cluster.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	cluster.DescriptionValidator = clusterDescDescription.Validators[0].(func(string) error)
+}
 
 const (
 	Version = "v0.14.5"                                         // Version of ent codegen.

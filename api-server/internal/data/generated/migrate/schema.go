@@ -11,6 +11,9 @@ var (
 	// ClustersColumns holds the columns for the "clusters" table.
 	ClustersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "name", Type: field.TypeString, Size: 256},
 		{Name: "description", Type: field.TypeString, Size: 1024, Default: ""},
 	}
