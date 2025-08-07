@@ -9,6 +9,7 @@ package main
 import (
 	"api-server/internal/biz"
 	"api-server/internal/conf"
+	"api-server/internal/data"
 	"api-server/internal/server"
 	"api-server/internal/service"
 	"github.com/go-kratos/kratos/v2"
@@ -23,12 +24,17 @@ import (
 
 // wireApp init kratos application.
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	clusterBiz := biz.NewClusterBiz()
+	dataData, cleanup, err := data.NewData(bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
+	clusterBiz := biz.NewClusterBiz(dataData)
 	clusterService := service.NewClusterService(clusterBiz)
 	v := service.NewServices(clusterService)
 	grpcServer := server.NewGRPCServer(bootstrap)
 	httpServer := server.NewHTTPServer(bootstrap)
 	app := newApp(logger, v, grpcServer, httpServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }
