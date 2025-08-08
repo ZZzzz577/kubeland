@@ -56,7 +56,7 @@ func (m *Page) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Page
+	// no validation rules for Current
 
 	// no validation rules for Size
 
@@ -137,47 +137,47 @@ var _ interface {
 	ErrorName() string
 } = PageValidationError{}
 
-// Validate checks the field values on PageInfo with the rules defined in the
+// Validate checks the field values on Pagination with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *PageInfo) Validate() error {
+func (m *Pagination) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PageInfo with the rules defined in
+// ValidateAll checks the field values on Pagination with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PageInfoMultiError, or nil
-// if none found.
-func (m *PageInfo) ValidateAll() error {
+// result is a list of violation errors wrapped in PaginationMultiError, or
+// nil if none found.
+func (m *Pagination) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PageInfo) validate(all bool) error {
+func (m *Pagination) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for Page
+	// no validation rules for Current
 
 	// no validation rules for Size
 
 	// no validation rules for Total
 
 	if len(errors) > 0 {
-		return PageInfoMultiError(errors)
+		return PaginationMultiError(errors)
 	}
 
 	return nil
 }
 
-// PageInfoMultiError is an error wrapping multiple validation errors returned
-// by PageInfo.ValidateAll() if the designated constraints aren't met.
-type PageInfoMultiError []error
+// PaginationMultiError is an error wrapping multiple validation errors
+// returned by Pagination.ValidateAll() if the designated constraints aren't met.
+type PaginationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PageInfoMultiError) Error() string {
+func (m PaginationMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -186,11 +186,11 @@ func (m PageInfoMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PageInfoMultiError) AllErrors() []error { return m }
+func (m PaginationMultiError) AllErrors() []error { return m }
 
-// PageInfoValidationError is the validation error returned by
-// PageInfo.Validate if the designated constraints aren't met.
-type PageInfoValidationError struct {
+// PaginationValidationError is the validation error returned by
+// Pagination.Validate if the designated constraints aren't met.
+type PaginationValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -198,22 +198,22 @@ type PageInfoValidationError struct {
 }
 
 // Field function returns field value.
-func (e PageInfoValidationError) Field() string { return e.field }
+func (e PaginationValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PageInfoValidationError) Reason() string { return e.reason }
+func (e PaginationValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PageInfoValidationError) Cause() error { return e.cause }
+func (e PaginationValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PageInfoValidationError) Key() bool { return e.key }
+func (e PaginationValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PageInfoValidationError) ErrorName() string { return "PageInfoValidationError" }
+func (e PaginationValidationError) ErrorName() string { return "PaginationValidationError" }
 
 // Error satisfies the builtin error interface
-func (e PageInfoValidationError) Error() string {
+func (e PaginationValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -225,14 +225,14 @@ func (e PageInfoValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPageInfo.%s: %s%s",
+		"invalid %sPagination.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PageInfoValidationError{}
+var _ error = PaginationValidationError{}
 
 var _ interface {
 	Field() string
@@ -240,4 +240,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PageInfoValidationError{}
+} = PaginationValidationError{}

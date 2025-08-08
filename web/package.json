@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
     "i18n:extract": "lingui extract",
-    "i18n:compile": "lingui compile --typescript"
+    "i18n:compile": "lingui compile --typescript",
+    "codegen": "openapi-generator-cli generate -g typescript-fetch -i ../api-server/openapi.yaml -o src/generated"
   },
   "dependencies": {
     "@icon-park/react": "^1.4.2",
@@ -21,7 +22,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.6.3",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "@openapitools/openapi-generator-cli": "^2.21.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

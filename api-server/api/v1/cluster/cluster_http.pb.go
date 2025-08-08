@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,15 +20,24 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationClusterServiceCreateCluster = "/api.v1.cluster.ClusterService/CreateCluster"
+const OperationClusterServiceGetCluster = "/api.v1.cluster.ClusterService/GetCluster"
 const OperationClusterServiceListClusters = "/api.v1.cluster.ClusterService/ListClusters"
+const OperationClusterServiceUpdateCluster = "/api.v1.cluster.ClusterService/UpdateCluster"
 
 type ClusterServiceHTTPServer interface {
+	CreateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
+	GetCluster(context.Context, *IdRequest) (*Cluster, error)
 	ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error)
+	UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
 }
 
 func RegisterClusterServiceHTTPServer(s *http.Server, srv ClusterServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/api/v1/clusters", _ClusterService_ListClusters0_HTTP_Handler(srv))
+	r.GET("/api/v1/cluster", _ClusterService_ListClusters0_HTTP_Handler(srv))
+	r.GET("/api/v1/cluster/{id}", _ClusterService_GetCluster0_HTTP_Handler(srv))
+	r.POST("/api/v1/cluster", _ClusterService_CreateCluster0_HTTP_Handler(srv))
+	r.PUT("/api/v1/cluster/{id}", _ClusterService_UpdateCluster0_HTTP_Handler(srv))
 }
 
 func _ClusterService_ListClusters0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
@@ -49,8 +59,80 @@ func _ClusterService_ListClusters0_HTTP_Handler(srv ClusterServiceHTTPServer) fu
 	}
 }
 
+func _ClusterService_GetCluster0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in IdRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationClusterServiceGetCluster)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCluster(ctx, req.(*IdRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Cluster)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ClusterService_CreateCluster0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Cluster
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationClusterServiceCreateCluster)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateCluster(ctx, req.(*Cluster))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ClusterService_UpdateCluster0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Cluster
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationClusterServiceUpdateCluster)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateCluster(ctx, req.(*Cluster))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ClusterServiceHTTPClient interface {
+	CreateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetCluster(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *Cluster, err error)
 	ListClusters(ctx context.Context, req *ListClustersRequest, opts ...http.CallOption) (rsp *ListClustersResponse, err error)
+	UpdateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type ClusterServiceHTTPClientImpl struct {
@@ -61,13 +143,52 @@ func NewClusterServiceHTTPClient(client *http.Client) ClusterServiceHTTPClient {
 	return &ClusterServiceHTTPClientImpl{client}
 }
 
+func (c *ClusterServiceHTTPClientImpl) CreateCluster(ctx context.Context, in *Cluster, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/cluster"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationClusterServiceCreateCluster))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ClusterServiceHTTPClientImpl) GetCluster(ctx context.Context, in *IdRequest, opts ...http.CallOption) (*Cluster, error) {
+	var out Cluster
+	pattern := "/api/v1/cluster/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationClusterServiceGetCluster))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ClusterServiceHTTPClientImpl) ListClusters(ctx context.Context, in *ListClustersRequest, opts ...http.CallOption) (*ListClustersResponse, error) {
 	var out ListClustersResponse
-	pattern := "/api/v1/clusters"
+	pattern := "/api/v1/cluster"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationClusterServiceListClusters))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ClusterServiceHTTPClientImpl) UpdateCluster(ctx context.Context, in *Cluster, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/cluster/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationClusterServiceUpdateCluster))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

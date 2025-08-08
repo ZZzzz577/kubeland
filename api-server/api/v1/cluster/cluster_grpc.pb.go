@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ClusterService_ListClusters_FullMethodName = "/api.v1.cluster.ClusterService/ListClusters"
+	ClusterService_ListClusters_FullMethodName  = "/api.v1.cluster.ClusterService/ListClusters"
+	ClusterService_GetCluster_FullMethodName    = "/api.v1.cluster.ClusterService/GetCluster"
+	ClusterService_CreateCluster_FullMethodName = "/api.v1.cluster.ClusterService/CreateCluster"
+	ClusterService_UpdateCluster_FullMethodName = "/api.v1.cluster.ClusterService/UpdateCluster"
 )
 
 // ClusterServiceClient is the client API for ClusterService service.
@@ -27,6 +31,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClusterServiceClient interface {
 	ListClusters(ctx context.Context, in *ListClustersRequest, opts ...grpc.CallOption) (*ListClustersResponse, error)
+	GetCluster(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Cluster, error)
+	CreateCluster(ctx context.Context, in *Cluster, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateCluster(ctx context.Context, in *Cluster, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type clusterServiceClient struct {
@@ -47,11 +54,44 @@ func (c *clusterServiceClient) ListClusters(ctx context.Context, in *ListCluster
 	return out, nil
 }
 
+func (c *clusterServiceClient) GetCluster(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Cluster, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Cluster)
+	err := c.cc.Invoke(ctx, ClusterService_GetCluster_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clusterServiceClient) CreateCluster(ctx context.Context, in *Cluster, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ClusterService_CreateCluster_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clusterServiceClient) UpdateCluster(ctx context.Context, in *Cluster, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ClusterService_UpdateCluster_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClusterServiceServer is the server API for ClusterService service.
 // All implementations must embed UnimplementedClusterServiceServer
 // for forward compatibility.
 type ClusterServiceServer interface {
 	ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error)
+	GetCluster(context.Context, *IdRequest) (*Cluster, error)
+	CreateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
+	UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
 	mustEmbedUnimplementedClusterServiceServer()
 }
 
@@ -64,6 +104,15 @@ type UnimplementedClusterServiceServer struct{}
 
 func (UnimplementedClusterServiceServer) ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListClusters not implemented")
+}
+func (UnimplementedClusterServiceServer) GetCluster(context.Context, *IdRequest) (*Cluster, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCluster not implemented")
+}
+func (UnimplementedClusterServiceServer) CreateCluster(context.Context, *Cluster) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCluster not implemented")
+}
+func (UnimplementedClusterServiceServer) UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCluster not implemented")
 }
 func (UnimplementedClusterServiceServer) mustEmbedUnimplementedClusterServiceServer() {}
 func (UnimplementedClusterServiceServer) testEmbeddedByValue()                        {}
@@ -104,6 +153,60 @@ func _ClusterService_ListClusters_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClusterService_GetCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClusterServiceServer).GetCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClusterService_GetCluster_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClusterServiceServer).GetCluster(ctx, req.(*IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClusterService_CreateCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Cluster)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClusterServiceServer).CreateCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClusterService_CreateCluster_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClusterServiceServer).CreateCluster(ctx, req.(*Cluster))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClusterService_UpdateCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Cluster)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClusterServiceServer).UpdateCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClusterService_UpdateCluster_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClusterServiceServer).UpdateCluster(ctx, req.(*Cluster))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClusterService_ServiceDesc is the grpc.ServiceDesc for ClusterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +217,18 @@ var ClusterService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListClusters",
 			Handler:    _ClusterService_ListClusters_Handler,
+		},
+		{
+			MethodName: "GetCluster",
+			Handler:    _ClusterService_GetCluster_Handler,
+		},
+		{
+			MethodName: "CreateCluster",
+			Handler:    _ClusterService_CreateCluster_Handler,
+		},
+		{
+			MethodName: "UpdateCluster",
+			Handler:    _ClusterService_UpdateCluster_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

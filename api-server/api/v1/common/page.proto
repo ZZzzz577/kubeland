@@ -5,12 +5,12 @@ package api.v1.common;
 option go_package = "api-server/api/v1/common;common";
 
 message Page {
-  uint32 page = 1;
+  uint32 current = 1;
   uint32 size = 2;
 }
 
-message PageInfo {
-  uint32 page = 1;
+message Pagination {
+  uint32 current = 1;
   uint32 size = 2;
   uint32 total = 3;
 }

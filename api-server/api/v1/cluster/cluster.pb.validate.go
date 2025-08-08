@@ -58,6 +58,158 @@ func (m *Cluster) validate(all bool) error {
 
 	// no validation rules for Id
 
+	if utf8.RuneCountInString(m.GetName()) > 64 {
+		err := ClusterValidationError{
+			field:  "Name",
+			reason: "value length must be at most 64 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if !_Cluster_Name_Pattern.MatchString(m.GetName()) {
+		err := ClusterValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^[a-z]([a-z0-9-]*[a-z0-9])?$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetDescription()) > 1024 {
+		err := ClusterValidationError{
+			field:  "Description",
+			reason: "value length must be at most 1024 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetAddress()) > 256 {
+		err := ClusterValidationError{
+			field:  "Address",
+			reason: "value length must be at most 256 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if uri, err := url.Parse(m.GetAddress()); err != nil {
+		err = ClusterValidationError{
+			field:  "Address",
+			reason: "value must be a valid URI",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	} else if !uri.IsAbs() {
+		err := ClusterValidationError{
+			field:  "Address",
+			reason: "value must be absolute",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetSecurity()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "Security",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "Security",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSecurity()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "Security",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCreatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "CreatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUpdatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpdatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "UpdatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ClusterMultiError(errors)
 	}
@@ -135,6 +287,8 @@ var _ interface {
 	ErrorName() string
 } = ClusterValidationError{}
 
+var _Cluster_Name_Pattern = regexp.MustCompile("^[a-z]([a-z0-9-]*[a-z0-9])?$")
+
 // Validate checks the field values on ListClustersRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -156,6 +310,35 @@ func (m *ListClustersRequest) validate(all bool) error {
 	}
 
 	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListClustersRequestValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListClustersRequestValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListClustersRequestValidationError{
+				field:  "Page",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ListClustersRequestMultiError(errors)
@@ -259,7 +442,36 @@ func (m *ListClustersResponse) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetClusters() {
+	if all {
+		switch v := interface{}(m.GetPagination()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListClustersResponseValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListClustersResponseValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListClustersResponseValidationError{
+				field:  "Pagination",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetItems() {
 		_, _ = idx, item
 
 		if all {
@@ -267,7 +479,7 @@ func (m *ListClustersResponse) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ListClustersResponseValidationError{
-						field:  fmt.Sprintf("Clusters[%v]", idx),
+						field:  fmt.Sprintf("Items[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -275,7 +487,7 @@ func (m *ListClustersResponse) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ListClustersResponseValidationError{
-						field:  fmt.Sprintf("Clusters[%v]", idx),
+						field:  fmt.Sprintf("Items[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -284,7 +496,7 @@ func (m *ListClustersResponse) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListClustersResponseValidationError{
-					field:  fmt.Sprintf("Clusters[%v]", idx),
+					field:  fmt.Sprintf("Items[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -372,3 +584,227 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListClustersResponseValidationError{}
+
+// Validate checks the field values on IdRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *IdRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IdRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in IdRequestMultiError, or nil
+// if none found.
+func (m *IdRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IdRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return IdRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// IdRequestMultiError is an error wrapping multiple validation errors returned
+// by IdRequest.ValidateAll() if the designated constraints aren't met.
+type IdRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IdRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IdRequestMultiError) AllErrors() []error { return m }
+
+// IdRequestValidationError is the validation error returned by
+// IdRequest.Validate if the designated constraints aren't met.
+type IdRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdRequestValidationError) ErrorName() string { return "IdRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdRequestValidationError{}
+
+// Validate checks the field values on Cluster_Security with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *Cluster_Security) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Cluster_Security with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Cluster_SecurityMultiError, or nil if none found.
+func (m *Cluster_Security) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Cluster_Security) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := _Cluster_Security_Type_NotInLookup[m.GetType()]; ok {
+		err := Cluster_SecurityValidationError{
+			field:  "Type",
+			reason: "value must not be in list [UNSPECIFIED]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Ca
+
+	// no validation rules for Cert
+
+	// no validation rules for Key
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return Cluster_SecurityMultiError(errors)
+	}
+
+	return nil
+}
+
+// Cluster_SecurityMultiError is an error wrapping multiple validation errors
+// returned by Cluster_Security.ValidateAll() if the designated constraints
+// aren't met.
+type Cluster_SecurityMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Cluster_SecurityMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Cluster_SecurityMultiError) AllErrors() []error { return m }
+
+// Cluster_SecurityValidationError is the validation error returned by
+// Cluster_Security.Validate if the designated constraints aren't met.
+type Cluster_SecurityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Cluster_SecurityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Cluster_SecurityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Cluster_SecurityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Cluster_SecurityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Cluster_SecurityValidationError) ErrorName() string { return "Cluster_SecurityValidationError" }
+
+// Error satisfies the builtin error interface
+func (e Cluster_SecurityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCluster_Security.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Cluster_SecurityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Cluster_SecurityValidationError{}
+
+var _Cluster_Security_Type_NotInLookup = map[Cluster_Security_Type]struct{}{
+	0: {},
+}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type ClusterService struct {
@@ -30,4 +31,14 @@ func (c *ClusterService) Register(gs *grpc.Server, hs *http.Server) {
 
 func (c *ClusterService) ListClusters(ctx context.Context, request *cluster.ListClustersRequest) (*cluster.ListClustersResponse, error) {
 	return c.clusterBiz.ListClusters(ctx, request)
+}
+
+func (c *ClusterService) GetCluster(ctx context.Context,request *cluster.IdRequest) (*cluster.Cluster, error) {
+	return nil, nil
+}
+func (c *ClusterService) CreateCluster(ctx context.Context, request *cluster.Cluster) (*emptypb.Empty, error) {
+	return nil, nil
+}
+func (c *ClusterService) UpdateCluster(ctx context.Context, request *cluster.Cluster) (*emptypb.Empty, error) {
+	return nil, nil
 }

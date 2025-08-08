@@ -12,11 +12,11 @@ type Pageable[T any, R any] interface {
 	All(ctx context.Context) ([]R, error)
 }
 
-func Page[T Pageable[T, R], R any](ctx context.Context, query Pageable[T, R], pageRequest *common.Page) (*common.PageInfo, []R, error) {
-	var page uint32 = 1
+func Page[T Pageable[T, R], R any](ctx context.Context, query Pageable[T, R], pageRequest *common.Page) (*common.Pagination, []R, error) {
+	var current uint32 = 1
 	var size uint32 = 20
-	if pageRequest != nil && pageRequest.Page > 0 {
-		page = pageRequest.Page
+	if pageRequest != nil && pageRequest.Current > 0 {
+		current = pageRequest.Current
 	}
 	if pageRequest != nil && pageRequest.Size > 0 {
 		size = pageRequest.Size
@@ -26,8 +26,8 @@ func Page[T Pageable[T, R], R any](ctx context.Context, query Pageable[T, R], pa
 	if err != nil {
 		return nil, nil, err
 	}
-	pagination := &common.PageInfo{
-		Page:  page,
+	pagination := &common.Pagination{
+		Current:  current,
 		Size:  size,
 		Total: uint32(total),
 	}
@@ -36,7 +36,7 @@ func Page[T Pageable[T, R], R any](ctx context.Context, query Pageable[T, R], pa
 	}
 	results, err := query.
 		Limit(int(size)).
-		Offset(int(page-1) * int(size)).
+		Offset(int(current-1) * int(size)).
 		All(ctx)
 	if err != nil {
 		return nil, nil, err

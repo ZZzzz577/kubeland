@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	entgo.io/ent v0.14.5
+	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/go-kratos/kratos/v2 v2.8.4
 	github.com/google/wire v0.6.0
 	github.com/mattn/go-sqlite3 v1.14.17
@@ -29,6 +30,7 @@ require (
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
+	golang.org/x/tools v0.30.0 // indirect
 )
 
 require (

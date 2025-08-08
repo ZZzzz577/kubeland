@@ -4,6 +4,10 @@ package api.v1.cluster;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "v1/common/page.proto";
 
 option go_package = "api-server/api/v1/cluster;cluster";
 
@@ -11,20 +15,91 @@ option go_package = "api-server/api/v1/cluster;cluster";
 service ClusterService {
   rpc ListClusters (ListClustersRequest) returns (ListClustersResponse) {
     option (google.api.http) = {
-      get: "/api/v1/clusters"
+      get: "/api/v1/cluster"
+    };
+  }
+  rpc GetCluster (IdRequest) returns (Cluster) {
+    option (google.api.http) = {
+      get: "/api/v1/cluster/{id}"
+    };
+  }
+  rpc CreateCluster (Cluster) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/cluster"
+      body: "*"
+    };
+  }
+  rpc UpdateCluster (Cluster) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/cluster/{id}"
+      body: "*"
     };
   }
 }
 
 message Cluster {
-  uint64 id = 1 [
+  message Security {
+    enum Type {
+      UNSPECIFIED = 0;
+      NONE = 1;
+      TLS_CERT = 2;
+      TLS_TOKEN = 3;
+    }
+
+    Type type = 1[
+      (google.api.field_behavior) = REQUIRED,
+      (validate.rules).enum = {not_in: [0]}
+    ];
+    string ca = 2;
+    string cert = 3;
+    string key = 4;
+    string token = 5;
+  }
+
+  uint64 id = 1[
+    (google.api.field_behavior) = IMMUTABLE
+  ];
+  string name = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {
+      pattern: "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+      max_len:64
+    }
+  ];
+  string description = 3 [
+    (google.api.field_behavior) = OPTIONAL,
+    (validate.rules).string = {max_len:1024}
+  ];
+  string address = 4 [
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {
+      uri: true,
+      max_len:256
+    }
+  ];
+  Security security = 5[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  google.protobuf.Timestamp created_at = 100[
     (google.api.field_behavior) = OUTPUT_ONLY
   ];
+  google.protobuf.Timestamp updated_at = 101[
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
 }
 
-message ListClustersRequest {}
+message ListClustersRequest {
+  common.Page page = 1;
+}
 
 message ListClustersResponse {
-  repeated Cluster clusters = 1;
+  common.Pagination pagination = 1;
+  repeated Cluster items = 2;
 }
 
+message IdRequest {
+  uint64 id = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
