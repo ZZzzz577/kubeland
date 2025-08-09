@@ -37,5 +37,4 @@ bin/
 .idea/
 *.swp
 
-/data/
-kubeland.db
+**/kubeland.db

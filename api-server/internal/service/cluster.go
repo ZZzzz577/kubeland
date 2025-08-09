@@ -4,7 +4,6 @@ import (
 	"api-server/api/v1/cluster"
 	"api-server/internal/biz"
 	"context"
-
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -33,12 +32,15 @@ func (c *ClusterService) ListClusters(ctx context.Context, request *cluster.List
 	return c.clusterBiz.ListClusters(ctx, request)
 }
 
-func (c *ClusterService) GetCluster(ctx context.Context,request *cluster.IdRequest) (*cluster.Cluster, error) {
-	return nil, nil
+func (c *ClusterService) GetCluster(ctx context.Context, request *cluster.IdRequest) (*cluster.Cluster, error) {
+	return c.clusterBiz.GetCluster(ctx, request)
 }
 func (c *ClusterService) CreateCluster(ctx context.Context, request *cluster.Cluster) (*emptypb.Empty, error) {
-	return nil, nil
+	return &emptypb.Empty{}, c.clusterBiz.CreateCluster(ctx, request)
 }
 func (c *ClusterService) UpdateCluster(ctx context.Context, request *cluster.Cluster) (*emptypb.Empty, error) {
-	return nil, nil
+	return &emptypb.Empty{}, c.clusterBiz.UpdateCluster(ctx, request)
+}
+func (c *ClusterService) DeleteCluster(ctx context.Context, request *cluster.IdRequest) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, c.clusterBiz.DeleteCluster(ctx, request)
 }

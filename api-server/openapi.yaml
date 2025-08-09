@@ -81,13 +81,26 @@ paths:
                 "200":
                     description: OK
                     content: {}
+        delete:
+            tags:
+                - ClusterService
+            operationId: ClusterService_DeleteCluster
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
 components:
     schemas:
         api.v1.cluster.Cluster:
             required:
                 - name
                 - address
-                - security
             type: object
             properties:
                 id:

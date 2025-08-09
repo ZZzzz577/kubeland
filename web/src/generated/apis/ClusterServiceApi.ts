@@ -29,6 +29,10 @@ export interface ClusterServiceCreateClusterRequest {
     apiV1ClusterCluster: Omit<ApiV1ClusterCluster, 'createdAt'|'updatedAt'>;
 }
 
+export interface ClusterServiceDeleteClusterRequest {
+    id: string;
+}
+
 export interface ClusterServiceGetClusterRequest {
     id: string;
 }
@@ -82,6 +86,40 @@ export class ClusterServiceApi extends runtime.BaseAPI {
      */
     async clusterServiceCreateCluster(requestParameters: ClusterServiceCreateClusterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.clusterServiceCreateClusterRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async clusterServiceDeleteClusterRaw(requestParameters: ClusterServiceDeleteClusterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling clusterServiceDeleteCluster().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/v1/cluster/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async clusterServiceDeleteCluster(requestParameters: ClusterServiceDeleteClusterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.clusterServiceDeleteClusterRaw(requestParameters, initOverrides);
     }
 
     /**

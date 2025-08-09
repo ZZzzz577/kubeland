@@ -35,6 +35,11 @@ service ClusterService {
       body: "*"
     };
   }
+  rpc DeleteCluster (IdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/cluster/{id}"
+    };
+  }
 }
 
 message Cluster {
@@ -78,7 +83,7 @@ message Cluster {
     }
   ];
   Security security = 5[
-    (google.api.field_behavior) = REQUIRED
+    (google.api.field_behavior) = OPTIONAL
   ];
   google.protobuf.Timestamp created_at = 100[
     (google.api.field_behavior) = OUTPUT_ONLY
