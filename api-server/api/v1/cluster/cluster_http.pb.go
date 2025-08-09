@@ -24,6 +24,7 @@ const OperationClusterServiceCreateCluster = "/api.v1.cluster.ClusterService/Cre
 const OperationClusterServiceDeleteCluster = "/api.v1.cluster.ClusterService/DeleteCluster"
 const OperationClusterServiceGetCluster = "/api.v1.cluster.ClusterService/GetCluster"
 const OperationClusterServiceListClusters = "/api.v1.cluster.ClusterService/ListClusters"
+const OperationClusterServiceResolveKubeConfig = "/api.v1.cluster.ClusterService/ResolveKubeConfig"
 const OperationClusterServiceUpdateCluster = "/api.v1.cluster.ClusterService/UpdateCluster"
 
 type ClusterServiceHTTPServer interface {
@@ -31,6 +32,7 @@ type ClusterServiceHTTPServer interface {
 	DeleteCluster(context.Context, *IdRequest) (*emptypb.Empty, error)
 	GetCluster(context.Context, *IdRequest) (*Cluster, error)
 	ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error)
+	ResolveKubeConfig(context.Context, *ResolveKubeConfigRequest) (*ResolveKubeConfigResponse, error)
 	UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
 }
 
@@ -41,6 +43,7 @@ func RegisterClusterServiceHTTPServer(s *http.Server, srv ClusterServiceHTTPServ
 	r.POST("/api/v1/cluster", _ClusterService_CreateCluster0_HTTP_Handler(srv))
 	r.PUT("/api/v1/cluster/{id}", _ClusterService_UpdateCluster0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/cluster/{id}", _ClusterService_DeleteCluster0_HTTP_Handler(srv))
+	r.POST("/api/v1/cluster/kube/config", _ClusterService_ResolveKubeConfig0_HTTP_Handler(srv))
 }
 
 func _ClusterService_ListClusters0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
@@ -153,11 +156,34 @@ func _ClusterService_DeleteCluster0_HTTP_Handler(srv ClusterServiceHTTPServer) f
 	}
 }
 
+func _ClusterService_ResolveKubeConfig0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ResolveKubeConfigRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationClusterServiceResolveKubeConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ResolveKubeConfig(ctx, req.(*ResolveKubeConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ResolveKubeConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ClusterServiceHTTPClient interface {
 	CreateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteCluster(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetCluster(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *Cluster, err error)
 	ListClusters(ctx context.Context, req *ListClustersRequest, opts ...http.CallOption) (rsp *ListClustersResponse, err error)
+	ResolveKubeConfig(ctx context.Context, req *ResolveKubeConfigRequest, opts ...http.CallOption) (rsp *ResolveKubeConfigResponse, err error)
 	UpdateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -215,6 +241,19 @@ func (c *ClusterServiceHTTPClientImpl) ListClusters(ctx context.Context, in *Lis
 	opts = append(opts, http.Operation(OperationClusterServiceListClusters))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ClusterServiceHTTPClientImpl) ResolveKubeConfig(ctx context.Context, in *ResolveKubeConfigRequest, opts ...http.CallOption) (*ResolveKubeConfigResponse, error) {
+	var out ResolveKubeConfigResponse
+	pattern := "/api/v1/cluster/kube/config"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationClusterServiceResolveKubeConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

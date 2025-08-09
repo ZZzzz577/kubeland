@@ -43,6 +43,24 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/cluster/kube/config:
+        post:
+            tags:
+                - ClusterService
+            operationId: ClusterService_ResolveKubeConfig
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigResponse'
     /api/v1/cluster/{id}:
         get:
             tags:
@@ -146,6 +164,49 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.v1.cluster.Cluster'
+        api.v1.cluster.ResolveKubeConfigRequest:
+            required:
+                - content
+            type: object
+            properties:
+                content:
+                    type: string
+        api.v1.cluster.ResolveKubeConfigResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigResponse_Context'
+        api.v1.cluster.ResolveKubeConfigResponse_Cluster:
+            required:
+                - server
+            type: object
+            properties:
+                server:
+                    type: string
+                ca:
+                    type: string
+        api.v1.cluster.ResolveKubeConfigResponse_Context:
+            type: object
+            properties:
+                name:
+                    type: string
+                namespace:
+                    type: string
+                current:
+                    type: boolean
+                cluster:
+                    $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigResponse_Cluster'
+                user:
+                    $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigResponse_User'
+        api.v1.cluster.ResolveKubeConfigResponse_User:
+            type: object
+            properties:
+                cert:
+                    type: string
+                key:
+                    type: string
         api.v1.common.Pagination:
             type: object
             properties:

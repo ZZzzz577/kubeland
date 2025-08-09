@@ -11,10 +11,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/client-go/tools/clientcmd"
+	"net/url"
 )
 
 var (
-	ClusterNotFoundError         = status.Error(codes.NotFound, "cluster not found")
+	ClusterNotFoundError = status.Error(codes.NotFound, "cluster not found")
+
+	ClusterSecurityRequiredError = status.Error(codes.InvalidArgument, "cluster security is required")
 	ClusterSecurityNotFoundError = status.Error(codes.NotFound, "cluster security not found")
 )
 
@@ -61,6 +65,9 @@ func (c *ClusterBiz) GetCluster(ctx context.Context, request *cluster.IdRequest)
 }
 
 func (c *ClusterBiz) CreateCluster(ctx context.Context, request *cluster.Cluster) error {
+	if request.Security == nil {
+		return ClusterSecurityRequiredError
+	}
 	return c.db.WithTx(ctx, func(tx *generated.Tx) error {
 		cr, err := tx.Cluster.Create().
 			SetName(request.Name).
@@ -139,7 +146,7 @@ func (c *ClusterBiz) DeleteCluster(ctx context.Context, request *cluster.IdReque
 	return c.db.WithTx(ctx, func(tx *generated.Tx) error {
 		cr, err := tx.Cluster.Query().
 			WithSecurity().
-			Where().
+			Where(clusterdb.ID(request.Id)).
 			Only(ctx)
 		if generated.IsNotFound(err) {
 			return ClusterNotFoundError
@@ -181,4 +188,62 @@ func (c *ClusterBiz) toProto(cr *generated.Cluster) *cluster.Cluster {
 		CreatedAt:   timestamppb.New(cr.CreatedAt),
 		UpdatedAt:   timestamppb.New(cr.UpdatedAt),
 	}
+}
+
+// ResolveKubeConfig 提取kubeConfig中有效的上下文配置信息。
+// 具体实现参考了clientcmd.BuildConfigFromFlags
+// 由于是在server端解析，不处理文件类型的认证参数（没有data结尾的参数）
+func (c *ClusterBiz) ResolveKubeConfig(_ context.Context, request *cluster.ResolveKubeConfigRequest) (*cluster.ResolveKubeConfigResponse, error) {
+	config, err := clientcmd.Load([]byte(request.Content))
+	if err != nil {
+		log.Error().
+			Err(err).
+			Str("content", request.Content).
+			Msg("failed to load kube config")
+		return nil, err
+	}
+	for name, obj := range config.AuthInfos {
+		config.AuthInfos[name] = obj
+	}
+	for name, obj := range config.Clusters {
+		config.Clusters[name] = obj
+	}
+	res := make([]*cluster.ResolveKubeConfigResponse_Context, 0)
+	for name, contextConfig := range config.Contexts {
+		authConfig := config.AuthInfos[contextConfig.AuthInfo]
+		if authConfig == nil ||
+			authConfig.ClientCertificateData == nil ||
+			authConfig.ClientKeyData == nil {
+			continue
+		}
+
+		clusterConfig := config.Clusters[contextConfig.Cluster]
+		if clusterConfig == nil ||
+			clusterConfig.Server == "" ||
+			clusterConfig.CertificateAuthorityData == nil {
+			continue
+		}
+		server := clusterConfig.Server
+		if u, err := url.ParseRequestURI(server); err == nil && u.Opaque == "" && len(u.Path) > 1 {
+			u.RawQuery = ""
+			u.Fragment = ""
+			server = u.String()
+		}
+
+		current := &cluster.ResolveKubeConfigResponse_Context{
+			Name:      name,
+			Namespace: contextConfig.Namespace,
+			Current:   name == config.CurrentContext,
+			Cluster: &cluster.ResolveKubeConfigResponse_Cluster{
+				Server: server,
+				Ca:     string(clusterConfig.CertificateAuthorityData),
+			},
+			User: &cluster.ResolveKubeConfigResponse_User{
+				Cert: string(authConfig.ClientCertificateData),
+				Key:  string(authConfig.ClientKeyData),
+			},
+		}
+		res = append(res, current)
+	}
+	return &cluster.ResolveKubeConfigResponse{Items: res}, nil
 }

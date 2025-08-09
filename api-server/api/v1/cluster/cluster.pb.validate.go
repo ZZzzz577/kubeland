@@ -686,6 +686,246 @@ var _ interface {
 	ErrorName() string
 } = IdRequestValidationError{}
 
+// Validate checks the field values on ResolveKubeConfigRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ResolveKubeConfigRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveKubeConfigRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ResolveKubeConfigRequestMultiError, or nil if none found.
+func (m *ResolveKubeConfigRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveKubeConfigRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Content
+
+	if len(errors) > 0 {
+		return ResolveKubeConfigRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveKubeConfigRequestMultiError is an error wrapping multiple validation
+// errors returned by ResolveKubeConfigRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ResolveKubeConfigRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveKubeConfigRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveKubeConfigRequestMultiError) AllErrors() []error { return m }
+
+// ResolveKubeConfigRequestValidationError is the validation error returned by
+// ResolveKubeConfigRequest.Validate if the designated constraints aren't met.
+type ResolveKubeConfigRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveKubeConfigRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveKubeConfigRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveKubeConfigRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveKubeConfigRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveKubeConfigRequestValidationError) ErrorName() string {
+	return "ResolveKubeConfigRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveKubeConfigRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveKubeConfigRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveKubeConfigRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveKubeConfigRequestValidationError{}
+
+// Validate checks the field values on ResolveKubeConfigResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ResolveKubeConfigResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveKubeConfigResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ResolveKubeConfigResponseMultiError, or nil if none found.
+func (m *ResolveKubeConfigResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveKubeConfigResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ResolveKubeConfigResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ResolveKubeConfigResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ResolveKubeConfigResponseValidationError{
+					field:  fmt.Sprintf("Items[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ResolveKubeConfigResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveKubeConfigResponseMultiError is an error wrapping multiple validation
+// errors returned by ResolveKubeConfigResponse.ValidateAll() if the
+// designated constraints aren't met.
+type ResolveKubeConfigResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveKubeConfigResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveKubeConfigResponseMultiError) AllErrors() []error { return m }
+
+// ResolveKubeConfigResponseValidationError is the validation error returned by
+// ResolveKubeConfigResponse.Validate if the designated constraints aren't met.
+type ResolveKubeConfigResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveKubeConfigResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveKubeConfigResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveKubeConfigResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveKubeConfigResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveKubeConfigResponseValidationError) ErrorName() string {
+	return "ResolveKubeConfigResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveKubeConfigResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveKubeConfigResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveKubeConfigResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveKubeConfigResponseValidationError{}
+
 // Validate checks the field values on Cluster_Security with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -808,3 +1048,407 @@ var _ interface {
 var _Cluster_Security_Type_NotInLookup = map[Cluster_Security_Type]struct{}{
 	0: {},
 }
+
+// Validate checks the field values on ResolveKubeConfigResponse_Cluster with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *ResolveKubeConfigResponse_Cluster) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveKubeConfigResponse_Cluster
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// ResolveKubeConfigResponse_ClusterMultiError, or nil if none found.
+func (m *ResolveKubeConfigResponse_Cluster) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveKubeConfigResponse_Cluster) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if uri, err := url.Parse(m.GetServer()); err != nil {
+		err = ResolveKubeConfigResponse_ClusterValidationError{
+			field:  "Server",
+			reason: "value must be a valid URI",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	} else if !uri.IsAbs() {
+		err := ResolveKubeConfigResponse_ClusterValidationError{
+			field:  "Server",
+			reason: "value must be absolute",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Ca
+
+	if len(errors) > 0 {
+		return ResolveKubeConfigResponse_ClusterMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveKubeConfigResponse_ClusterMultiError is an error wrapping multiple
+// validation errors returned by
+// ResolveKubeConfigResponse_Cluster.ValidateAll() if the designated
+// constraints aren't met.
+type ResolveKubeConfigResponse_ClusterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveKubeConfigResponse_ClusterMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveKubeConfigResponse_ClusterMultiError) AllErrors() []error { return m }
+
+// ResolveKubeConfigResponse_ClusterValidationError is the validation error
+// returned by ResolveKubeConfigResponse_Cluster.Validate if the designated
+// constraints aren't met.
+type ResolveKubeConfigResponse_ClusterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveKubeConfigResponse_ClusterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveKubeConfigResponse_ClusterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveKubeConfigResponse_ClusterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveKubeConfigResponse_ClusterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveKubeConfigResponse_ClusterValidationError) ErrorName() string {
+	return "ResolveKubeConfigResponse_ClusterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveKubeConfigResponse_ClusterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveKubeConfigResponse_Cluster.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveKubeConfigResponse_ClusterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveKubeConfigResponse_ClusterValidationError{}
+
+// Validate checks the field values on ResolveKubeConfigResponse_User with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ResolveKubeConfigResponse_User) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveKubeConfigResponse_User with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ResolveKubeConfigResponse_UserMultiError, or nil if none found.
+func (m *ResolveKubeConfigResponse_User) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveKubeConfigResponse_User) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Cert
+
+	// no validation rules for Key
+
+	if len(errors) > 0 {
+		return ResolveKubeConfigResponse_UserMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveKubeConfigResponse_UserMultiError is an error wrapping multiple
+// validation errors returned by ResolveKubeConfigResponse_User.ValidateAll()
+// if the designated constraints aren't met.
+type ResolveKubeConfigResponse_UserMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveKubeConfigResponse_UserMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveKubeConfigResponse_UserMultiError) AllErrors() []error { return m }
+
+// ResolveKubeConfigResponse_UserValidationError is the validation error
+// returned by ResolveKubeConfigResponse_User.Validate if the designated
+// constraints aren't met.
+type ResolveKubeConfigResponse_UserValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveKubeConfigResponse_UserValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveKubeConfigResponse_UserValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveKubeConfigResponse_UserValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveKubeConfigResponse_UserValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveKubeConfigResponse_UserValidationError) ErrorName() string {
+	return "ResolveKubeConfigResponse_UserValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveKubeConfigResponse_UserValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveKubeConfigResponse_User.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveKubeConfigResponse_UserValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveKubeConfigResponse_UserValidationError{}
+
+// Validate checks the field values on ResolveKubeConfigResponse_Context with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *ResolveKubeConfigResponse_Context) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveKubeConfigResponse_Context
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// ResolveKubeConfigResponse_ContextMultiError, or nil if none found.
+func (m *ResolveKubeConfigResponse_Context) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveKubeConfigResponse_Context) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Namespace
+
+	// no validation rules for Current
+
+	if all {
+		switch v := interface{}(m.GetCluster()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ResolveKubeConfigResponse_ContextValidationError{
+					field:  "Cluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ResolveKubeConfigResponse_ContextValidationError{
+					field:  "Cluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCluster()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResolveKubeConfigResponse_ContextValidationError{
+				field:  "Cluster",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ResolveKubeConfigResponse_ContextValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ResolveKubeConfigResponse_ContextValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResolveKubeConfigResponse_ContextValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ResolveKubeConfigResponse_ContextMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveKubeConfigResponse_ContextMultiError is an error wrapping multiple
+// validation errors returned by
+// ResolveKubeConfigResponse_Context.ValidateAll() if the designated
+// constraints aren't met.
+type ResolveKubeConfigResponse_ContextMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveKubeConfigResponse_ContextMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveKubeConfigResponse_ContextMultiError) AllErrors() []error { return m }
+
+// ResolveKubeConfigResponse_ContextValidationError is the validation error
+// returned by ResolveKubeConfigResponse_Context.Validate if the designated
+// constraints aren't met.
+type ResolveKubeConfigResponse_ContextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveKubeConfigResponse_ContextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveKubeConfigResponse_ContextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveKubeConfigResponse_ContextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveKubeConfigResponse_ContextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveKubeConfigResponse_ContextValidationError) ErrorName() string {
+	return "ResolveKubeConfigResponse_ContextValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveKubeConfigResponse_ContextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveKubeConfigResponse_Context.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveKubeConfigResponse_ContextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveKubeConfigResponse_ContextValidationError{}

@@ -44,3 +44,7 @@ func (c *ClusterService) UpdateCluster(ctx context.Context, request *cluster.Clu
 func (c *ClusterService) DeleteCluster(ctx context.Context, request *cluster.IdRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, c.clusterBiz.DeleteCluster(ctx, request)
 }
+
+func (c *ClusterService) ResolveKubeConfig(ctx context.Context, request *cluster.ResolveKubeConfigRequest) (*cluster.ResolveKubeConfigResponse, error) {
+	return c.clusterBiz.ResolveKubeConfig(ctx, request)
+}

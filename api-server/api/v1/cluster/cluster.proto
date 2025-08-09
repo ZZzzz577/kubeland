@@ -40,6 +40,12 @@ service ClusterService {
       delete: "/api/v1/cluster/{id}"
     };
   }
+  rpc ResolveKubeConfig(ResolveKubeConfigRequest) returns (ResolveKubeConfigResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cluster/kube/config"
+      body: "*"
+    };
+  }
 }
 
 message Cluster {
@@ -107,4 +113,33 @@ message IdRequest {
   uint64 id = 1[
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+message ResolveKubeConfigRequest {
+  string content = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ResolveKubeConfigResponse {
+  message Cluster {
+    string server = 1[
+      (google.api.field_behavior) = REQUIRED,
+      (validate.rules).string = {uri: true}
+    ];
+    string ca = 2;
+  }
+  message User {
+    string cert = 1;
+    string key = 2;
+  }
+  message Context {
+    string name = 1;
+    string namespace = 2;
+    bool current = 3;
+    Cluster cluster = 4;
+    User user = 5;
+  }
+
+  repeated Context items = 1;
 }
