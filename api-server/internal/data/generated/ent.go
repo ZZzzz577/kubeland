@@ -4,6 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"context"
 	"errors"
 	"fmt"
@@ -73,7 +74,8 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			cluster.Table: cluster.ValidColumn,
+			cluster.Table:         cluster.ValidColumn,
+			clustersecurity.Table: clustersecurity.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

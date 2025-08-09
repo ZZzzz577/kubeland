@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -24,8 +25,19 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldAddress holds the string denoting the address field in the database.
+	FieldAddress = "address"
+	// EdgeSecurity holds the string denoting the security edge name in mutations.
+	EdgeSecurity = "security"
 	// Table holds the table name of the cluster in the database.
 	Table = "clusters"
+	// SecurityTable is the table that holds the security relation/edge.
+	SecurityTable = "cluster_securities"
+	// SecurityInverseTable is the table name for the ClusterSecurity entity.
+	// It exists in this package in order to avoid circular dependency with the "clustersecurity" package.
+	SecurityInverseTable = "cluster_securities"
+	// SecurityColumn is the table column denoting the security relation/edge.
+	SecurityColumn = "cluster_id"
 )
 
 // Columns holds all SQL columns for cluster fields.
@@ -36,6 +48,7 @@ var Columns = []string{
 	FieldDeleteAt,
 	FieldName,
 	FieldDescription,
+	FieldAddress,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -68,6 +81,8 @@ var (
 	DefaultDescription string
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
+	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	AddressValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Cluster queries.
@@ -101,4 +116,23 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByAddress orders the results by the address field.
+func ByAddress(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAddress, opts...).ToFunc()
+}
+
+// BySecurityField orders the results by security field.
+func BySecurityField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSecurityStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newSecurityStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SecurityInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, SecurityTable, SecurityColumn),
+	)
 }

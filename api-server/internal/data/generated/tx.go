@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Cluster is the client for interacting with the Cluster builders.
 	Cluster *ClusterClient
+	// ClusterSecurity is the client for interacting with the ClusterSecurity builders.
+	ClusterSecurity *ClusterSecurityClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Cluster = NewClusterClient(tx.config)
+	tx.ClusterSecurity = NewClusterSecurityClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

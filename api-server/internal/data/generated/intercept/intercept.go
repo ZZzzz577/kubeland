@@ -8,6 +8,7 @@ import (
 
 	"api-server/internal/data/generated"
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"api-server/internal/data/generated/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -96,11 +97,40 @@ func (f TraverseCluster) Traverse(ctx context.Context, q generated.Query) error 
 	return fmt.Errorf("unexpected query type %T. expect *generated.ClusterQuery", q)
 }
 
+// The ClusterSecurityFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ClusterSecurityFunc func(context.Context, *generated.ClusterSecurityQuery) (generated.Value, error)
+
+// Query calls f(ctx, q).
+func (f ClusterSecurityFunc) Query(ctx context.Context, q generated.Query) (generated.Value, error) {
+	if q, ok := q.(*generated.ClusterSecurityQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *generated.ClusterSecurityQuery", q)
+}
+
+// The TraverseClusterSecurity type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseClusterSecurity func(context.Context, *generated.ClusterSecurityQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseClusterSecurity) Intercept(next generated.Querier) generated.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseClusterSecurity) Traverse(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.ClusterSecurityQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *generated.ClusterSecurityQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q generated.Query) (Query, error) {
 	switch q := q.(type) {
 	case *generated.ClusterQuery:
 		return &query[*generated.ClusterQuery, predicate.Cluster, cluster.OrderOption]{typ: generated.TypeCluster, tq: q}, nil
+	case *generated.ClusterSecurityQuery:
+		return &query[*generated.ClusterSecurityQuery, predicate.ClusterSecurity, clustersecurity.OrderOption]{typ: generated.TypeClusterSecurity, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

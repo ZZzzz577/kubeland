@@ -72,7 +72,7 @@ func (m *Cluster) validate(all bool) error {
 	if !_Cluster_Name_Pattern.MatchString(m.GetName()) {
 		err := ClusterValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"^[a-z]([a-z0-9-]*[a-z0-9])?$\"",
+			reason: "value does not match regex pattern \"^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$\"",
 		}
 		if !all {
 			return err
@@ -91,10 +91,10 @@ func (m *Cluster) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetAddress()) > 256 {
+	if utf8.RuneCountInString(m.GetAddress()) > 512 {
 		err := ClusterValidationError{
 			field:  "Address",
-			reason: "value length must be at most 256 runes",
+			reason: "value length must be at most 512 runes",
 		}
 		if !all {
 			return err
@@ -287,7 +287,7 @@ var _ interface {
 	ErrorName() string
 } = ClusterValidationError{}
 
-var _Cluster_Name_Pattern = regexp.MustCompile("^[a-z]([a-z0-9-]*[a-z0-9])?$")
+var _Cluster_Name_Pattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$")
 
 // Validate checks the field values on ListClustersRequest with the rules
 // defined in the proto definition for this message. If any rules are

@@ -24,7 +24,7 @@ func NewData(config *conf.Bootstrap) (*Data, func(), error) {
 	driver := c.Database.Driver
 	source := c.Database.Source
 	if driver == dialect.SQLite && source == "" {
-		source = "file:../data/kubeland.db?_fk=1"
+		source = "file:kubeland.db?_fk=1"
 	}
 	drv, err := sql.Open(
 		driver,

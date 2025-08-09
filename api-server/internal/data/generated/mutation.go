@@ -4,6 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"api-server/internal/data/generated/predicate"
 	"context"
 	"errors"
@@ -24,24 +25,28 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCluster = "Cluster"
+	TypeCluster         = "Cluster"
+	TypeClusterSecurity = "ClusterSecurity"
 )
 
 // ClusterMutation represents an operation that mutates the Cluster nodes in the graph.
 type ClusterMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uint64
-	created_at    *time.Time
-	updated_at    *time.Time
-	delete_at     *time.Time
-	name          *string
-	description   *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Cluster, error)
-	predicates    []predicate.Cluster
+	op              Op
+	typ             string
+	id              *uint64
+	created_at      *time.Time
+	updated_at      *time.Time
+	delete_at       *time.Time
+	name            *string
+	description     *string
+	address         *string
+	clearedFields   map[string]struct{}
+	security        *uint64
+	clearedsecurity bool
+	done            bool
+	oldValue        func(context.Context) (*Cluster, error)
+	predicates      []predicate.Cluster
 }
 
 var _ ent.Mutation = (*ClusterMutation)(nil)
@@ -335,6 +340,81 @@ func (m *ClusterMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetAddress sets the "address" field.
+func (m *ClusterMutation) SetAddress(s string) {
+	m.address = &s
+}
+
+// Address returns the value of the "address" field in the mutation.
+func (m *ClusterMutation) Address() (r string, exists bool) {
+	v := m.address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddress returns the old "address" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddress: %w", err)
+	}
+	return oldValue.Address, nil
+}
+
+// ResetAddress resets all changes to the "address" field.
+func (m *ClusterMutation) ResetAddress() {
+	m.address = nil
+}
+
+// SetSecurityID sets the "security" edge to the ClusterSecurity entity by id.
+func (m *ClusterMutation) SetSecurityID(id uint64) {
+	m.security = &id
+}
+
+// ClearSecurity clears the "security" edge to the ClusterSecurity entity.
+func (m *ClusterMutation) ClearSecurity() {
+	m.clearedsecurity = true
+}
+
+// SecurityCleared reports if the "security" edge to the ClusterSecurity entity was cleared.
+func (m *ClusterMutation) SecurityCleared() bool {
+	return m.clearedsecurity
+}
+
+// SecurityID returns the "security" edge ID in the mutation.
+func (m *ClusterMutation) SecurityID() (id uint64, exists bool) {
+	if m.security != nil {
+		return *m.security, true
+	}
+	return
+}
+
+// SecurityIDs returns the "security" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SecurityID instead. It exists only for internal usage by the builders.
+func (m *ClusterMutation) SecurityIDs() (ids []uint64) {
+	if id := m.security; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSecurity resets all changes to the "security" edge.
+func (m *ClusterMutation) ResetSecurity() {
+	m.security = nil
+	m.clearedsecurity = false
+}
+
 // Where appends a list predicates to the ClusterMutation builder.
 func (m *ClusterMutation) Where(ps ...predicate.Cluster) {
 	m.predicates = append(m.predicates, ps...)
@@ -369,7 +449,7 @@ func (m *ClusterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClusterMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, cluster.FieldCreatedAt)
 	}
@@ -384,6 +464,9 @@ func (m *ClusterMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, cluster.FieldDescription)
+	}
+	if m.address != nil {
+		fields = append(fields, cluster.FieldAddress)
 	}
 	return fields
 }
@@ -403,6 +486,8 @@ func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case cluster.FieldDescription:
 		return m.Description()
+	case cluster.FieldAddress:
+		return m.Address()
 	}
 	return nil, false
 }
@@ -422,6 +507,8 @@ func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case cluster.FieldDescription:
 		return m.OldDescription(ctx)
+	case cluster.FieldAddress:
+		return m.OldAddress(ctx)
 	}
 	return nil, fmt.Errorf("unknown Cluster field %s", name)
 }
@@ -465,6 +552,13 @@ func (m *ClusterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case cluster.FieldAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddress(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Cluster field %s", name)
@@ -539,25 +633,37 @@ func (m *ClusterMutation) ResetField(name string) error {
 	case cluster.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case cluster.FieldAddress:
+		m.ResetAddress()
+		return nil
 	}
 	return fmt.Errorf("unknown Cluster field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClusterMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.security != nil {
+		edges = append(edges, cluster.EdgeSecurity)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ClusterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case cluster.EdgeSecurity:
+		if id := m.security; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClusterMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -569,24 +675,911 @@ func (m *ClusterMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClusterMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedsecurity {
+		edges = append(edges, cluster.EdgeSecurity)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ClusterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case cluster.EdgeSecurity:
+		return m.clearedsecurity
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ClusterMutation) ClearEdge(name string) error {
+	switch name {
+	case cluster.EdgeSecurity:
+		m.ClearSecurity()
+		return nil
+	}
 	return fmt.Errorf("unknown Cluster unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ClusterMutation) ResetEdge(name string) error {
+	switch name {
+	case cluster.EdgeSecurity:
+		m.ResetSecurity()
+		return nil
+	}
 	return fmt.Errorf("unknown Cluster edge %s", name)
+}
+
+// ClusterSecurityMutation represents an operation that mutates the ClusterSecurity nodes in the graph.
+type ClusterSecurityMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uint64
+	created_at     *time.Time
+	updated_at     *time.Time
+	delete_at      *time.Time
+	_type          *uint8
+	add_type       *int8
+	ca             *string
+	cert           *string
+	key            *string
+	token          *string
+	clearedFields  map[string]struct{}
+	cluster        *uint64
+	clearedcluster bool
+	done           bool
+	oldValue       func(context.Context) (*ClusterSecurity, error)
+	predicates     []predicate.ClusterSecurity
+}
+
+var _ ent.Mutation = (*ClusterSecurityMutation)(nil)
+
+// clustersecurityOption allows management of the mutation configuration using functional options.
+type clustersecurityOption func(*ClusterSecurityMutation)
+
+// newClusterSecurityMutation creates new mutation for the ClusterSecurity entity.
+func newClusterSecurityMutation(c config, op Op, opts ...clustersecurityOption) *ClusterSecurityMutation {
+	m := &ClusterSecurityMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeClusterSecurity,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withClusterSecurityID sets the ID field of the mutation.
+func withClusterSecurityID(id uint64) clustersecurityOption {
+	return func(m *ClusterSecurityMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ClusterSecurity
+		)
+		m.oldValue = func(ctx context.Context) (*ClusterSecurity, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ClusterSecurity.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withClusterSecurity sets the old ClusterSecurity of the mutation.
+func withClusterSecurity(node *ClusterSecurity) clustersecurityOption {
+	return func(m *ClusterSecurityMutation) {
+		m.oldValue = func(context.Context) (*ClusterSecurity, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ClusterSecurityMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ClusterSecurityMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ClusterSecurityMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ClusterSecurityMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ClusterSecurity.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ClusterSecurityMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ClusterSecurityMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ClusterSecurityMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ClusterSecurityMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ClusterSecurityMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ClusterSecurityMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (m *ClusterSecurityMutation) SetDeleteAt(t time.Time) {
+	m.delete_at = &t
+}
+
+// DeleteAt returns the value of the "delete_at" field in the mutation.
+func (m *ClusterSecurityMutation) DeleteAt() (r time.Time, exists bool) {
+	v := m.delete_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteAt returns the old "delete_at" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldDeleteAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteAt: %w", err)
+	}
+	return oldValue.DeleteAt, nil
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (m *ClusterSecurityMutation) ClearDeleteAt() {
+	m.delete_at = nil
+	m.clearedFields[clustersecurity.FieldDeleteAt] = struct{}{}
+}
+
+// DeleteAtCleared returns if the "delete_at" field was cleared in this mutation.
+func (m *ClusterSecurityMutation) DeleteAtCleared() bool {
+	_, ok := m.clearedFields[clustersecurity.FieldDeleteAt]
+	return ok
+}
+
+// ResetDeleteAt resets all changes to the "delete_at" field.
+func (m *ClusterSecurityMutation) ResetDeleteAt() {
+	m.delete_at = nil
+	delete(m.clearedFields, clustersecurity.FieldDeleteAt)
+}
+
+// SetClusterID sets the "cluster_id" field.
+func (m *ClusterSecurityMutation) SetClusterID(u uint64) {
+	m.cluster = &u
+}
+
+// ClusterID returns the value of the "cluster_id" field in the mutation.
+func (m *ClusterSecurityMutation) ClusterID() (r uint64, exists bool) {
+	v := m.cluster
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClusterID returns the old "cluster_id" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldClusterID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClusterID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClusterID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClusterID: %w", err)
+	}
+	return oldValue.ClusterID, nil
+}
+
+// ResetClusterID resets all changes to the "cluster_id" field.
+func (m *ClusterSecurityMutation) ResetClusterID() {
+	m.cluster = nil
+}
+
+// SetType sets the "type" field.
+func (m *ClusterSecurityMutation) SetType(u uint8) {
+	m._type = &u
+	m.add_type = nil
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ClusterSecurityMutation) GetType() (r uint8, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldType(ctx context.Context) (v uint8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// AddType adds u to the "type" field.
+func (m *ClusterSecurityMutation) AddType(u int8) {
+	if m.add_type != nil {
+		*m.add_type += u
+	} else {
+		m.add_type = &u
+	}
+}
+
+// AddedType returns the value that was added to the "type" field in this mutation.
+func (m *ClusterSecurityMutation) AddedType() (r int8, exists bool) {
+	v := m.add_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ClusterSecurityMutation) ResetType() {
+	m._type = nil
+	m.add_type = nil
+}
+
+// SetCa sets the "ca" field.
+func (m *ClusterSecurityMutation) SetCa(s string) {
+	m.ca = &s
+}
+
+// Ca returns the value of the "ca" field in the mutation.
+func (m *ClusterSecurityMutation) Ca() (r string, exists bool) {
+	v := m.ca
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCa returns the old "ca" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldCa(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCa is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCa requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCa: %w", err)
+	}
+	return oldValue.Ca, nil
+}
+
+// ResetCa resets all changes to the "ca" field.
+func (m *ClusterSecurityMutation) ResetCa() {
+	m.ca = nil
+}
+
+// SetCert sets the "cert" field.
+func (m *ClusterSecurityMutation) SetCert(s string) {
+	m.cert = &s
+}
+
+// Cert returns the value of the "cert" field in the mutation.
+func (m *ClusterSecurityMutation) Cert() (r string, exists bool) {
+	v := m.cert
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCert returns the old "cert" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldCert(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCert is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCert requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCert: %w", err)
+	}
+	return oldValue.Cert, nil
+}
+
+// ResetCert resets all changes to the "cert" field.
+func (m *ClusterSecurityMutation) ResetCert() {
+	m.cert = nil
+}
+
+// SetKey sets the "key" field.
+func (m *ClusterSecurityMutation) SetKey(s string) {
+	m.key = &s
+}
+
+// Key returns the value of the "key" field in the mutation.
+func (m *ClusterSecurityMutation) Key() (r string, exists bool) {
+	v := m.key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKey returns the old "key" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+	}
+	return oldValue.Key, nil
+}
+
+// ResetKey resets all changes to the "key" field.
+func (m *ClusterSecurityMutation) ResetKey() {
+	m.key = nil
+}
+
+// SetToken sets the "token" field.
+func (m *ClusterSecurityMutation) SetToken(s string) {
+	m.token = &s
+}
+
+// Token returns the value of the "token" field in the mutation.
+func (m *ClusterSecurityMutation) Token() (r string, exists bool) {
+	v := m.token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldToken returns the old "token" field's value of the ClusterSecurity entity.
+// If the ClusterSecurity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterSecurityMutation) OldToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldToken: %w", err)
+	}
+	return oldValue.Token, nil
+}
+
+// ResetToken resets all changes to the "token" field.
+func (m *ClusterSecurityMutation) ResetToken() {
+	m.token = nil
+}
+
+// ClearCluster clears the "cluster" edge to the Cluster entity.
+func (m *ClusterSecurityMutation) ClearCluster() {
+	m.clearedcluster = true
+	m.clearedFields[clustersecurity.FieldClusterID] = struct{}{}
+}
+
+// ClusterCleared reports if the "cluster" edge to the Cluster entity was cleared.
+func (m *ClusterSecurityMutation) ClusterCleared() bool {
+	return m.clearedcluster
+}
+
+// ClusterIDs returns the "cluster" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ClusterID instead. It exists only for internal usage by the builders.
+func (m *ClusterSecurityMutation) ClusterIDs() (ids []uint64) {
+	if id := m.cluster; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCluster resets all changes to the "cluster" edge.
+func (m *ClusterSecurityMutation) ResetCluster() {
+	m.cluster = nil
+	m.clearedcluster = false
+}
+
+// Where appends a list predicates to the ClusterSecurityMutation builder.
+func (m *ClusterSecurityMutation) Where(ps ...predicate.ClusterSecurity) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ClusterSecurityMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ClusterSecurityMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ClusterSecurity, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ClusterSecurityMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ClusterSecurityMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ClusterSecurity).
+func (m *ClusterSecurityMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ClusterSecurityMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, clustersecurity.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, clustersecurity.FieldUpdatedAt)
+	}
+	if m.delete_at != nil {
+		fields = append(fields, clustersecurity.FieldDeleteAt)
+	}
+	if m.cluster != nil {
+		fields = append(fields, clustersecurity.FieldClusterID)
+	}
+	if m._type != nil {
+		fields = append(fields, clustersecurity.FieldType)
+	}
+	if m.ca != nil {
+		fields = append(fields, clustersecurity.FieldCa)
+	}
+	if m.cert != nil {
+		fields = append(fields, clustersecurity.FieldCert)
+	}
+	if m.key != nil {
+		fields = append(fields, clustersecurity.FieldKey)
+	}
+	if m.token != nil {
+		fields = append(fields, clustersecurity.FieldToken)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ClusterSecurityMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case clustersecurity.FieldCreatedAt:
+		return m.CreatedAt()
+	case clustersecurity.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case clustersecurity.FieldDeleteAt:
+		return m.DeleteAt()
+	case clustersecurity.FieldClusterID:
+		return m.ClusterID()
+	case clustersecurity.FieldType:
+		return m.GetType()
+	case clustersecurity.FieldCa:
+		return m.Ca()
+	case clustersecurity.FieldCert:
+		return m.Cert()
+	case clustersecurity.FieldKey:
+		return m.Key()
+	case clustersecurity.FieldToken:
+		return m.Token()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ClusterSecurityMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case clustersecurity.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case clustersecurity.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case clustersecurity.FieldDeleteAt:
+		return m.OldDeleteAt(ctx)
+	case clustersecurity.FieldClusterID:
+		return m.OldClusterID(ctx)
+	case clustersecurity.FieldType:
+		return m.OldType(ctx)
+	case clustersecurity.FieldCa:
+		return m.OldCa(ctx)
+	case clustersecurity.FieldCert:
+		return m.OldCert(ctx)
+	case clustersecurity.FieldKey:
+		return m.OldKey(ctx)
+	case clustersecurity.FieldToken:
+		return m.OldToken(ctx)
+	}
+	return nil, fmt.Errorf("unknown ClusterSecurity field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClusterSecurityMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case clustersecurity.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case clustersecurity.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case clustersecurity.FieldDeleteAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteAt(v)
+		return nil
+	case clustersecurity.FieldClusterID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClusterID(v)
+		return nil
+	case clustersecurity.FieldType:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case clustersecurity.FieldCa:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCa(v)
+		return nil
+	case clustersecurity.FieldCert:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCert(v)
+		return nil
+	case clustersecurity.FieldKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKey(v)
+		return nil
+	case clustersecurity.FieldToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetToken(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ClusterSecurityMutation) AddedFields() []string {
+	var fields []string
+	if m.add_type != nil {
+		fields = append(fields, clustersecurity.FieldType)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ClusterSecurityMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case clustersecurity.FieldType:
+		return m.AddedType()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClusterSecurityMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case clustersecurity.FieldType:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ClusterSecurityMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(clustersecurity.FieldDeleteAt) {
+		fields = append(fields, clustersecurity.FieldDeleteAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ClusterSecurityMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ClusterSecurityMutation) ClearField(name string) error {
+	switch name {
+	case clustersecurity.FieldDeleteAt:
+		m.ClearDeleteAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ClusterSecurityMutation) ResetField(name string) error {
+	switch name {
+	case clustersecurity.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case clustersecurity.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case clustersecurity.FieldDeleteAt:
+		m.ResetDeleteAt()
+		return nil
+	case clustersecurity.FieldClusterID:
+		m.ResetClusterID()
+		return nil
+	case clustersecurity.FieldType:
+		m.ResetType()
+		return nil
+	case clustersecurity.FieldCa:
+		m.ResetCa()
+		return nil
+	case clustersecurity.FieldCert:
+		m.ResetCert()
+		return nil
+	case clustersecurity.FieldKey:
+		m.ResetKey()
+		return nil
+	case clustersecurity.FieldToken:
+		m.ResetToken()
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ClusterSecurityMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cluster != nil {
+		edges = append(edges, clustersecurity.EdgeCluster)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ClusterSecurityMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case clustersecurity.EdgeCluster:
+		if id := m.cluster; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ClusterSecurityMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ClusterSecurityMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ClusterSecurityMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedcluster {
+		edges = append(edges, clustersecurity.EdgeCluster)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ClusterSecurityMutation) EdgeCleared(name string) bool {
+	switch name {
+	case clustersecurity.EdgeCluster:
+		return m.clearedcluster
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ClusterSecurityMutation) ClearEdge(name string) error {
+	switch name {
+	case clustersecurity.EdgeCluster:
+		m.ClearCluster()
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ClusterSecurityMutation) ResetEdge(name string) error {
+	switch name {
+	case clustersecurity.EdgeCluster:
+		m.ResetCluster()
+		return nil
+	}
+	return fmt.Errorf("unknown ClusterSecurity edge %s", name)
 }

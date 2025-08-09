@@ -4,6 +4,7 @@ package runtime
 
 import (
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"api-server/internal/data/schema"
 	"time"
 )
@@ -39,6 +40,7 @@ func init() {
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
+			validators[2].(func(string) error),
 		}
 		return func(name string) error {
 			for _, fn := range fns {
@@ -55,6 +57,59 @@ func init() {
 	cluster.DefaultDescription = clusterDescDescription.Default.(string)
 	// cluster.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	cluster.DescriptionValidator = clusterDescDescription.Validators[0].(func(string) error)
+	// clusterDescAddress is the schema descriptor for address field.
+	clusterDescAddress := clusterFields[2].Descriptor()
+	// cluster.AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	cluster.AddressValidator = func() func(string) error {
+		validators := clusterDescAddress.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(address string) error {
+			for _, fn := range fns {
+				if err := fn(address); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	clustersecurityMixin := schema.ClusterSecurity{}.Mixin()
+	clustersecurityMixinHooks1 := clustersecurityMixin[1].Hooks()
+	clustersecurity.Hooks[0] = clustersecurityMixinHooks1[0]
+	clustersecurityMixinInters1 := clustersecurityMixin[1].Interceptors()
+	clustersecurity.Interceptors[0] = clustersecurityMixinInters1[0]
+	clustersecurityMixinFields0 := clustersecurityMixin[0].Fields()
+	_ = clustersecurityMixinFields0
+	clustersecurityFields := schema.ClusterSecurity{}.Fields()
+	_ = clustersecurityFields
+	// clustersecurityDescCreatedAt is the schema descriptor for created_at field.
+	clustersecurityDescCreatedAt := clustersecurityMixinFields0[0].Descriptor()
+	// clustersecurity.DefaultCreatedAt holds the default value on creation for the created_at field.
+	clustersecurity.DefaultCreatedAt = clustersecurityDescCreatedAt.Default.(func() time.Time)
+	// clustersecurityDescUpdatedAt is the schema descriptor for updated_at field.
+	clustersecurityDescUpdatedAt := clustersecurityMixinFields0[1].Descriptor()
+	// clustersecurity.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	clustersecurity.DefaultUpdatedAt = clustersecurityDescUpdatedAt.Default.(func() time.Time)
+	// clustersecurity.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	clustersecurity.UpdateDefaultUpdatedAt = clustersecurityDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// clustersecurityDescCa is the schema descriptor for ca field.
+	clustersecurityDescCa := clustersecurityFields[2].Descriptor()
+	// clustersecurity.DefaultCa holds the default value on creation for the ca field.
+	clustersecurity.DefaultCa = clustersecurityDescCa.Default.(string)
+	// clustersecurityDescCert is the schema descriptor for cert field.
+	clustersecurityDescCert := clustersecurityFields[3].Descriptor()
+	// clustersecurity.DefaultCert holds the default value on creation for the cert field.
+	clustersecurity.DefaultCert = clustersecurityDescCert.Default.(string)
+	// clustersecurityDescKey is the schema descriptor for key field.
+	clustersecurityDescKey := clustersecurityFields[4].Descriptor()
+	// clustersecurity.DefaultKey holds the default value on creation for the key field.
+	clustersecurity.DefaultKey = clustersecurityDescKey.Default.(string)
+	// clustersecurityDescToken is the schema descriptor for token field.
+	clustersecurityDescToken := clustersecurityFields[5].Descriptor()
+	// clustersecurity.DefaultToken holds the default value on creation for the token field.
+	clustersecurity.DefaultToken = clustersecurityDescToken.Default.(string)
 }
 
 const (

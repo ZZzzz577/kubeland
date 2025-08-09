@@ -38,3 +38,4 @@ bin/
 *.swp
 
 /data/
+kubeland.db

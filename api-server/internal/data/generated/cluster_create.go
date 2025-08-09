@@ -4,6 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"context"
 	"errors"
 	"fmt"
@@ -80,6 +81,31 @@ func (_c *ClusterCreate) SetNillableDescription(v *string) *ClusterCreate {
 		_c.SetDescription(*v)
 	}
 	return _c
+}
+
+// SetAddress sets the "address" field.
+func (_c *ClusterCreate) SetAddress(v string) *ClusterCreate {
+	_c.mutation.SetAddress(v)
+	return _c
+}
+
+// SetSecurityID sets the "security" edge to the ClusterSecurity entity by ID.
+func (_c *ClusterCreate) SetSecurityID(id uint64) *ClusterCreate {
+	_c.mutation.SetSecurityID(id)
+	return _c
+}
+
+// SetNillableSecurityID sets the "security" edge to the ClusterSecurity entity by ID if the given value is not nil.
+func (_c *ClusterCreate) SetNillableSecurityID(id *uint64) *ClusterCreate {
+	if id != nil {
+		_c = _c.SetSecurityID(*id)
+	}
+	return _c
+}
+
+// SetSecurity sets the "security" edge to the ClusterSecurity entity.
+func (_c *ClusterCreate) SetSecurity(v *ClusterSecurity) *ClusterCreate {
+	return _c.SetSecurityID(v.ID)
 }
 
 // Mutation returns the ClusterMutation object of the builder.
@@ -164,6 +190,14 @@ func (_c *ClusterCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`generated: validator failed for field "Cluster.description": %w`, err)}
 		}
 	}
+	if _, ok := _c.mutation.Address(); !ok {
+		return &ValidationError{Name: "address", err: errors.New(`generated: missing required field "Cluster.address"`)}
+	}
+	if v, ok := _c.mutation.Address(); ok {
+		if err := cluster.AddressValidator(v); err != nil {
+			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "Cluster.address": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -209,6 +243,26 @@ func (_c *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := _c.mutation.Address(); ok {
+		_spec.SetField(cluster.FieldAddress, field.TypeString, value)
+		_node.Address = value
+	}
+	if nodes := _c.mutation.SecurityIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   cluster.SecurityTable,
+			Columns: []string{cluster.SecurityColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

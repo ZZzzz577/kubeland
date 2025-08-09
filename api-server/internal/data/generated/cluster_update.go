@@ -4,6 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
+	"api-server/internal/data/generated/clustersecurity"
 	"api-server/internal/data/generated/predicate"
 	"context"
 	"errors"
@@ -82,9 +83,48 @@ func (_u *ClusterUpdate) SetNillableDescription(v *string) *ClusterUpdate {
 	return _u
 }
 
+// SetAddress sets the "address" field.
+func (_u *ClusterUpdate) SetAddress(v string) *ClusterUpdate {
+	_u.mutation.SetAddress(v)
+	return _u
+}
+
+// SetNillableAddress sets the "address" field if the given value is not nil.
+func (_u *ClusterUpdate) SetNillableAddress(v *string) *ClusterUpdate {
+	if v != nil {
+		_u.SetAddress(*v)
+	}
+	return _u
+}
+
+// SetSecurityID sets the "security" edge to the ClusterSecurity entity by ID.
+func (_u *ClusterUpdate) SetSecurityID(id uint64) *ClusterUpdate {
+	_u.mutation.SetSecurityID(id)
+	return _u
+}
+
+// SetNillableSecurityID sets the "security" edge to the ClusterSecurity entity by ID if the given value is not nil.
+func (_u *ClusterUpdate) SetNillableSecurityID(id *uint64) *ClusterUpdate {
+	if id != nil {
+		_u = _u.SetSecurityID(*id)
+	}
+	return _u
+}
+
+// SetSecurity sets the "security" edge to the ClusterSecurity entity.
+func (_u *ClusterUpdate) SetSecurity(v *ClusterSecurity) *ClusterUpdate {
+	return _u.SetSecurityID(v.ID)
+}
+
 // Mutation returns the ClusterMutation object of the builder.
 func (_u *ClusterUpdate) Mutation() *ClusterMutation {
 	return _u.mutation
+}
+
+// ClearSecurity clears the "security" edge to the ClusterSecurity entity.
+func (_u *ClusterUpdate) ClearSecurity() *ClusterUpdate {
+	_u.mutation.ClearSecurity()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -141,6 +181,11 @@ func (_u *ClusterUpdate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`generated: validator failed for field "Cluster.description": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Address(); ok {
+		if err := cluster.AddressValidator(v); err != nil {
+			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "Cluster.address": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -170,6 +215,38 @@ func (_u *ClusterUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Address(); ok {
+		_spec.SetField(cluster.FieldAddress, field.TypeString, value)
+	}
+	if _u.mutation.SecurityCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   cluster.SecurityTable,
+			Columns: []string{cluster.SecurityColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SecurityIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   cluster.SecurityTable,
+			Columns: []string{cluster.SecurityColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -245,9 +322,48 @@ func (_u *ClusterUpdateOne) SetNillableDescription(v *string) *ClusterUpdateOne 
 	return _u
 }
 
+// SetAddress sets the "address" field.
+func (_u *ClusterUpdateOne) SetAddress(v string) *ClusterUpdateOne {
+	_u.mutation.SetAddress(v)
+	return _u
+}
+
+// SetNillableAddress sets the "address" field if the given value is not nil.
+func (_u *ClusterUpdateOne) SetNillableAddress(v *string) *ClusterUpdateOne {
+	if v != nil {
+		_u.SetAddress(*v)
+	}
+	return _u
+}
+
+// SetSecurityID sets the "security" edge to the ClusterSecurity entity by ID.
+func (_u *ClusterUpdateOne) SetSecurityID(id uint64) *ClusterUpdateOne {
+	_u.mutation.SetSecurityID(id)
+	return _u
+}
+
+// SetNillableSecurityID sets the "security" edge to the ClusterSecurity entity by ID if the given value is not nil.
+func (_u *ClusterUpdateOne) SetNillableSecurityID(id *uint64) *ClusterUpdateOne {
+	if id != nil {
+		_u = _u.SetSecurityID(*id)
+	}
+	return _u
+}
+
+// SetSecurity sets the "security" edge to the ClusterSecurity entity.
+func (_u *ClusterUpdateOne) SetSecurity(v *ClusterSecurity) *ClusterUpdateOne {
+	return _u.SetSecurityID(v.ID)
+}
+
 // Mutation returns the ClusterMutation object of the builder.
 func (_u *ClusterUpdateOne) Mutation() *ClusterMutation {
 	return _u.mutation
+}
+
+// ClearSecurity clears the "security" edge to the ClusterSecurity entity.
+func (_u *ClusterUpdateOne) ClearSecurity() *ClusterUpdateOne {
+	_u.mutation.ClearSecurity()
+	return _u
 }
 
 // Where appends a list predicates to the ClusterUpdate builder.
@@ -317,6 +433,11 @@ func (_u *ClusterUpdateOne) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`generated: validator failed for field "Cluster.description": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Address(); ok {
+		if err := cluster.AddressValidator(v); err != nil {
+			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "Cluster.address": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -363,6 +484,38 @@ func (_u *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err er
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Address(); ok {
+		_spec.SetField(cluster.FieldAddress, field.TypeString, value)
+	}
+	if _u.mutation.SecurityCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   cluster.SecurityTable,
+			Columns: []string{cluster.SecurityColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SecurityIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   cluster.SecurityTable,
+			Columns: []string{cluster.SecurityColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Cluster{config: _u.config}
 	_spec.Assign = _node.assignValues

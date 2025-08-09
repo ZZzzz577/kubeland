@@ -7,7 +7,6 @@ import (
 	"api-server/internal/data/generated/clustersecurity"
 	"api-server/internal/data/generated/predicate"
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -17,53 +16,53 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ClusterQuery is the builder for querying Cluster entities.
-type ClusterQuery struct {
+// ClusterSecurityQuery is the builder for querying ClusterSecurity entities.
+type ClusterSecurityQuery struct {
 	config
-	ctx          *QueryContext
-	order        []cluster.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Cluster
-	withSecurity *ClusterSecurityQuery
+	ctx         *QueryContext
+	order       []clustersecurity.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.ClusterSecurity
+	withCluster *ClusterQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the ClusterQuery builder.
-func (_q *ClusterQuery) Where(ps ...predicate.Cluster) *ClusterQuery {
+// Where adds a new predicate for the ClusterSecurityQuery builder.
+func (_q *ClusterSecurityQuery) Where(ps ...predicate.ClusterSecurity) *ClusterSecurityQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *ClusterQuery) Limit(limit int) *ClusterQuery {
+func (_q *ClusterSecurityQuery) Limit(limit int) *ClusterSecurityQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *ClusterQuery) Offset(offset int) *ClusterQuery {
+func (_q *ClusterSecurityQuery) Offset(offset int) *ClusterSecurityQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *ClusterQuery) Unique(unique bool) *ClusterQuery {
+func (_q *ClusterSecurityQuery) Unique(unique bool) *ClusterSecurityQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *ClusterQuery) Order(o ...cluster.OrderOption) *ClusterQuery {
+func (_q *ClusterSecurityQuery) Order(o ...clustersecurity.OrderOption) *ClusterSecurityQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// QuerySecurity chains the current query on the "security" edge.
-func (_q *ClusterQuery) QuerySecurity() *ClusterSecurityQuery {
-	query := (&ClusterSecurityClient{config: _q.config}).Query()
+// QueryCluster chains the current query on the "cluster" edge.
+func (_q *ClusterSecurityQuery) QueryCluster() *ClusterQuery {
+	query := (&ClusterClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,9 +72,9 @@ func (_q *ClusterQuery) QuerySecurity() *ClusterSecurityQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
-			sqlgraph.To(clustersecurity.Table, clustersecurity.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, cluster.SecurityTable, cluster.SecurityColumn),
+			sqlgraph.From(clustersecurity.Table, clustersecurity.FieldID, selector),
+			sqlgraph.To(cluster.Table, cluster.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, clustersecurity.ClusterTable, clustersecurity.ClusterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -83,21 +82,21 @@ func (_q *ClusterQuery) QuerySecurity() *ClusterSecurityQuery {
 	return query
 }
 
-// First returns the first Cluster entity from the query.
-// Returns a *NotFoundError when no Cluster was found.
-func (_q *ClusterQuery) First(ctx context.Context) (*Cluster, error) {
+// First returns the first ClusterSecurity entity from the query.
+// Returns a *NotFoundError when no ClusterSecurity was found.
+func (_q *ClusterSecurityQuery) First(ctx context.Context) (*ClusterSecurity, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{cluster.Label}
+		return nil, &NotFoundError{clustersecurity.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *ClusterQuery) FirstX(ctx context.Context) *Cluster {
+func (_q *ClusterSecurityQuery) FirstX(ctx context.Context) *ClusterSecurity {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -105,22 +104,22 @@ func (_q *ClusterQuery) FirstX(ctx context.Context) *Cluster {
 	return node
 }
 
-// FirstID returns the first Cluster ID from the query.
-// Returns a *NotFoundError when no Cluster ID was found.
-func (_q *ClusterQuery) FirstID(ctx context.Context) (id uint64, err error) {
+// FirstID returns the first ClusterSecurity ID from the query.
+// Returns a *NotFoundError when no ClusterSecurity ID was found.
+func (_q *ClusterSecurityQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{cluster.Label}
+		err = &NotFoundError{clustersecurity.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ClusterQuery) FirstIDX(ctx context.Context) uint64 {
+func (_q *ClusterSecurityQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -128,10 +127,10 @@ func (_q *ClusterQuery) FirstIDX(ctx context.Context) uint64 {
 	return id
 }
 
-// Only returns a single Cluster entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Cluster entity is found.
-// Returns a *NotFoundError when no Cluster entities are found.
-func (_q *ClusterQuery) Only(ctx context.Context) (*Cluster, error) {
+// Only returns a single ClusterSecurity entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one ClusterSecurity entity is found.
+// Returns a *NotFoundError when no ClusterSecurity entities are found.
+func (_q *ClusterSecurityQuery) Only(ctx context.Context) (*ClusterSecurity, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -140,14 +139,14 @@ func (_q *ClusterQuery) Only(ctx context.Context) (*Cluster, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{cluster.Label}
+		return nil, &NotFoundError{clustersecurity.Label}
 	default:
-		return nil, &NotSingularError{cluster.Label}
+		return nil, &NotSingularError{clustersecurity.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *ClusterQuery) OnlyX(ctx context.Context) *Cluster {
+func (_q *ClusterSecurityQuery) OnlyX(ctx context.Context) *ClusterSecurity {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -155,10 +154,10 @@ func (_q *ClusterQuery) OnlyX(ctx context.Context) *Cluster {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Cluster ID in the query.
-// Returns a *NotSingularError when more than one Cluster ID is found.
+// OnlyID is like Only, but returns the only ClusterSecurity ID in the query.
+// Returns a *NotSingularError when more than one ClusterSecurity ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ClusterQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+func (_q *ClusterSecurityQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -167,15 +166,15 @@ func (_q *ClusterQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{cluster.Label}
+		err = &NotFoundError{clustersecurity.Label}
 	default:
-		err = &NotSingularError{cluster.Label}
+		err = &NotSingularError{clustersecurity.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ClusterQuery) OnlyIDX(ctx context.Context) uint64 {
+func (_q *ClusterSecurityQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -183,18 +182,18 @@ func (_q *ClusterQuery) OnlyIDX(ctx context.Context) uint64 {
 	return id
 }
 
-// All executes the query and returns a list of Clusters.
-func (_q *ClusterQuery) All(ctx context.Context) ([]*Cluster, error) {
+// All executes the query and returns a list of ClusterSecurities.
+func (_q *ClusterSecurityQuery) All(ctx context.Context) ([]*ClusterSecurity, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Cluster, *ClusterQuery]()
-	return withInterceptors[[]*Cluster](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*ClusterSecurity, *ClusterSecurityQuery]()
+	return withInterceptors[[]*ClusterSecurity](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *ClusterQuery) AllX(ctx context.Context) []*Cluster {
+func (_q *ClusterSecurityQuery) AllX(ctx context.Context) []*ClusterSecurity {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -202,20 +201,20 @@ func (_q *ClusterQuery) AllX(ctx context.Context) []*Cluster {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Cluster IDs.
-func (_q *ClusterQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+// IDs executes the query and returns a list of ClusterSecurity IDs.
+func (_q *ClusterSecurityQuery) IDs(ctx context.Context) (ids []uint64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(cluster.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(clustersecurity.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ClusterQuery) IDsX(ctx context.Context) []uint64 {
+func (_q *ClusterSecurityQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -224,16 +223,16 @@ func (_q *ClusterQuery) IDsX(ctx context.Context) []uint64 {
 }
 
 // Count returns the count of the given query.
-func (_q *ClusterQuery) Count(ctx context.Context) (int, error) {
+func (_q *ClusterSecurityQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*ClusterQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*ClusterSecurityQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *ClusterQuery) CountX(ctx context.Context) int {
+func (_q *ClusterSecurityQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -242,7 +241,7 @@ func (_q *ClusterQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *ClusterQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *ClusterSecurityQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -255,7 +254,7 @@ func (_q *ClusterQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *ClusterQuery) ExistX(ctx context.Context) bool {
+func (_q *ClusterSecurityQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -263,33 +262,33 @@ func (_q *ClusterQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the ClusterQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the ClusterSecurityQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *ClusterQuery) Clone() *ClusterQuery {
+func (_q *ClusterSecurityQuery) Clone() *ClusterSecurityQuery {
 	if _q == nil {
 		return nil
 	}
-	return &ClusterQuery{
-		config:       _q.config,
-		ctx:          _q.ctx.Clone(),
-		order:        append([]cluster.OrderOption{}, _q.order...),
-		inters:       append([]Interceptor{}, _q.inters...),
-		predicates:   append([]predicate.Cluster{}, _q.predicates...),
-		withSecurity: _q.withSecurity.Clone(),
+	return &ClusterSecurityQuery{
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]clustersecurity.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.ClusterSecurity{}, _q.predicates...),
+		withCluster: _q.withCluster.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
 }
 
-// WithSecurity tells the query-builder to eager-load the nodes that are connected to
-// the "security" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *ClusterQuery) WithSecurity(opts ...func(*ClusterSecurityQuery)) *ClusterQuery {
-	query := (&ClusterSecurityClient{config: _q.config}).Query()
+// WithCluster tells the query-builder to eager-load the nodes that are connected to
+// the "cluster" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ClusterSecurityQuery) WithCluster(opts ...func(*ClusterQuery)) *ClusterSecurityQuery {
+	query := (&ClusterClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withSecurity = query
+	_q.withCluster = query
 	return _q
 }
 
@@ -303,15 +302,15 @@ func (_q *ClusterQuery) WithSecurity(opts ...func(*ClusterSecurityQuery)) *Clust
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Cluster.Query().
-//		GroupBy(cluster.FieldCreatedAt).
+//	client.ClusterSecurity.Query().
+//		GroupBy(clustersecurity.FieldCreatedAt).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
-func (_q *ClusterQuery) GroupBy(field string, fields ...string) *ClusterGroupBy {
+func (_q *ClusterSecurityQuery) GroupBy(field string, fields ...string) *ClusterSecurityGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &ClusterGroupBy{build: _q}
+	grbuild := &ClusterSecurityGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = cluster.Label
+	grbuild.label = clustersecurity.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -325,23 +324,23 @@ func (_q *ClusterQuery) GroupBy(field string, fields ...string) *ClusterGroupBy 
 //		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
-//	client.Cluster.Query().
-//		Select(cluster.FieldCreatedAt).
+//	client.ClusterSecurity.Query().
+//		Select(clustersecurity.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (_q *ClusterQuery) Select(fields ...string) *ClusterSelect {
+func (_q *ClusterSecurityQuery) Select(fields ...string) *ClusterSecuritySelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &ClusterSelect{ClusterQuery: _q}
-	sbuild.label = cluster.Label
+	sbuild := &ClusterSecuritySelect{ClusterSecurityQuery: _q}
+	sbuild.label = clustersecurity.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a ClusterSelect configured with the given aggregations.
-func (_q *ClusterQuery) Aggregate(fns ...AggregateFunc) *ClusterSelect {
+// Aggregate returns a ClusterSecuritySelect configured with the given aggregations.
+func (_q *ClusterSecurityQuery) Aggregate(fns ...AggregateFunc) *ClusterSecuritySelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *ClusterQuery) prepareQuery(ctx context.Context) error {
+func (_q *ClusterSecurityQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("generated: uninitialized interceptor (forgotten import generated/runtime?)")
@@ -353,7 +352,7 @@ func (_q *ClusterQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !cluster.ValidColumn(f) {
+		if !clustersecurity.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("generated: invalid field %q for query", f)}
 		}
 	}
@@ -367,19 +366,19 @@ func (_q *ClusterQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cluster, error) {
+func (_q *ClusterSecurityQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ClusterSecurity, error) {
 	var (
-		nodes       = []*Cluster{}
+		nodes       = []*ClusterSecurity{}
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			_q.withSecurity != nil,
+			_q.withCluster != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Cluster).scanValues(nil, columns)
+		return (*ClusterSecurity).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Cluster{config: _q.config}
+		node := &ClusterSecurity{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -393,44 +392,46 @@ func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withSecurity; query != nil {
-		if err := _q.loadSecurity(ctx, query, nodes, nil,
-			func(n *Cluster, e *ClusterSecurity) { n.Edges.Security = e }); err != nil {
+	if query := _q.withCluster; query != nil {
+		if err := _q.loadCluster(ctx, query, nodes, nil,
+			func(n *ClusterSecurity, e *Cluster) { n.Edges.Cluster = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (_q *ClusterQuery) loadSecurity(ctx context.Context, query *ClusterSecurityQuery, nodes []*Cluster, init func(*Cluster), assign func(*Cluster, *ClusterSecurity)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uint64]*Cluster)
+func (_q *ClusterSecurityQuery) loadCluster(ctx context.Context, query *ClusterQuery, nodes []*ClusterSecurity, init func(*ClusterSecurity), assign func(*ClusterSecurity, *Cluster)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*ClusterSecurity)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+		fk := nodes[i].ClusterID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(clustersecurity.FieldClusterID)
+	if len(ids) == 0 {
+		return nil
 	}
-	query.Where(predicate.ClusterSecurity(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(cluster.SecurityColumn), fks...))
-	}))
+	query.Where(cluster.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ClusterID
-		node, ok := nodeids[fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "cluster_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "cluster_id" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
 
-func (_q *ClusterQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *ClusterSecurityQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	_spec.Node.Columns = _q.ctx.Fields
 	if len(_q.ctx.Fields) > 0 {
@@ -439,8 +440,8 @@ func (_q *ClusterQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *ClusterQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(cluster.Table, cluster.Columns, sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeUint64))
+func (_q *ClusterSecurityQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(clustersecurity.Table, clustersecurity.Columns, sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -449,11 +450,14 @@ func (_q *ClusterQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, cluster.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, clustersecurity.FieldID)
 		for i := range fields {
-			if fields[i] != cluster.FieldID {
+			if fields[i] != clustersecurity.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withCluster != nil {
+			_spec.Node.AddColumnOnce(clustersecurity.FieldClusterID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -479,12 +483,12 @@ func (_q *ClusterQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *ClusterQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *ClusterSecurityQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(cluster.Table)
+	t1 := builder.Table(clustersecurity.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = cluster.Columns
+		columns = clustersecurity.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -511,28 +515,28 @@ func (_q *ClusterQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// ClusterGroupBy is the group-by builder for Cluster entities.
-type ClusterGroupBy struct {
+// ClusterSecurityGroupBy is the group-by builder for ClusterSecurity entities.
+type ClusterSecurityGroupBy struct {
 	selector
-	build *ClusterQuery
+	build *ClusterSecurityQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *ClusterGroupBy) Aggregate(fns ...AggregateFunc) *ClusterGroupBy {
+func (_g *ClusterSecurityGroupBy) Aggregate(fns ...AggregateFunc) *ClusterSecurityGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *ClusterGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *ClusterSecurityGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ClusterQuery, *ClusterGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*ClusterSecurityQuery, *ClusterSecurityGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *ClusterGroupBy) sqlScan(ctx context.Context, root *ClusterQuery, v any) error {
+func (_g *ClusterSecurityGroupBy) sqlScan(ctx context.Context, root *ClusterSecurityQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -559,28 +563,28 @@ func (_g *ClusterGroupBy) sqlScan(ctx context.Context, root *ClusterQuery, v any
 	return sql.ScanSlice(rows, v)
 }
 
-// ClusterSelect is the builder for selecting fields of Cluster entities.
-type ClusterSelect struct {
-	*ClusterQuery
+// ClusterSecuritySelect is the builder for selecting fields of ClusterSecurity entities.
+type ClusterSecuritySelect struct {
+	*ClusterSecurityQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *ClusterSelect) Aggregate(fns ...AggregateFunc) *ClusterSelect {
+func (_s *ClusterSecuritySelect) Aggregate(fns ...AggregateFunc) *ClusterSecuritySelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *ClusterSelect) Scan(ctx context.Context, v any) error {
+func (_s *ClusterSecuritySelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ClusterQuery, *ClusterSelect](ctx, _s.ClusterQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*ClusterSecurityQuery, *ClusterSecuritySelect](ctx, _s.ClusterSecurityQuery, _s, _s.inters, v)
 }
 
-func (_s *ClusterSelect) sqlScan(ctx context.Context, root *ClusterQuery, v any) error {
+func (_s *ClusterSecuritySelect) sqlScan(ctx context.Context, root *ClusterSecurityQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {
