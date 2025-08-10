@@ -4,6 +4,11 @@ index.ts
 models/ApiV1ClusterCluster.ts
 models/ApiV1ClusterClusterSecurity.ts
 models/ApiV1ClusterListClustersResponse.ts
+models/ApiV1ClusterResolveKubeConfigRequest.ts
+models/ApiV1ClusterResolveKubeConfigResponse.ts
+models/ApiV1ClusterResolveKubeConfigResponseCluster.ts
+models/ApiV1ClusterResolveKubeConfigResponseContext.ts
+models/ApiV1ClusterResolveKubeConfigResponseUser.ts
 models/ApiV1CommonPagination.ts
 models/index.ts
 runtime.ts

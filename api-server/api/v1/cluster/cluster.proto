@@ -73,7 +73,7 @@ message Cluster {
   string name = 2 [
     (google.api.field_behavior) = REQUIRED,
     (validate.rules).string = {
-      pattern: "^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$",
+      pattern: "^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$",
       max_len:64
     }
   ];

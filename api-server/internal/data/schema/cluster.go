@@ -19,7 +19,7 @@ func (Cluster) Fields() []ent.Field {
 		field.String("name").
 			NotEmpty().
 			MaxLen(64).
-			Match(regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$")).
+			Match(regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$")).
 			Comment("集群名称"),
 		field.String("description").
 			Default("").

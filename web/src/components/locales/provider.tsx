@@ -11,16 +11,16 @@ const language = getBrowserLanguage();
 i18n.activate(language);
 
 export default function LocalesProvider(props: { children: ReactNode }) {
-  const { children } = props;
+    const { children } = props;
 
-  const [locales, setLocales] = useState<Locales>(language);
-  useEffect(() => {
-    i18n.activate(locales);
-  }, [locales]);
+    const [locales, setLocales] = useState<Locales>(language);
+    useEffect(() => {
+        i18n.activate(locales);
+    }, [locales]);
 
-  return (
-    <LocalesContext.Provider value={{ locales, setLocales }}>
-      <I18nProvider i18n={i18n}>{children}</I18nProvider>
-    </LocalesContext.Provider>
-  );
+    return (
+        <LocalesContext.Provider value={{ locales, setLocales }}>
+            <I18nProvider i18n={i18n}>{children}</I18nProvider>
+        </LocalesContext.Provider>
+    );
 }

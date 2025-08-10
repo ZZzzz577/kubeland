@@ -3,10 +3,10 @@ import { useContext } from "react";
 import { ThemeContext } from "@/components/theme/context.ts";
 
 export default function ThemeToggler() {
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
-  return isDarkMode ? (
-    <SunOutlined onClick={toggleTheme} className={"text-xl"} />
-  ) : (
-    <MoonOutlined onClick={toggleTheme} className={"text-xl"} />
-  );
+    const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+    return isDarkMode ? (
+        <SunOutlined onClick={toggleTheme} className={"text-xl"} />
+    ) : (
+        <MoonOutlined onClick={toggleTheme} className={"text-xl"} />
+    );
 }

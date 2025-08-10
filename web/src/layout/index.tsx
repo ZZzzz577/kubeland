@@ -10,27 +10,21 @@ import enUS from "antd/locale/en_US";
 import "dayjs/locale/zh-cn";
 
 export default function AppLayout() {
-  const [siderCollapsed, setSiderCollapsed] = useState(false);
-  const toggleSiderCollapsed = () => {
-    setSiderCollapsed((prev) => !prev);
-  };
-  const { currentTheme } = useContext(ThemeContext);
-  const { locales } = useContext(LocalesContext);
-  return (
-    <ConfigProvider
-      theme={currentTheme}
-      locale={locales === "zh" ? zhCN : enUS}
-    >
-      <Layout className={"min-h-screen"}>
-        <AppSider collapsed={siderCollapsed} />
-        <Layout>
-          <AppHeader
-            collapsed={siderCollapsed}
-            triggerCollapsed={toggleSiderCollapsed}
-          />
-          <AppContent />
-        </Layout>
-      </Layout>
-    </ConfigProvider>
-  );
+    const [siderCollapsed, setSiderCollapsed] = useState(false);
+    const toggleSiderCollapsed = () => {
+        setSiderCollapsed((prev) => !prev);
+    };
+    const { currentTheme } = useContext(ThemeContext);
+    const { locales } = useContext(LocalesContext);
+    return (
+        <ConfigProvider theme={currentTheme} locale={locales === "zh" ? zhCN : enUS}>
+            <Layout className={"min-h-screen"}>
+                <AppSider collapsed={siderCollapsed} />
+                <Layout>
+                    <AppHeader collapsed={siderCollapsed} triggerCollapsed={toggleSiderCollapsed} />
+                    <AppContent />
+                </Layout>
+            </Layout>
+        </ConfigProvider>
+    );
 }
