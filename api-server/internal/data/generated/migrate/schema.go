@@ -16,7 +16,6 @@ var (
 		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "name", Type: field.TypeString, Size: 64},
 		{Name: "description", Type: field.TypeString, Size: 1024, Default: ""},
-		{Name: "address", Type: field.TypeString, Size: 512},
 	}
 	// ClustersTable holds the schema information for the "clusters" table.
 	ClustersTable = &schema.Table{
@@ -31,12 +30,13 @@ var (
 			},
 		},
 	}
-	// ClusterSecuritiesColumns holds the columns for the "cluster_securities" table.
-	ClusterSecuritiesColumns = []*schema.Column{
+	// ClusterConnectionsColumns holds the columns for the "cluster_connections" table.
+	ClusterConnectionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "address", Type: field.TypeString, Size: 512},
 		{Name: "type", Type: field.TypeUint8},
 		{Name: "ca", Type: field.TypeString, Size: 2147483647, Default: ""},
 		{Name: "cert", Type: field.TypeString, Size: 2147483647, Default: ""},
@@ -44,34 +44,34 @@ var (
 		{Name: "token", Type: field.TypeString, Size: 2147483647, Default: ""},
 		{Name: "cluster_id", Type: field.TypeUint64, Unique: true},
 	}
-	// ClusterSecuritiesTable holds the schema information for the "cluster_securities" table.
-	ClusterSecuritiesTable = &schema.Table{
-		Name:       "cluster_securities",
-		Columns:    ClusterSecuritiesColumns,
-		PrimaryKey: []*schema.Column{ClusterSecuritiesColumns[0]},
+	// ClusterConnectionsTable holds the schema information for the "cluster_connections" table.
+	ClusterConnectionsTable = &schema.Table{
+		Name:       "cluster_connections",
+		Columns:    ClusterConnectionsColumns,
+		PrimaryKey: []*schema.Column{ClusterConnectionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "cluster_securities_clusters_security",
-				Columns:    []*schema.Column{ClusterSecuritiesColumns[9]},
+				Symbol:     "cluster_connections_clusters_connection",
+				Columns:    []*schema.Column{ClusterConnectionsColumns[10]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "clustersecurity_cluster_id",
+				Name:    "clusterconnection_cluster_id",
 				Unique:  false,
-				Columns: []*schema.Column{ClusterSecuritiesColumns[9]},
+				Columns: []*schema.Column{ClusterConnectionsColumns[10]},
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ClustersTable,
-		ClusterSecuritiesTable,
+		ClusterConnectionsTable,
 	}
 )
 
 func init() {
-	ClusterSecuritiesTable.ForeignKeys[0].RefTable = ClustersTable
+	ClusterConnectionsTable.ForeignKeys[0].RefTable = ClustersTable
 }

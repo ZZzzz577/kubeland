@@ -11,7 +11,6 @@ import (
 
 type ClusterService struct {
 	cluster.UnimplementedClusterServiceServer
-
 	clusterBiz *biz.ClusterBiz
 }
 
@@ -47,4 +46,8 @@ func (c *ClusterService) DeleteCluster(ctx context.Context, request *cluster.IdR
 
 func (c *ClusterService) ResolveKubeConfig(ctx context.Context, request *cluster.ResolveKubeConfigRequest) (*cluster.ResolveKubeConfigResponse, error) {
 	return c.clusterBiz.ResolveKubeConfig(ctx, request)
+}
+
+func (c *ClusterService) TestConnection(ctx context.Context, request *cluster.Connection) (*cluster.TestConnectionResponse, error) {
+	return c.clusterBiz.TestConnection(ctx, request)
 }

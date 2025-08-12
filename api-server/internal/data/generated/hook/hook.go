@@ -20,16 +20,16 @@ func (f ClusterFunc) Mutate(ctx context.Context, m generated.Mutation) (generate
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ClusterMutation", m)
 }
 
-// The ClusterSecurityFunc type is an adapter to allow the use of ordinary
-// function as ClusterSecurity mutator.
-type ClusterSecurityFunc func(context.Context, *generated.ClusterSecurityMutation) (generated.Value, error)
+// The ClusterConnectionFunc type is an adapter to allow the use of ordinary
+// function as ClusterConnection mutator.
+type ClusterConnectionFunc func(context.Context, *generated.ClusterConnectionMutation) (generated.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ClusterSecurityFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
-	if mv, ok := m.(*generated.ClusterSecurityMutation); ok {
+func (f ClusterConnectionFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	if mv, ok := m.(*generated.ClusterConnectionMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ClusterSecurityMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ClusterConnectionMutation", m)
 }
 
 // Condition is a hook condition function.

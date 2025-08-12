@@ -35,6 +35,160 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on Connection with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Connection) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Connection with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ConnectionMultiError, or
+// nil if none found.
+func (m *Connection) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Connection) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetAddress()) > 512 {
+		err := ConnectionValidationError{
+			field:  "Address",
+			reason: "value length must be at most 512 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if uri, err := url.Parse(m.GetAddress()); err != nil {
+		err = ConnectionValidationError{
+			field:  "Address",
+			reason: "value must be a valid URI",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	} else if !uri.IsAbs() {
+		err := ConnectionValidationError{
+			field:  "Address",
+			reason: "value must be absolute",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Ca
+
+	if _, ok := _Connection_Type_NotInLookup[m.GetType()]; ok {
+		err := ConnectionValidationError{
+			field:  "Type",
+			reason: "value must not be in list [UNSPECIFIED]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Cert
+
+	// no validation rules for Key
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return ConnectionMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConnectionMultiError is an error wrapping multiple validation errors
+// returned by Connection.ValidateAll() if the designated constraints aren't met.
+type ConnectionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConnectionMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConnectionMultiError) AllErrors() []error { return m }
+
+// ConnectionValidationError is the validation error returned by
+// Connection.Validate if the designated constraints aren't met.
+type ConnectionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConnectionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConnectionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConnectionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConnectionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConnectionValidationError) ErrorName() string { return "ConnectionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ConnectionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConnection.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConnectionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConnectionValidationError{}
+
+var _Connection_Type_NotInLookup = map[Connection_Type]struct{}{
+	0: {},
+}
+
 // Validate checks the field values on Cluster with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -72,7 +226,7 @@ func (m *Cluster) validate(all bool) error {
 	if !_Cluster_Name_Pattern.MatchString(m.GetName()) {
 		err := ClusterValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$\"",
+			reason: "value does not match regex pattern \"^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$\"",
 		}
 		if !all {
 			return err
@@ -91,44 +245,12 @@ func (m *Cluster) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetAddress()) > 512 {
-		err := ClusterValidationError{
-			field:  "Address",
-			reason: "value length must be at most 512 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if uri, err := url.Parse(m.GetAddress()); err != nil {
-		err = ClusterValidationError{
-			field:  "Address",
-			reason: "value must be a valid URI",
-			cause:  err,
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	} else if !uri.IsAbs() {
-		err := ClusterValidationError{
-			field:  "Address",
-			reason: "value must be absolute",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
-		switch v := interface{}(m.GetSecurity()).(type) {
+		switch v := interface{}(m.GetConnection()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, ClusterValidationError{
-					field:  "Security",
+					field:  "Connection",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -136,16 +258,16 @@ func (m *Cluster) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, ClusterValidationError{
-					field:  "Security",
+					field:  "Connection",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSecurity()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "Security",
+				field:  "Connection",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -287,7 +409,7 @@ var _ interface {
 	ErrorName() string
 } = ClusterValidationError{}
 
-var _Cluster_Name_Pattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]?$")
+var _Cluster_Name_Pattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$")
 
 // Validate checks the field values on ListClustersRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -926,61 +1048,44 @@ var _ interface {
 	ErrorName() string
 } = ResolveKubeConfigResponseValidationError{}
 
-// Validate checks the field values on Cluster_Security with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *Cluster_Security) Validate() error {
+// Validate checks the field values on TestConnectionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TestConnectionResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Cluster_Security with the rules
+// ValidateAll checks the field values on TestConnectionResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// Cluster_SecurityMultiError, or nil if none found.
-func (m *Cluster_Security) ValidateAll() error {
+// TestConnectionResponseMultiError, or nil if none found.
+func (m *TestConnectionResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Cluster_Security) validate(all bool) error {
+func (m *TestConnectionResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if _, ok := _Cluster_Security_Type_NotInLookup[m.GetType()]; ok {
-		err := Cluster_SecurityValidationError{
-			field:  "Type",
-			reason: "value must not be in list [UNSPECIFIED]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	// no validation rules for Ca
-
-	// no validation rules for Cert
-
-	// no validation rules for Key
-
-	// no validation rules for Token
+	// no validation rules for Version
 
 	if len(errors) > 0 {
-		return Cluster_SecurityMultiError(errors)
+		return TestConnectionResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// Cluster_SecurityMultiError is an error wrapping multiple validation errors
-// returned by Cluster_Security.ValidateAll() if the designated constraints
-// aren't met.
-type Cluster_SecurityMultiError []error
+// TestConnectionResponseMultiError is an error wrapping multiple validation
+// errors returned by TestConnectionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type TestConnectionResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m Cluster_SecurityMultiError) Error() string {
+func (m TestConnectionResponseMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -989,11 +1094,11 @@ func (m Cluster_SecurityMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m Cluster_SecurityMultiError) AllErrors() []error { return m }
+func (m TestConnectionResponseMultiError) AllErrors() []error { return m }
 
-// Cluster_SecurityValidationError is the validation error returned by
-// Cluster_Security.Validate if the designated constraints aren't met.
-type Cluster_SecurityValidationError struct {
+// TestConnectionResponseValidationError is the validation error returned by
+// TestConnectionResponse.Validate if the designated constraints aren't met.
+type TestConnectionResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1001,22 +1106,24 @@ type Cluster_SecurityValidationError struct {
 }
 
 // Field function returns field value.
-func (e Cluster_SecurityValidationError) Field() string { return e.field }
+func (e TestConnectionResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Cluster_SecurityValidationError) Reason() string { return e.reason }
+func (e TestConnectionResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Cluster_SecurityValidationError) Cause() error { return e.cause }
+func (e TestConnectionResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Cluster_SecurityValidationError) Key() bool { return e.key }
+func (e TestConnectionResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Cluster_SecurityValidationError) ErrorName() string { return "Cluster_SecurityValidationError" }
+func (e TestConnectionResponseValidationError) ErrorName() string {
+	return "TestConnectionResponseValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e Cluster_SecurityValidationError) Error() string {
+func (e TestConnectionResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1028,14 +1135,14 @@ func (e Cluster_SecurityValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCluster_Security.%s: %s%s",
+		"invalid %sTestConnectionResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Cluster_SecurityValidationError{}
+var _ error = TestConnectionResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -1043,11 +1150,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Cluster_SecurityValidationError{}
-
-var _Cluster_Security_Type_NotInLookup = map[Cluster_Security_Type]struct{}{
-	0: {},
-}
+} = TestConnectionResponseValidationError{}
 
 // Validate checks the field values on ResolveKubeConfigResponse_Cluster with
 // the rules defined in the proto definition for this message. If any rules

@@ -3,6 +3,7 @@ import AppLayout from "@/layout";
 import { Trans } from "@lingui/react/macro";
 import { KubernetesOutlined } from "@ant-design/icons";
 import ClusterModify from "@/views/cluster/modify";
+import ClusterList from "@/views/cluster/list";
 
 export const Cluster = (): Route => {
     return {
@@ -15,10 +16,11 @@ export const Cluster = (): Route => {
         children: [
             {
                 path: "",
-                element: <div>Cluster</div>,
+                element: <ClusterList />,
             },
             {
                 path: "create",
+                name: <Trans>create</Trans>,
                 element: <ClusterModify />,
             },
             {

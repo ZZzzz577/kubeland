@@ -4,7 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 	"fmt"
 	"strings"
 	"time"
@@ -28,8 +28,6 @@ type Cluster struct {
 	Name string `json:"name,omitempty"`
 	// 集群描述
 	Description string `json:"description,omitempty"`
-	// 集群地址
-	Address string `json:"address,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClusterQuery when eager-loading is set.
 	Edges        ClusterEdges `json:"edges"`
@@ -38,22 +36,22 @@ type Cluster struct {
 
 // ClusterEdges holds the relations/edges for other nodes in the graph.
 type ClusterEdges struct {
-	// Security holds the value of the security edge.
-	Security *ClusterSecurity `json:"security,omitempty"`
+	// Connection holds the value of the connection edge.
+	Connection *ClusterConnection `json:"connection,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// SecurityOrErr returns the Security value or an error if the edge
+// ConnectionOrErr returns the Connection value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClusterEdges) SecurityOrErr() (*ClusterSecurity, error) {
-	if e.Security != nil {
-		return e.Security, nil
+func (e ClusterEdges) ConnectionOrErr() (*ClusterConnection, error) {
+	if e.Connection != nil {
+		return e.Connection, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: clustersecurity.Label}
+		return nil, &NotFoundError{label: clusterconnection.Label}
 	}
-	return nil, &NotLoadedError{edge: "security"}
+	return nil, &NotLoadedError{edge: "connection"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -63,7 +61,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cluster.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cluster.FieldName, cluster.FieldDescription, cluster.FieldAddress:
+		case cluster.FieldName, cluster.FieldDescription:
 			values[i] = new(sql.NullString)
 		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeleteAt:
 			values[i] = new(sql.NullTime)
@@ -118,12 +116,6 @@ func (_m *Cluster) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Description = value.String
 			}
-		case cluster.FieldAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address", values[i])
-			} else if value.Valid {
-				_m.Address = value.String
-			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -137,9 +129,9 @@ func (_m *Cluster) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QuerySecurity queries the "security" edge of the Cluster entity.
-func (_m *Cluster) QuerySecurity() *ClusterSecurityQuery {
-	return NewClusterClient(_m.config).QuerySecurity(_m)
+// QueryConnection queries the "connection" edge of the Cluster entity.
+func (_m *Cluster) QueryConnection() *ClusterConnectionQuery {
+	return NewClusterClient(_m.config).QueryConnection(_m)
 }
 
 // Update returns a builder for updating this Cluster.
@@ -179,9 +171,6 @@ func (_m *Cluster) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)
-	builder.WriteString(", ")
-	builder.WriteString("address=")
-	builder.WriteString(_m.Address)
 	builder.WriteByte(')')
 	return builder.String()
 }

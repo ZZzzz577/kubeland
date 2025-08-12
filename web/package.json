@@ -11,7 +11,7 @@
         "format": "prettier --write .",
         "i18n:extract": "lingui extract",
         "i18n:compile": "lingui compile --typescript",
-        "codegen": "openapi-generator-cli generate -g typescript-fetch -i ../api-server/openapi.yaml -o src/generated"
+        "generate": "openapi-generator-cli generate -g typescript-fetch -i ../api-server/openapi.yaml -o src/generated"
     },
     "dependencies": {
         "@icon-park/react": "^1.4.2",

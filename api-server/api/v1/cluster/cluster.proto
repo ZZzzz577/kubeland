@@ -46,27 +46,40 @@ service ClusterService {
       body: "*"
     };
   }
+  rpc TestConnection(Connection) returns (TestConnectionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cluster/connection/test"
+      body: "*"
+    };
+  }
+}
+
+message Connection {
+  enum Type {
+    UNSPECIFIED = 0;
+    NONE = 1;
+    TLS_CERT = 2;
+    TLS_TOKEN = 3;
+  }
+
+  string address = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {
+      uri: true,
+      max_len:512
+    }
+  ];
+  string ca = 2;
+  Type type = 3[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).enum = {not_in: [0]}
+  ];
+  string cert = 4;
+  string key = 5;
+  string token = 6;
 }
 
 message Cluster {
-  message Security {
-    enum Type {
-      UNSPECIFIED = 0;
-      NONE = 1;
-      TLS_CERT = 2;
-      TLS_TOKEN = 3;
-    }
-
-    Type type = 1[
-      (google.api.field_behavior) = REQUIRED,
-      (validate.rules).enum = {not_in: [0]}
-    ];
-    string ca = 2;
-    string cert = 3;
-    string key = 4;
-    string token = 5;
-  }
-
   uint64 id = 1[
     (google.api.field_behavior) = IMMUTABLE
   ];
@@ -81,15 +94,8 @@ message Cluster {
     (google.api.field_behavior) = OPTIONAL,
     (validate.rules).string = {max_len:1024}
   ];
-  string address = 4 [
-    (google.api.field_behavior) = REQUIRED,
-    (validate.rules).string = {
-      uri: true,
-      max_len:512
-    }
-  ];
-  Security security = 5[
-    (google.api.field_behavior) = OPTIONAL
+  Connection connection = 5[
+    (google.api.field_behavior) = REQUIRED
   ];
   google.protobuf.Timestamp created_at = 100[
     (google.api.field_behavior) = OUTPUT_ONLY
@@ -142,4 +148,8 @@ message ResolveKubeConfigResponse {
   }
 
   repeated Context items = 1;
+}
+
+message TestConnectionResponse {
+  string version = 1;
 }

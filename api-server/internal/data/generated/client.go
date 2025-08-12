@@ -12,7 +12,7 @@ import (
 	"api-server/internal/data/generated/migrate"
 
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -27,8 +27,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Cluster is the client for interacting with the Cluster builders.
 	Cluster *ClusterClient
-	// ClusterSecurity is the client for interacting with the ClusterSecurity builders.
-	ClusterSecurity *ClusterSecurityClient
+	// ClusterConnection is the client for interacting with the ClusterConnection builders.
+	ClusterConnection *ClusterConnectionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -41,7 +41,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Cluster = NewClusterClient(c.config)
-	c.ClusterSecurity = NewClusterSecurityClient(c.config)
+	c.ClusterConnection = NewClusterConnectionClient(c.config)
 }
 
 type (
@@ -132,10 +132,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		Cluster:         NewClusterClient(cfg),
-		ClusterSecurity: NewClusterSecurityClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		Cluster:           NewClusterClient(cfg),
+		ClusterConnection: NewClusterConnectionClient(cfg),
 	}, nil
 }
 
@@ -153,10 +153,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		Cluster:         NewClusterClient(cfg),
-		ClusterSecurity: NewClusterSecurityClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		Cluster:           NewClusterClient(cfg),
+		ClusterConnection: NewClusterConnectionClient(cfg),
 	}, nil
 }
 
@@ -186,14 +186,14 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Cluster.Use(hooks...)
-	c.ClusterSecurity.Use(hooks...)
+	c.ClusterConnection.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Cluster.Intercept(interceptors...)
-	c.ClusterSecurity.Intercept(interceptors...)
+	c.ClusterConnection.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -201,8 +201,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ClusterMutation:
 		return c.Cluster.mutate(ctx, m)
-	case *ClusterSecurityMutation:
-		return c.ClusterSecurity.mutate(ctx, m)
+	case *ClusterConnectionMutation:
+		return c.ClusterConnection.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("generated: unknown mutation type %T", m)
 	}
@@ -316,15 +316,15 @@ func (c *ClusterClient) GetX(ctx context.Context, id uint64) *Cluster {
 	return obj
 }
 
-// QuerySecurity queries the security edge of a Cluster.
-func (c *ClusterClient) QuerySecurity(_m *Cluster) *ClusterSecurityQuery {
-	query := (&ClusterSecurityClient{config: c.config}).Query()
+// QueryConnection queries the connection edge of a Cluster.
+func (c *ClusterClient) QueryConnection(_m *Cluster) *ClusterConnectionQuery {
+	query := (&ClusterConnectionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(clustersecurity.Table, clustersecurity.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, cluster.SecurityTable, cluster.SecurityColumn),
+			sqlgraph.To(clusterconnection.Table, clusterconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, cluster.ConnectionTable, cluster.ConnectionColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -359,107 +359,107 @@ func (c *ClusterClient) mutate(ctx context.Context, m *ClusterMutation) (Value, 
 	}
 }
 
-// ClusterSecurityClient is a client for the ClusterSecurity schema.
-type ClusterSecurityClient struct {
+// ClusterConnectionClient is a client for the ClusterConnection schema.
+type ClusterConnectionClient struct {
 	config
 }
 
-// NewClusterSecurityClient returns a client for the ClusterSecurity from the given config.
-func NewClusterSecurityClient(c config) *ClusterSecurityClient {
-	return &ClusterSecurityClient{config: c}
+// NewClusterConnectionClient returns a client for the ClusterConnection from the given config.
+func NewClusterConnectionClient(c config) *ClusterConnectionClient {
+	return &ClusterConnectionClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `clustersecurity.Hooks(f(g(h())))`.
-func (c *ClusterSecurityClient) Use(hooks ...Hook) {
-	c.hooks.ClusterSecurity = append(c.hooks.ClusterSecurity, hooks...)
+// A call to `Use(f, g, h)` equals to `clusterconnection.Hooks(f(g(h())))`.
+func (c *ClusterConnectionClient) Use(hooks ...Hook) {
+	c.hooks.ClusterConnection = append(c.hooks.ClusterConnection, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `clustersecurity.Intercept(f(g(h())))`.
-func (c *ClusterSecurityClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ClusterSecurity = append(c.inters.ClusterSecurity, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `clusterconnection.Intercept(f(g(h())))`.
+func (c *ClusterConnectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ClusterConnection = append(c.inters.ClusterConnection, interceptors...)
 }
 
-// Create returns a builder for creating a ClusterSecurity entity.
-func (c *ClusterSecurityClient) Create() *ClusterSecurityCreate {
-	mutation := newClusterSecurityMutation(c.config, OpCreate)
-	return &ClusterSecurityCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ClusterConnection entity.
+func (c *ClusterConnectionClient) Create() *ClusterConnectionCreate {
+	mutation := newClusterConnectionMutation(c.config, OpCreate)
+	return &ClusterConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ClusterSecurity entities.
-func (c *ClusterSecurityClient) CreateBulk(builders ...*ClusterSecurityCreate) *ClusterSecurityCreateBulk {
-	return &ClusterSecurityCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ClusterConnection entities.
+func (c *ClusterConnectionClient) CreateBulk(builders ...*ClusterConnectionCreate) *ClusterConnectionCreateBulk {
+	return &ClusterConnectionCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *ClusterSecurityClient) MapCreateBulk(slice any, setFunc func(*ClusterSecurityCreate, int)) *ClusterSecurityCreateBulk {
+func (c *ClusterConnectionClient) MapCreateBulk(slice any, setFunc func(*ClusterConnectionCreate, int)) *ClusterConnectionCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &ClusterSecurityCreateBulk{err: fmt.Errorf("calling to ClusterSecurityClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ClusterConnectionCreateBulk{err: fmt.Errorf("calling to ClusterConnectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*ClusterSecurityCreate, rv.Len())
+	builders := make([]*ClusterConnectionCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &ClusterSecurityCreateBulk{config: c.config, builders: builders}
+	return &ClusterConnectionCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ClusterSecurity.
-func (c *ClusterSecurityClient) Update() *ClusterSecurityUpdate {
-	mutation := newClusterSecurityMutation(c.config, OpUpdate)
-	return &ClusterSecurityUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ClusterConnection.
+func (c *ClusterConnectionClient) Update() *ClusterConnectionUpdate {
+	mutation := newClusterConnectionMutation(c.config, OpUpdate)
+	return &ClusterConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ClusterSecurityClient) UpdateOne(_m *ClusterSecurity) *ClusterSecurityUpdateOne {
-	mutation := newClusterSecurityMutation(c.config, OpUpdateOne, withClusterSecurity(_m))
-	return &ClusterSecurityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ClusterConnectionClient) UpdateOne(_m *ClusterConnection) *ClusterConnectionUpdateOne {
+	mutation := newClusterConnectionMutation(c.config, OpUpdateOne, withClusterConnection(_m))
+	return &ClusterConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ClusterSecurityClient) UpdateOneID(id uint64) *ClusterSecurityUpdateOne {
-	mutation := newClusterSecurityMutation(c.config, OpUpdateOne, withClusterSecurityID(id))
-	return &ClusterSecurityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ClusterConnectionClient) UpdateOneID(id uint64) *ClusterConnectionUpdateOne {
+	mutation := newClusterConnectionMutation(c.config, OpUpdateOne, withClusterConnectionID(id))
+	return &ClusterConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ClusterSecurity.
-func (c *ClusterSecurityClient) Delete() *ClusterSecurityDelete {
-	mutation := newClusterSecurityMutation(c.config, OpDelete)
-	return &ClusterSecurityDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ClusterConnection.
+func (c *ClusterConnectionClient) Delete() *ClusterConnectionDelete {
+	mutation := newClusterConnectionMutation(c.config, OpDelete)
+	return &ClusterConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ClusterSecurityClient) DeleteOne(_m *ClusterSecurity) *ClusterSecurityDeleteOne {
+func (c *ClusterConnectionClient) DeleteOne(_m *ClusterConnection) *ClusterConnectionDeleteOne {
 	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ClusterSecurityClient) DeleteOneID(id uint64) *ClusterSecurityDeleteOne {
-	builder := c.Delete().Where(clustersecurity.ID(id))
+func (c *ClusterConnectionClient) DeleteOneID(id uint64) *ClusterConnectionDeleteOne {
+	builder := c.Delete().Where(clusterconnection.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ClusterSecurityDeleteOne{builder}
+	return &ClusterConnectionDeleteOne{builder}
 }
 
-// Query returns a query builder for ClusterSecurity.
-func (c *ClusterSecurityClient) Query() *ClusterSecurityQuery {
-	return &ClusterSecurityQuery{
+// Query returns a query builder for ClusterConnection.
+func (c *ClusterConnectionClient) Query() *ClusterConnectionQuery {
+	return &ClusterConnectionQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeClusterSecurity},
+		ctx:    &QueryContext{Type: TypeClusterConnection},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ClusterSecurity entity by its id.
-func (c *ClusterSecurityClient) Get(ctx context.Context, id uint64) (*ClusterSecurity, error) {
-	return c.Query().Where(clustersecurity.ID(id)).Only(ctx)
+// Get returns a ClusterConnection entity by its id.
+func (c *ClusterConnectionClient) Get(ctx context.Context, id uint64) (*ClusterConnection, error) {
+	return c.Query().Where(clusterconnection.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ClusterSecurityClient) GetX(ctx context.Context, id uint64) *ClusterSecurity {
+func (c *ClusterConnectionClient) GetX(ctx context.Context, id uint64) *ClusterConnection {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -467,15 +467,15 @@ func (c *ClusterSecurityClient) GetX(ctx context.Context, id uint64) *ClusterSec
 	return obj
 }
 
-// QueryCluster queries the cluster edge of a ClusterSecurity.
-func (c *ClusterSecurityClient) QueryCluster(_m *ClusterSecurity) *ClusterQuery {
+// QueryCluster queries the cluster edge of a ClusterConnection.
+func (c *ClusterConnectionClient) QueryCluster(_m *ClusterConnection) *ClusterQuery {
 	query := (&ClusterClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(clustersecurity.Table, clustersecurity.FieldID, id),
+			sqlgraph.From(clusterconnection.Table, clusterconnection.FieldID, id),
 			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, clustersecurity.ClusterTable, clustersecurity.ClusterColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, clusterconnection.ClusterTable, clusterconnection.ClusterColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -484,38 +484,38 @@ func (c *ClusterSecurityClient) QueryCluster(_m *ClusterSecurity) *ClusterQuery 
 }
 
 // Hooks returns the client hooks.
-func (c *ClusterSecurityClient) Hooks() []Hook {
-	hooks := c.hooks.ClusterSecurity
-	return append(hooks[:len(hooks):len(hooks)], clustersecurity.Hooks[:]...)
+func (c *ClusterConnectionClient) Hooks() []Hook {
+	hooks := c.hooks.ClusterConnection
+	return append(hooks[:len(hooks):len(hooks)], clusterconnection.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *ClusterSecurityClient) Interceptors() []Interceptor {
-	inters := c.inters.ClusterSecurity
-	return append(inters[:len(inters):len(inters)], clustersecurity.Interceptors[:]...)
+func (c *ClusterConnectionClient) Interceptors() []Interceptor {
+	inters := c.inters.ClusterConnection
+	return append(inters[:len(inters):len(inters)], clusterconnection.Interceptors[:]...)
 }
 
-func (c *ClusterSecurityClient) mutate(ctx context.Context, m *ClusterSecurityMutation) (Value, error) {
+func (c *ClusterConnectionClient) mutate(ctx context.Context, m *ClusterConnectionMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ClusterSecurityCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClusterConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ClusterSecurityUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClusterConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ClusterSecurityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClusterConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ClusterSecurityDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ClusterConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("generated: unknown ClusterSecurity mutation op: %q", m.Op())
+		return nil, fmt.Errorf("generated: unknown ClusterConnection mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Cluster, ClusterSecurity []ent.Hook
+		Cluster, ClusterConnection []ent.Hook
 	}
 	inters struct {
-		Cluster, ClusterSecurity []ent.Interceptor
+		Cluster, ClusterConnection []ent.Interceptor
 	}
 )

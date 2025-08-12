@@ -4,7 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 	"fmt"
 	"strings"
 	"time"
@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// ClusterSecurity is the model entity for the ClusterSecurity schema.
-type ClusterSecurity struct {
+// ClusterConnection is the model entity for the ClusterConnection schema.
+type ClusterConnection struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
@@ -26,6 +26,8 @@ type ClusterSecurity struct {
 	DeleteAt time.Time `json:"delete_at,omitempty"`
 	// 集群ID
 	ClusterID uint64 `json:"cluster_id,omitempty"`
+	// 集群地址
+	Address string `json:"address,omitempty"`
 	// 连接类型
 	Type uint8 `json:"type,omitempty"`
 	// CA证书
@@ -37,13 +39,13 @@ type ClusterSecurity struct {
 	// token
 	Token string `json:"token,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ClusterSecurityQuery when eager-loading is set.
-	Edges        ClusterSecurityEdges `json:"edges"`
+	// The values are being populated by the ClusterConnectionQuery when eager-loading is set.
+	Edges        ClusterConnectionEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// ClusterSecurityEdges holds the relations/edges for other nodes in the graph.
-type ClusterSecurityEdges struct {
+// ClusterConnectionEdges holds the relations/edges for other nodes in the graph.
+type ClusterConnectionEdges struct {
 	// Cluster holds the value of the cluster edge.
 	Cluster *Cluster `json:"cluster,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -53,7 +55,7 @@ type ClusterSecurityEdges struct {
 
 // ClusterOrErr returns the Cluster value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClusterSecurityEdges) ClusterOrErr() (*Cluster, error) {
+func (e ClusterConnectionEdges) ClusterOrErr() (*Cluster, error) {
 	if e.Cluster != nil {
 		return e.Cluster, nil
 	} else if e.loadedTypes[0] {
@@ -63,15 +65,15 @@ func (e ClusterSecurityEdges) ClusterOrErr() (*Cluster, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*ClusterSecurity) scanValues(columns []string) ([]any, error) {
+func (*ClusterConnection) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case clustersecurity.FieldID, clustersecurity.FieldClusterID, clustersecurity.FieldType:
+		case clusterconnection.FieldID, clusterconnection.FieldClusterID, clusterconnection.FieldType:
 			values[i] = new(sql.NullInt64)
-		case clustersecurity.FieldCa, clustersecurity.FieldCert, clustersecurity.FieldKey, clustersecurity.FieldToken:
+		case clusterconnection.FieldAddress, clusterconnection.FieldCa, clusterconnection.FieldCert, clusterconnection.FieldKey, clusterconnection.FieldToken:
 			values[i] = new(sql.NullString)
-		case clustersecurity.FieldCreatedAt, clustersecurity.FieldUpdatedAt, clustersecurity.FieldDeleteAt:
+		case clusterconnection.FieldCreatedAt, clusterconnection.FieldUpdatedAt, clusterconnection.FieldDeleteAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -81,68 +83,74 @@ func (*ClusterSecurity) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the ClusterSecurity fields.
-func (_m *ClusterSecurity) assignValues(columns []string, values []any) error {
+// to the ClusterConnection fields.
+func (_m *ClusterConnection) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case clustersecurity.FieldID:
+		case clusterconnection.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = uint64(value.Int64)
-		case clustersecurity.FieldCreatedAt:
+		case clusterconnection.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
 			}
-		case clustersecurity.FieldUpdatedAt:
+		case clusterconnection.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case clustersecurity.FieldDeleteAt:
+		case clusterconnection.FieldDeleteAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_at", values[i])
 			} else if value.Valid {
 				_m.DeleteAt = value.Time
 			}
-		case clustersecurity.FieldClusterID:
+		case clusterconnection.FieldClusterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field cluster_id", values[i])
 			} else if value.Valid {
 				_m.ClusterID = uint64(value.Int64)
 			}
-		case clustersecurity.FieldType:
+		case clusterconnection.FieldAddress:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field address", values[i])
+			} else if value.Valid {
+				_m.Address = value.String
+			}
+		case clusterconnection.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				_m.Type = uint8(value.Int64)
 			}
-		case clustersecurity.FieldCa:
+		case clusterconnection.FieldCa:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ca", values[i])
 			} else if value.Valid {
 				_m.Ca = value.String
 			}
-		case clustersecurity.FieldCert:
+		case clusterconnection.FieldCert:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field cert", values[i])
 			} else if value.Valid {
 				_m.Cert = value.String
 			}
-		case clustersecurity.FieldKey:
+		case clusterconnection.FieldKey:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field key", values[i])
 			} else if value.Valid {
 				_m.Key = value.String
 			}
-		case clustersecurity.FieldToken:
+		case clusterconnection.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
@@ -155,39 +163,39 @@ func (_m *ClusterSecurity) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the ClusterSecurity.
+// Value returns the ent.Value that was dynamically selected and assigned to the ClusterConnection.
 // This includes values selected through modifiers, order, etc.
-func (_m *ClusterSecurity) Value(name string) (ent.Value, error) {
+func (_m *ClusterConnection) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryCluster queries the "cluster" edge of the ClusterSecurity entity.
-func (_m *ClusterSecurity) QueryCluster() *ClusterQuery {
-	return NewClusterSecurityClient(_m.config).QueryCluster(_m)
+// QueryCluster queries the "cluster" edge of the ClusterConnection entity.
+func (_m *ClusterConnection) QueryCluster() *ClusterQuery {
+	return NewClusterConnectionClient(_m.config).QueryCluster(_m)
 }
 
-// Update returns a builder for updating this ClusterSecurity.
-// Note that you need to call ClusterSecurity.Unwrap() before calling this method if this ClusterSecurity
+// Update returns a builder for updating this ClusterConnection.
+// Note that you need to call ClusterConnection.Unwrap() before calling this method if this ClusterConnection
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (_m *ClusterSecurity) Update() *ClusterSecurityUpdateOne {
-	return NewClusterSecurityClient(_m.config).UpdateOne(_m)
+func (_m *ClusterConnection) Update() *ClusterConnectionUpdateOne {
+	return NewClusterConnectionClient(_m.config).UpdateOne(_m)
 }
 
-// Unwrap unwraps the ClusterSecurity entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the ClusterConnection entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (_m *ClusterSecurity) Unwrap() *ClusterSecurity {
+func (_m *ClusterConnection) Unwrap() *ClusterConnection {
 	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
-		panic("generated: ClusterSecurity is not a transactional entity")
+		panic("generated: ClusterConnection is not a transactional entity")
 	}
 	_m.config.driver = _tx.drv
 	return _m
 }
 
 // String implements the fmt.Stringer.
-func (_m *ClusterSecurity) String() string {
+func (_m *ClusterConnection) String() string {
 	var builder strings.Builder
-	builder.WriteString("ClusterSecurity(")
+	builder.WriteString("ClusterConnection(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
@@ -200,6 +208,9 @@ func (_m *ClusterSecurity) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("cluster_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ClusterID))
+	builder.WriteString(", ")
+	builder.WriteString("address=")
+	builder.WriteString(_m.Address)
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Type))
@@ -219,5 +230,5 @@ func (_m *ClusterSecurity) String() string {
 	return builder.String()
 }
 
-// ClusterSecurities is a parsable slice of ClusterSecurity.
-type ClusterSecurities []*ClusterSecurity
+// ClusterConnections is a parsable slice of ClusterConnection.
+type ClusterConnections []*ClusterConnection

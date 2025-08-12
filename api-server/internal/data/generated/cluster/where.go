@@ -80,11 +80,6 @@ func Description(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldDescription, v))
 }
 
-// Address applies equality check predicate on the "address" field. It's identical to AddressEQ.
-func Address(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEQ(FieldAddress, v))
-}
-
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldCreatedAt, v))
@@ -345,86 +340,21 @@ func DescriptionContainsFold(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// AddressEQ applies the EQ predicate on the "address" field.
-func AddressEQ(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEQ(FieldAddress, v))
-}
-
-// AddressNEQ applies the NEQ predicate on the "address" field.
-func AddressNEQ(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldNEQ(FieldAddress, v))
-}
-
-// AddressIn applies the In predicate on the "address" field.
-func AddressIn(vs ...string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldIn(FieldAddress, vs...))
-}
-
-// AddressNotIn applies the NotIn predicate on the "address" field.
-func AddressNotIn(vs ...string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldNotIn(FieldAddress, vs...))
-}
-
-// AddressGT applies the GT predicate on the "address" field.
-func AddressGT(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldGT(FieldAddress, v))
-}
-
-// AddressGTE applies the GTE predicate on the "address" field.
-func AddressGTE(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldGTE(FieldAddress, v))
-}
-
-// AddressLT applies the LT predicate on the "address" field.
-func AddressLT(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldLT(FieldAddress, v))
-}
-
-// AddressLTE applies the LTE predicate on the "address" field.
-func AddressLTE(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldLTE(FieldAddress, v))
-}
-
-// AddressContains applies the Contains predicate on the "address" field.
-func AddressContains(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldContains(FieldAddress, v))
-}
-
-// AddressHasPrefix applies the HasPrefix predicate on the "address" field.
-func AddressHasPrefix(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldHasPrefix(FieldAddress, v))
-}
-
-// AddressHasSuffix applies the HasSuffix predicate on the "address" field.
-func AddressHasSuffix(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldHasSuffix(FieldAddress, v))
-}
-
-// AddressEqualFold applies the EqualFold predicate on the "address" field.
-func AddressEqualFold(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEqualFold(FieldAddress, v))
-}
-
-// AddressContainsFold applies the ContainsFold predicate on the "address" field.
-func AddressContainsFold(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldContainsFold(FieldAddress, v))
-}
-
-// HasSecurity applies the HasEdge predicate on the "security" edge.
-func HasSecurity() predicate.Cluster {
+// HasConnection applies the HasEdge predicate on the "connection" edge.
+func HasConnection() predicate.Cluster {
 	return predicate.Cluster(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, SecurityTable, SecurityColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, ConnectionTable, ConnectionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSecurityWith applies the HasEdge predicate on the "security" edge with a given conditions (other predicates).
-func HasSecurityWith(preds ...predicate.ClusterSecurity) predicate.Cluster {
+// HasConnectionWith applies the HasEdge predicate on the "connection" edge with a given conditions (other predicates).
+func HasConnectionWith(preds ...predicate.ClusterConnection) predicate.Cluster {
 	return predicate.Cluster(func(s *sql.Selector) {
-		step := newSecurityStep()
+		step := newConnectionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -9,5 +9,5 @@ import (
 // Cluster is the predicate function for cluster builders.
 type Cluster func(*sql.Selector)
 
-// ClusterSecurity is the predicate function for clustersecurity builders.
-type ClusterSecurity func(*sql.Selector)
+// ClusterConnection is the predicate function for clusterconnection builders.
+type ClusterConnection func(*sql.Selector)

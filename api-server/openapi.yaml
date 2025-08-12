@@ -43,6 +43,24 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/cluster/connection/test:
+        post:
+            tags:
+                - ClusterService
+            operationId: ClusterService_TestConnection
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.cluster.Connection'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.cluster.TestConnectionResponse'
     /api/v1/cluster/kube/config:
         post:
             tags:
@@ -118,7 +136,7 @@ components:
         api.v1.cluster.Cluster:
             required:
                 - name
-                - address
+                - connection
             type: object
             properties:
                 id:
@@ -127,10 +145,8 @@ components:
                     type: string
                 description:
                     type: string
-                address:
-                    type: string
-                security:
-                    $ref: '#/components/schemas/api.v1.cluster.Cluster_Security'
+                connection:
+                    $ref: '#/components/schemas/api.v1.cluster.Connection'
                 createdAt:
                     readOnly: true
                     type: string
@@ -139,16 +155,24 @@ components:
                     readOnly: true
                     type: string
                     format: date-time
-        api.v1.cluster.Cluster_Security:
+        api.v1.cluster.Connection:
             required:
+                - address
                 - type
             type: object
             properties:
-                type:
-                    type: integer
-                    format: enum
+                address:
+                    type: string
                 ca:
                     type: string
+                type:
+                    enum:
+                        - UNSPECIFIED
+                        - NONE
+                        - TLS_CERT
+                        - TLS_TOKEN
+                    type: string
+                    format: enum
                 cert:
                     type: string
                 key:
@@ -206,6 +230,11 @@ components:
                 cert:
                     type: string
                 key:
+                    type: string
+        api.v1.cluster.TestConnectionResponse:
+            type: object
+            properties:
+                version:
                     type: string
         api.v1.common.Pagination:
             type: object

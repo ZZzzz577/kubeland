@@ -42,7 +42,7 @@ api:
  	       --go_out=paths=source_relative:./api \
  	       --go-http_out=paths=source_relative:./api \
  	       --go-grpc_out=paths=source_relative:./api \
-	       --openapi_out=fq_schema_naming=true,default_response=false:. \
+	       --openapi_out=fq_schema_naming=true,default_response=false,enum_type=string:. \
 		   --validate_out=paths=source_relative,lang=go:./api \
 	       $(API_PROTO_FILES)
 

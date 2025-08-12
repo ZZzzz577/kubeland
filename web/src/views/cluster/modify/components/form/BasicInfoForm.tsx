@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Form, Input } from "antd";
 
-export default function ClusterModifyFormBasic() {
+export default function BasicInfoForm() {
     const { t } = useLingui();
     const { Item } = Form;
     return (

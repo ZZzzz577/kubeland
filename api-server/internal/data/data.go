@@ -37,11 +37,13 @@ func NewData(config *conf.Bootstrap) (*Data, func(), error) {
 	client := generated.NewClient(generated.Driver(drv))
 	cleanUp := func() {
 		log.Info().Msg("closing the data resources")
-		client.Close()
+		_ = client.Close()
 	}
 	err = client.Schema.Create(
 		context.Background(),
 		migrate.WithForeignKeys(false),
+		migrate.WithDropColumn(true),
+		migrate.WithDropIndex(true),
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed creating schema resources")

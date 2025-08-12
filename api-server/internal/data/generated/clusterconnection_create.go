@@ -4,7 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 	"context"
 	"errors"
 	"fmt"
@@ -14,21 +14,21 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ClusterSecurityCreate is the builder for creating a ClusterSecurity entity.
-type ClusterSecurityCreate struct {
+// ClusterConnectionCreate is the builder for creating a ClusterConnection entity.
+type ClusterConnectionCreate struct {
 	config
-	mutation *ClusterSecurityMutation
+	mutation *ClusterConnectionMutation
 	hooks    []Hook
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (_c *ClusterSecurityCreate) SetCreatedAt(v time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetCreatedAt(v time.Time) *ClusterConnectionCreate {
 	_c.mutation.SetCreatedAt(v)
 	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableCreatedAt(v *time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableCreatedAt(v *time.Time) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetCreatedAt(*v)
 	}
@@ -36,13 +36,13 @@ func (_c *ClusterSecurityCreate) SetNillableCreatedAt(v *time.Time) *ClusterSecu
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (_c *ClusterSecurityCreate) SetUpdatedAt(v time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetUpdatedAt(v time.Time) *ClusterConnectionCreate {
 	_c.mutation.SetUpdatedAt(v)
 	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableUpdatedAt(v *time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableUpdatedAt(v *time.Time) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetUpdatedAt(*v)
 	}
@@ -50,13 +50,13 @@ func (_c *ClusterSecurityCreate) SetNillableUpdatedAt(v *time.Time) *ClusterSecu
 }
 
 // SetDeleteAt sets the "delete_at" field.
-func (_c *ClusterSecurityCreate) SetDeleteAt(v time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetDeleteAt(v time.Time) *ClusterConnectionCreate {
 	_c.mutation.SetDeleteAt(v)
 	return _c
 }
 
 // SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableDeleteAt(v *time.Time) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableDeleteAt(v *time.Time) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetDeleteAt(*v)
 	}
@@ -64,25 +64,31 @@ func (_c *ClusterSecurityCreate) SetNillableDeleteAt(v *time.Time) *ClusterSecur
 }
 
 // SetClusterID sets the "cluster_id" field.
-func (_c *ClusterSecurityCreate) SetClusterID(v uint64) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetClusterID(v uint64) *ClusterConnectionCreate {
 	_c.mutation.SetClusterID(v)
 	return _c
 }
 
+// SetAddress sets the "address" field.
+func (_c *ClusterConnectionCreate) SetAddress(v string) *ClusterConnectionCreate {
+	_c.mutation.SetAddress(v)
+	return _c
+}
+
 // SetType sets the "type" field.
-func (_c *ClusterSecurityCreate) SetType(v uint8) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetType(v uint8) *ClusterConnectionCreate {
 	_c.mutation.SetType(v)
 	return _c
 }
 
 // SetCa sets the "ca" field.
-func (_c *ClusterSecurityCreate) SetCa(v string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetCa(v string) *ClusterConnectionCreate {
 	_c.mutation.SetCa(v)
 	return _c
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableCa(v *string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableCa(v *string) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetCa(*v)
 	}
@@ -90,13 +96,13 @@ func (_c *ClusterSecurityCreate) SetNillableCa(v *string) *ClusterSecurityCreate
 }
 
 // SetCert sets the "cert" field.
-func (_c *ClusterSecurityCreate) SetCert(v string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetCert(v string) *ClusterConnectionCreate {
 	_c.mutation.SetCert(v)
 	return _c
 }
 
 // SetNillableCert sets the "cert" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableCert(v *string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableCert(v *string) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetCert(*v)
 	}
@@ -104,13 +110,13 @@ func (_c *ClusterSecurityCreate) SetNillableCert(v *string) *ClusterSecurityCrea
 }
 
 // SetKey sets the "key" field.
-func (_c *ClusterSecurityCreate) SetKey(v string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetKey(v string) *ClusterConnectionCreate {
 	_c.mutation.SetKey(v)
 	return _c
 }
 
 // SetNillableKey sets the "key" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableKey(v *string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableKey(v *string) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetKey(*v)
 	}
@@ -118,13 +124,13 @@ func (_c *ClusterSecurityCreate) SetNillableKey(v *string) *ClusterSecurityCreat
 }
 
 // SetToken sets the "token" field.
-func (_c *ClusterSecurityCreate) SetToken(v string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetToken(v string) *ClusterConnectionCreate {
 	_c.mutation.SetToken(v)
 	return _c
 }
 
 // SetNillableToken sets the "token" field if the given value is not nil.
-func (_c *ClusterSecurityCreate) SetNillableToken(v *string) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetNillableToken(v *string) *ClusterConnectionCreate {
 	if v != nil {
 		_c.SetToken(*v)
 	}
@@ -132,17 +138,17 @@ func (_c *ClusterSecurityCreate) SetNillableToken(v *string) *ClusterSecurityCre
 }
 
 // SetCluster sets the "cluster" edge to the Cluster entity.
-func (_c *ClusterSecurityCreate) SetCluster(v *Cluster) *ClusterSecurityCreate {
+func (_c *ClusterConnectionCreate) SetCluster(v *Cluster) *ClusterConnectionCreate {
 	return _c.SetClusterID(v.ID)
 }
 
-// Mutation returns the ClusterSecurityMutation object of the builder.
-func (_c *ClusterSecurityCreate) Mutation() *ClusterSecurityMutation {
+// Mutation returns the ClusterConnectionMutation object of the builder.
+func (_c *ClusterConnectionCreate) Mutation() *ClusterConnectionMutation {
 	return _c.mutation
 }
 
-// Save creates the ClusterSecurity in the database.
-func (_c *ClusterSecurityCreate) Save(ctx context.Context) (*ClusterSecurity, error) {
+// Save creates the ClusterConnection in the database.
+func (_c *ClusterConnectionCreate) Save(ctx context.Context) (*ClusterConnection, error) {
 	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
@@ -150,7 +156,7 @@ func (_c *ClusterSecurityCreate) Save(ctx context.Context) (*ClusterSecurity, er
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (_c *ClusterSecurityCreate) SaveX(ctx context.Context) *ClusterSecurity {
+func (_c *ClusterConnectionCreate) SaveX(ctx context.Context) *ClusterConnection {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -159,86 +165,94 @@ func (_c *ClusterSecurityCreate) SaveX(ctx context.Context) *ClusterSecurity {
 }
 
 // Exec executes the query.
-func (_c *ClusterSecurityCreate) Exec(ctx context.Context) error {
+func (_c *ClusterConnectionCreate) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *ClusterSecurityCreate) ExecX(ctx context.Context) {
+func (_c *ClusterConnectionCreate) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *ClusterSecurityCreate) defaults() error {
+func (_c *ClusterConnectionCreate) defaults() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if clustersecurity.DefaultCreatedAt == nil {
-			return fmt.Errorf("generated: uninitialized clustersecurity.DefaultCreatedAt (forgotten import generated/runtime?)")
+		if clusterconnection.DefaultCreatedAt == nil {
+			return fmt.Errorf("generated: uninitialized clusterconnection.DefaultCreatedAt (forgotten import generated/runtime?)")
 		}
-		v := clustersecurity.DefaultCreatedAt()
+		v := clusterconnection.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		if clustersecurity.DefaultUpdatedAt == nil {
-			return fmt.Errorf("generated: uninitialized clustersecurity.DefaultUpdatedAt (forgotten import generated/runtime?)")
+		if clusterconnection.DefaultUpdatedAt == nil {
+			return fmt.Errorf("generated: uninitialized clusterconnection.DefaultUpdatedAt (forgotten import generated/runtime?)")
 		}
-		v := clustersecurity.DefaultUpdatedAt()
+		v := clusterconnection.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := _c.mutation.Ca(); !ok {
-		v := clustersecurity.DefaultCa
+		v := clusterconnection.DefaultCa
 		_c.mutation.SetCa(v)
 	}
 	if _, ok := _c.mutation.Cert(); !ok {
-		v := clustersecurity.DefaultCert
+		v := clusterconnection.DefaultCert
 		_c.mutation.SetCert(v)
 	}
 	if _, ok := _c.mutation.Key(); !ok {
-		v := clustersecurity.DefaultKey
+		v := clusterconnection.DefaultKey
 		_c.mutation.SetKey(v)
 	}
 	if _, ok := _c.mutation.Token(); !ok {
-		v := clustersecurity.DefaultToken
+		v := clusterconnection.DefaultToken
 		_c.mutation.SetToken(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_c *ClusterSecurityCreate) check() error {
+func (_c *ClusterConnectionCreate) check() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`generated: missing required field "ClusterSecurity.created_at"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`generated: missing required field "ClusterConnection.created_at"`)}
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`generated: missing required field "ClusterSecurity.updated_at"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`generated: missing required field "ClusterConnection.updated_at"`)}
 	}
 	if _, ok := _c.mutation.ClusterID(); !ok {
-		return &ValidationError{Name: "cluster_id", err: errors.New(`generated: missing required field "ClusterSecurity.cluster_id"`)}
+		return &ValidationError{Name: "cluster_id", err: errors.New(`generated: missing required field "ClusterConnection.cluster_id"`)}
+	}
+	if _, ok := _c.mutation.Address(); !ok {
+		return &ValidationError{Name: "address", err: errors.New(`generated: missing required field "ClusterConnection.address"`)}
+	}
+	if v, ok := _c.mutation.Address(); ok {
+		if err := clusterconnection.AddressValidator(v); err != nil {
+			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "ClusterConnection.address": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`generated: missing required field "ClusterSecurity.type"`)}
+		return &ValidationError{Name: "type", err: errors.New(`generated: missing required field "ClusterConnection.type"`)}
 	}
 	if _, ok := _c.mutation.Ca(); !ok {
-		return &ValidationError{Name: "ca", err: errors.New(`generated: missing required field "ClusterSecurity.ca"`)}
+		return &ValidationError{Name: "ca", err: errors.New(`generated: missing required field "ClusterConnection.ca"`)}
 	}
 	if _, ok := _c.mutation.Cert(); !ok {
-		return &ValidationError{Name: "cert", err: errors.New(`generated: missing required field "ClusterSecurity.cert"`)}
+		return &ValidationError{Name: "cert", err: errors.New(`generated: missing required field "ClusterConnection.cert"`)}
 	}
 	if _, ok := _c.mutation.Key(); !ok {
-		return &ValidationError{Name: "key", err: errors.New(`generated: missing required field "ClusterSecurity.key"`)}
+		return &ValidationError{Name: "key", err: errors.New(`generated: missing required field "ClusterConnection.key"`)}
 	}
 	if _, ok := _c.mutation.Token(); !ok {
-		return &ValidationError{Name: "token", err: errors.New(`generated: missing required field "ClusterSecurity.token"`)}
+		return &ValidationError{Name: "token", err: errors.New(`generated: missing required field "ClusterConnection.token"`)}
 	}
 	if len(_c.mutation.ClusterIDs()) == 0 {
-		return &ValidationError{Name: "cluster", err: errors.New(`generated: missing required edge "ClusterSecurity.cluster"`)}
+		return &ValidationError{Name: "cluster", err: errors.New(`generated: missing required edge "ClusterConnection.cluster"`)}
 	}
 	return nil
 }
 
-func (_c *ClusterSecurityCreate) sqlSave(ctx context.Context) (*ClusterSecurity, error) {
+func (_c *ClusterConnectionCreate) sqlSave(ctx context.Context) (*ClusterConnection, error) {
 	if err := _c.check(); err != nil {
 		return nil, err
 	}
@@ -256,49 +270,53 @@ func (_c *ClusterSecurityCreate) sqlSave(ctx context.Context) (*ClusterSecurity,
 	return _node, nil
 }
 
-func (_c *ClusterSecurityCreate) createSpec() (*ClusterSecurity, *sqlgraph.CreateSpec) {
+func (_c *ClusterConnectionCreate) createSpec() (*ClusterConnection, *sqlgraph.CreateSpec) {
 	var (
-		_node = &ClusterSecurity{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(clustersecurity.Table, sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64))
+		_node = &ClusterConnection{config: _c.config}
+		_spec = sqlgraph.NewCreateSpec(clusterconnection.Table, sqlgraph.NewFieldSpec(clusterconnection.FieldID, field.TypeUint64))
 	)
 	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(clustersecurity.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(clusterconnection.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(clustersecurity.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(clusterconnection.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := _c.mutation.DeleteAt(); ok {
-		_spec.SetField(clustersecurity.FieldDeleteAt, field.TypeTime, value)
+		_spec.SetField(clusterconnection.FieldDeleteAt, field.TypeTime, value)
 		_node.DeleteAt = value
 	}
+	if value, ok := _c.mutation.Address(); ok {
+		_spec.SetField(clusterconnection.FieldAddress, field.TypeString, value)
+		_node.Address = value
+	}
 	if value, ok := _c.mutation.GetType(); ok {
-		_spec.SetField(clustersecurity.FieldType, field.TypeUint8, value)
+		_spec.SetField(clusterconnection.FieldType, field.TypeUint8, value)
 		_node.Type = value
 	}
 	if value, ok := _c.mutation.Ca(); ok {
-		_spec.SetField(clustersecurity.FieldCa, field.TypeString, value)
+		_spec.SetField(clusterconnection.FieldCa, field.TypeString, value)
 		_node.Ca = value
 	}
 	if value, ok := _c.mutation.Cert(); ok {
-		_spec.SetField(clustersecurity.FieldCert, field.TypeString, value)
+		_spec.SetField(clusterconnection.FieldCert, field.TypeString, value)
 		_node.Cert = value
 	}
 	if value, ok := _c.mutation.Key(); ok {
-		_spec.SetField(clustersecurity.FieldKey, field.TypeString, value)
+		_spec.SetField(clusterconnection.FieldKey, field.TypeString, value)
 		_node.Key = value
 	}
 	if value, ok := _c.mutation.Token(); ok {
-		_spec.SetField(clustersecurity.FieldToken, field.TypeString, value)
+		_spec.SetField(clusterconnection.FieldToken, field.TypeString, value)
 		_node.Token = value
 	}
 	if nodes := _c.mutation.ClusterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   clustersecurity.ClusterTable,
-			Columns: []string{clustersecurity.ClusterColumn},
+			Table:   clusterconnection.ClusterTable,
+			Columns: []string{clusterconnection.ClusterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeUint64),
@@ -313,27 +331,27 @@ func (_c *ClusterSecurityCreate) createSpec() (*ClusterSecurity, *sqlgraph.Creat
 	return _node, _spec
 }
 
-// ClusterSecurityCreateBulk is the builder for creating many ClusterSecurity entities in bulk.
-type ClusterSecurityCreateBulk struct {
+// ClusterConnectionCreateBulk is the builder for creating many ClusterConnection entities in bulk.
+type ClusterConnectionCreateBulk struct {
 	config
 	err      error
-	builders []*ClusterSecurityCreate
+	builders []*ClusterConnectionCreate
 }
 
-// Save creates the ClusterSecurity entities in the database.
-func (_c *ClusterSecurityCreateBulk) Save(ctx context.Context) ([]*ClusterSecurity, error) {
+// Save creates the ClusterConnection entities in the database.
+func (_c *ClusterConnectionCreateBulk) Save(ctx context.Context) ([]*ClusterConnection, error) {
 	if _c.err != nil {
 		return nil, _c.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
-	nodes := make([]*ClusterSecurity, len(_c.builders))
+	nodes := make([]*ClusterConnection, len(_c.builders))
 	mutators := make([]Mutator, len(_c.builders))
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*ClusterSecurityMutation)
+				mutation, ok := m.(*ClusterConnectionMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -380,7 +398,7 @@ func (_c *ClusterSecurityCreateBulk) Save(ctx context.Context) ([]*ClusterSecuri
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_c *ClusterSecurityCreateBulk) SaveX(ctx context.Context) []*ClusterSecurity {
+func (_c *ClusterConnectionCreateBulk) SaveX(ctx context.Context) []*ClusterConnection {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -389,13 +407,13 @@ func (_c *ClusterSecurityCreateBulk) SaveX(ctx context.Context) []*ClusterSecuri
 }
 
 // Exec executes the query.
-func (_c *ClusterSecurityCreateBulk) Exec(ctx context.Context) error {
+func (_c *ClusterConnectionCreateBulk) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *ClusterSecurityCreateBulk) ExecX(ctx context.Context) {
+func (_c *ClusterConnectionCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}

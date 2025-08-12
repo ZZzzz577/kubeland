@@ -1,9 +1,9 @@
 package data
 
 import (
+	"api-server/internal/data/generated"
 	"context"
 	"fmt"
-	"api-server/internal/data/generated"
 )
 
 func (d *Data) WithTx(ctx context.Context, fn func(tx *generated.Tx) error) error {

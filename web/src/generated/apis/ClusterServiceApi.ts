@@ -15,19 +15,25 @@
 import * as runtime from "../runtime";
 import type {
     ApiV1ClusterCluster,
+    ApiV1ClusterConnection,
     ApiV1ClusterListClustersResponse,
     ApiV1ClusterResolveKubeConfigRequest,
     ApiV1ClusterResolveKubeConfigResponse,
+    ApiV1ClusterTestConnectionResponse,
 } from "../models/index";
 import {
     ApiV1ClusterClusterFromJSON,
     ApiV1ClusterClusterToJSON,
+    ApiV1ClusterConnectionFromJSON,
+    ApiV1ClusterConnectionToJSON,
     ApiV1ClusterListClustersResponseFromJSON,
     ApiV1ClusterListClustersResponseToJSON,
     ApiV1ClusterResolveKubeConfigRequestFromJSON,
     ApiV1ClusterResolveKubeConfigRequestToJSON,
     ApiV1ClusterResolveKubeConfigResponseFromJSON,
     ApiV1ClusterResolveKubeConfigResponseToJSON,
+    ApiV1ClusterTestConnectionResponseFromJSON,
+    ApiV1ClusterTestConnectionResponseToJSON,
 } from "../models/index";
 
 export interface ClusterServiceCreateClusterRequest {
@@ -49,6 +55,10 @@ export interface ClusterServiceListClustersRequest {
 
 export interface ClusterServiceResolveKubeConfigRequest {
     apiV1ClusterResolveKubeConfigRequest: ApiV1ClusterResolveKubeConfigRequest;
+}
+
+export interface ClusterServiceTestConnectionRequest {
+    apiV1ClusterConnection: ApiV1ClusterConnection;
 }
 
 export interface ClusterServiceUpdateClusterRequest {
@@ -280,6 +290,53 @@ export class ClusterServiceApi extends runtime.BaseAPI {
         initOverrides?: RequestInit | runtime.InitOverrideFunction,
     ): Promise<ApiV1ClusterResolveKubeConfigResponse> {
         const response = await this.clusterServiceResolveKubeConfigRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async clusterServiceTestConnectionRaw(
+        requestParameters: ClusterServiceTestConnectionRequest,
+        initOverrides?: RequestInit | runtime.InitOverrideFunction,
+    ): Promise<runtime.ApiResponse<ApiV1ClusterTestConnectionResponse>> {
+        if (requestParameters["apiV1ClusterConnection"] == null) {
+            throw new runtime.RequiredError(
+                "apiV1ClusterConnection",
+                'Required parameter "apiV1ClusterConnection" was null or undefined when calling clusterServiceTestConnection().',
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters["Content-Type"] = "application/json";
+
+        let urlPath = `/api/v1/cluster/connection/test`;
+
+        const response = await this.request(
+            {
+                path: urlPath,
+                method: "POST",
+                headers: headerParameters,
+                query: queryParameters,
+                body: ApiV1ClusterConnectionToJSON(requestParameters["apiV1ClusterConnection"]),
+            },
+            initOverrides,
+        );
+
+        return new runtime.JSONApiResponse(response, (jsonValue) =>
+            ApiV1ClusterTestConnectionResponseFromJSON(jsonValue),
+        );
+    }
+
+    /**
+     */
+    async clusterServiceTestConnection(
+        requestParameters: ClusterServiceTestConnectionRequest,
+        initOverrides?: RequestInit | runtime.InitOverrideFunction,
+    ): Promise<ApiV1ClusterTestConnectionResponse> {
+        const response = await this.clusterServiceTestConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

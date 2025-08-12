@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from "../runtime";
-import type { ApiV1ClusterClusterSecurity } from "./ApiV1ClusterClusterSecurity";
+import type { ApiV1ClusterConnection } from "./ApiV1ClusterConnection";
 import {
-    ApiV1ClusterClusterSecurityFromJSON,
-    ApiV1ClusterClusterSecurityFromJSONTyped,
-    ApiV1ClusterClusterSecurityToJSON,
-    ApiV1ClusterClusterSecurityToJSONTyped,
-} from "./ApiV1ClusterClusterSecurity";
+    ApiV1ClusterConnectionFromJSON,
+    ApiV1ClusterConnectionFromJSONTyped,
+    ApiV1ClusterConnectionToJSON,
+    ApiV1ClusterConnectionToJSONTyped,
+} from "./ApiV1ClusterConnection";
 
 /**
  *
@@ -47,16 +47,10 @@ export interface ApiV1ClusterCluster {
     description?: string;
     /**
      *
-     * @type {string}
+     * @type {ApiV1ClusterConnection}
      * @memberof ApiV1ClusterCluster
      */
-    address: string;
-    /**
-     *
-     * @type {ApiV1ClusterClusterSecurity}
-     * @memberof ApiV1ClusterCluster
-     */
-    security?: ApiV1ClusterClusterSecurity;
+    connection: ApiV1ClusterConnection;
     /**
      *
      * @type {Date}
@@ -76,7 +70,7 @@ export interface ApiV1ClusterCluster {
  */
 export function instanceOfApiV1ClusterCluster(value: object): value is ApiV1ClusterCluster {
     if (!("name" in value) || value["name"] === undefined) return false;
-    if (!("address" in value) || value["address"] === undefined) return false;
+    if (!("connection" in value) || value["connection"] === undefined) return false;
     return true;
 }
 
@@ -92,8 +86,7 @@ export function ApiV1ClusterClusterFromJSONTyped(json: any, ignoreDiscriminator:
         id: json["id"] == null ? undefined : json["id"],
         name: json["name"],
         description: json["description"] == null ? undefined : json["description"],
-        address: json["address"],
-        security: json["security"] == null ? undefined : ApiV1ClusterClusterSecurityFromJSON(json["security"]),
+        connection: ApiV1ClusterConnectionFromJSON(json["connection"]),
         createdAt: json["createdAt"] == null ? undefined : new Date(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? undefined : new Date(json["updatedAt"]),
     };
@@ -115,7 +108,6 @@ export function ApiV1ClusterClusterToJSONTyped(
         id: value["id"],
         name: value["name"],
         description: value["description"],
-        address: value["address"],
-        security: ApiV1ClusterClusterSecurityToJSON(value["security"]),
+        connection: ApiV1ClusterConnectionToJSON(value["connection"]),
     };
 }

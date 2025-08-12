@@ -1,37 +1,82 @@
 import { useLingui } from "@lingui/react/macro";
 import { useForm } from "antd/es/form/Form";
 import type { ApiV1ClusterCluster } from "@/generated";
-import {Button, Form, Space} from "antd";
+import { Button, Divider, Form, notification, Space } from "antd";
 import { useRequest } from "ahooks";
 import { clusterApi } from "@/api";
-import type { NotificationInstance } from "antd/es/notification/interface";
-import ClusterModifyFormBasic from "@/views/cluster/modify/components/form/ClusterModifyFormBasic.tsx";
-import ClusterModifyFormConnection from "@/views/cluster/modify/components/form/ClusterModifyFormConnection.tsx";
+import BasicInfoForm from "@/views/cluster/modify/components/form/BasicInfoForm.tsx";
+import ConnectionForm from "@/views/cluster/modify/components/form/ConnectionForm.tsx";
+import TestConnection from "@/views/cluster/modify/components/form/TestConnection.tsx";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
 
-export default function ClusterModifyForm(props: { notify: NotificationInstance }) {
-    const { notify } = props;
+export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster }) {
+    const { cluster } = props;
+    const isUpdate = !!cluster;
     const { t } = useLingui();
+    const [notify, notifyContext] = notification.useNotification();
+    const navigate = useNavigate();
+
     const [form] = useForm<ApiV1ClusterCluster>();
-    const createCluster = clusterApi.clusterServiceCreateCluster.bind(clusterApi);
-    const { run, loading } = useRequest(createCluster, {
-        manual: true,
-        onSuccess: () => {
-            notify.success({
-                message: t`create cluster success`,
-            });
+    useEffect(() => {
+        if (cluster) {
+            form.setFieldsValue(cluster);
+        }
+    }, [cluster, form]);
+
+    const { run: createCluster, loading: createLoading } = useRequest(
+        clusterApi.clusterServiceCreateCluster.bind(clusterApi),
+        {
+            manual: true,
+            onSuccess: () => {
+                notify.success({
+                    message: t`create cluster success`,
+                });
+                setTimeout(() => navigate("/cluster"), 500);
+            },
+            onError: (error) => {
+                console.log(error);
+                notify.error({
+                    message: t`create cluster failed`,
+                    description: error.message,
+                });
+            },
         },
-        onError: (error) => {
-            console.log(error);
-            notify.error({
-                message: t`create cluster failed`,
-                description: error.message,
-            });
+    );
+
+    const { run: updateCluster, loading: updateLoading } = useRequest(
+        clusterApi.clusterServiceUpdateCluster.bind(clusterApi),
+        {
+            manual: true,
+            onSuccess: () => {
+                notify.success({
+                    message: t`update cluster success`,
+                });
+                setTimeout(() => navigate("/cluster"), 500);
+            },
+            onError: (error) => {
+                console.log(error);
+                notify.error({
+                    message: t`update cluster failed`,
+                    description: error.message,
+                });
+            },
         },
-    });
+    );
+
     const submitForm = (values: ApiV1ClusterCluster) => {
-        run({
-            apiV1ClusterCluster: values,
-        });
+        if (isUpdate) {
+            if (cluster?.id) {
+                updateCluster({
+                    id: cluster.id,
+                    apiV1ClusterCluster: values,
+                });
+            }
+        } else {
+            createCluster({
+                apiV1ClusterCluster: values,
+            });
+        }
     };
 
     return (
@@ -43,11 +88,15 @@ export default function ClusterModifyForm(props: { notify: NotificationInstance 
                 flex: "100px",
             }}
         >
-            <ClusterModifyFormBasic />
-            <ClusterModifyFormConnection />
-            <Space>
-                <Button type="primary" htmlType="submit" loading={loading}>
-                    {t`create`}
+            {notifyContext}
+            <BasicInfoForm />
+            <Divider />
+            <ConnectionForm />
+
+            <Space className={"ml-25"}>
+                <TestConnection />
+                <Button type="primary" htmlType="submit" loading={isUpdate ? updateLoading : createLoading}>
+                    {isUpdate ? t`update` : t`create`}
                 </Button>
             </Space>
         </Form>

@@ -4,7 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 	"api-server/internal/data/generated/predicate"
 	"context"
 	"errors"
@@ -83,37 +83,23 @@ func (_u *ClusterUpdate) SetNillableDescription(v *string) *ClusterUpdate {
 	return _u
 }
 
-// SetAddress sets the "address" field.
-func (_u *ClusterUpdate) SetAddress(v string) *ClusterUpdate {
-	_u.mutation.SetAddress(v)
+// SetConnectionID sets the "connection" edge to the ClusterConnection entity by ID.
+func (_u *ClusterUpdate) SetConnectionID(id uint64) *ClusterUpdate {
+	_u.mutation.SetConnectionID(id)
 	return _u
 }
 
-// SetNillableAddress sets the "address" field if the given value is not nil.
-func (_u *ClusterUpdate) SetNillableAddress(v *string) *ClusterUpdate {
-	if v != nil {
-		_u.SetAddress(*v)
-	}
-	return _u
-}
-
-// SetSecurityID sets the "security" edge to the ClusterSecurity entity by ID.
-func (_u *ClusterUpdate) SetSecurityID(id uint64) *ClusterUpdate {
-	_u.mutation.SetSecurityID(id)
-	return _u
-}
-
-// SetNillableSecurityID sets the "security" edge to the ClusterSecurity entity by ID if the given value is not nil.
-func (_u *ClusterUpdate) SetNillableSecurityID(id *uint64) *ClusterUpdate {
+// SetNillableConnectionID sets the "connection" edge to the ClusterConnection entity by ID if the given value is not nil.
+func (_u *ClusterUpdate) SetNillableConnectionID(id *uint64) *ClusterUpdate {
 	if id != nil {
-		_u = _u.SetSecurityID(*id)
+		_u = _u.SetConnectionID(*id)
 	}
 	return _u
 }
 
-// SetSecurity sets the "security" edge to the ClusterSecurity entity.
-func (_u *ClusterUpdate) SetSecurity(v *ClusterSecurity) *ClusterUpdate {
-	return _u.SetSecurityID(v.ID)
+// SetConnection sets the "connection" edge to the ClusterConnection entity.
+func (_u *ClusterUpdate) SetConnection(v *ClusterConnection) *ClusterUpdate {
+	return _u.SetConnectionID(v.ID)
 }
 
 // Mutation returns the ClusterMutation object of the builder.
@@ -121,9 +107,9 @@ func (_u *ClusterUpdate) Mutation() *ClusterMutation {
 	return _u.mutation
 }
 
-// ClearSecurity clears the "security" edge to the ClusterSecurity entity.
-func (_u *ClusterUpdate) ClearSecurity() *ClusterUpdate {
-	_u.mutation.ClearSecurity()
+// ClearConnection clears the "connection" edge to the ClusterConnection entity.
+func (_u *ClusterUpdate) ClearConnection() *ClusterUpdate {
+	_u.mutation.ClearConnection()
 	return _u
 }
 
@@ -181,11 +167,6 @@ func (_u *ClusterUpdate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`generated: validator failed for field "Cluster.description": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Address(); ok {
-		if err := cluster.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "Cluster.address": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -216,31 +197,28 @@ func (_u *ClusterUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.Address(); ok {
-		_spec.SetField(cluster.FieldAddress, field.TypeString, value)
-	}
-	if _u.mutation.SecurityCleared() {
+	if _u.mutation.ConnectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   cluster.SecurityTable,
-			Columns: []string{cluster.SecurityColumn},
+			Table:   cluster.ConnectionTable,
+			Columns: []string{cluster.ConnectionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+				IDSpec: sqlgraph.NewFieldSpec(clusterconnection.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.SecurityIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ConnectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   cluster.SecurityTable,
-			Columns: []string{cluster.SecurityColumn},
+			Table:   cluster.ConnectionTable,
+			Columns: []string{cluster.ConnectionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+				IDSpec: sqlgraph.NewFieldSpec(clusterconnection.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -322,37 +300,23 @@ func (_u *ClusterUpdateOne) SetNillableDescription(v *string) *ClusterUpdateOne 
 	return _u
 }
 
-// SetAddress sets the "address" field.
-func (_u *ClusterUpdateOne) SetAddress(v string) *ClusterUpdateOne {
-	_u.mutation.SetAddress(v)
+// SetConnectionID sets the "connection" edge to the ClusterConnection entity by ID.
+func (_u *ClusterUpdateOne) SetConnectionID(id uint64) *ClusterUpdateOne {
+	_u.mutation.SetConnectionID(id)
 	return _u
 }
 
-// SetNillableAddress sets the "address" field if the given value is not nil.
-func (_u *ClusterUpdateOne) SetNillableAddress(v *string) *ClusterUpdateOne {
-	if v != nil {
-		_u.SetAddress(*v)
-	}
-	return _u
-}
-
-// SetSecurityID sets the "security" edge to the ClusterSecurity entity by ID.
-func (_u *ClusterUpdateOne) SetSecurityID(id uint64) *ClusterUpdateOne {
-	_u.mutation.SetSecurityID(id)
-	return _u
-}
-
-// SetNillableSecurityID sets the "security" edge to the ClusterSecurity entity by ID if the given value is not nil.
-func (_u *ClusterUpdateOne) SetNillableSecurityID(id *uint64) *ClusterUpdateOne {
+// SetNillableConnectionID sets the "connection" edge to the ClusterConnection entity by ID if the given value is not nil.
+func (_u *ClusterUpdateOne) SetNillableConnectionID(id *uint64) *ClusterUpdateOne {
 	if id != nil {
-		_u = _u.SetSecurityID(*id)
+		_u = _u.SetConnectionID(*id)
 	}
 	return _u
 }
 
-// SetSecurity sets the "security" edge to the ClusterSecurity entity.
-func (_u *ClusterUpdateOne) SetSecurity(v *ClusterSecurity) *ClusterUpdateOne {
-	return _u.SetSecurityID(v.ID)
+// SetConnection sets the "connection" edge to the ClusterConnection entity.
+func (_u *ClusterUpdateOne) SetConnection(v *ClusterConnection) *ClusterUpdateOne {
+	return _u.SetConnectionID(v.ID)
 }
 
 // Mutation returns the ClusterMutation object of the builder.
@@ -360,9 +324,9 @@ func (_u *ClusterUpdateOne) Mutation() *ClusterMutation {
 	return _u.mutation
 }
 
-// ClearSecurity clears the "security" edge to the ClusterSecurity entity.
-func (_u *ClusterUpdateOne) ClearSecurity() *ClusterUpdateOne {
-	_u.mutation.ClearSecurity()
+// ClearConnection clears the "connection" edge to the ClusterConnection entity.
+func (_u *ClusterUpdateOne) ClearConnection() *ClusterUpdateOne {
+	_u.mutation.ClearConnection()
 	return _u
 }
 
@@ -433,11 +397,6 @@ func (_u *ClusterUpdateOne) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`generated: validator failed for field "Cluster.description": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Address(); ok {
-		if err := cluster.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`generated: validator failed for field "Cluster.address": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -485,31 +444,28 @@ func (_u *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err er
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.Address(); ok {
-		_spec.SetField(cluster.FieldAddress, field.TypeString, value)
-	}
-	if _u.mutation.SecurityCleared() {
+	if _u.mutation.ConnectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   cluster.SecurityTable,
-			Columns: []string{cluster.SecurityColumn},
+			Table:   cluster.ConnectionTable,
+			Columns: []string{cluster.ConnectionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+				IDSpec: sqlgraph.NewFieldSpec(clusterconnection.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.SecurityIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ConnectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   cluster.SecurityTable,
-			Columns: []string{cluster.SecurityColumn},
+			Table:   cluster.ConnectionTable,
+			Columns: []string{cluster.ConnectionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(clustersecurity.FieldID, field.TypeUint64),
+				IDSpec: sqlgraph.NewFieldSpec(clusterconnection.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

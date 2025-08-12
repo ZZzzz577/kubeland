@@ -8,14 +8,18 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-type ClusterSecurity struct {
+type ClusterConnection struct {
 	ent.Schema
 }
 
-func (ClusterSecurity) Fields() []ent.Field {
+func (ClusterConnection) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("cluster_id").
 			Comment("集群ID"),
+		field.String("address").
+			NotEmpty().
+			MaxLen(512).
+			Comment("集群地址"),
 		field.Uint8("type").
 			Comment("连接类型"),
 		field.Text("ca").
@@ -33,23 +37,23 @@ func (ClusterSecurity) Fields() []ent.Field {
 	}
 }
 
-func (ClusterSecurity) Mixin() []ent.Mixin {
+func (ClusterConnection) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
 		mixin.SoftDeleteMixin{},
 	}
 }
 
-func (ClusterSecurity) Indexes() []ent.Index {
+func (ClusterConnection) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("cluster_id"),
 	}
 }
 
-func (ClusterSecurity) Edges() []ent.Edge {
+func (ClusterConnection) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("cluster", Cluster.Type).
-			Ref("security").
+			Ref("connection").
 			Field("cluster_id").
 			Unique().
 			Required(),

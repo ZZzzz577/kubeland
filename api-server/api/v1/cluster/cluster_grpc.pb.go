@@ -26,6 +26,7 @@ const (
 	ClusterService_UpdateCluster_FullMethodName     = "/api.v1.cluster.ClusterService/UpdateCluster"
 	ClusterService_DeleteCluster_FullMethodName     = "/api.v1.cluster.ClusterService/DeleteCluster"
 	ClusterService_ResolveKubeConfig_FullMethodName = "/api.v1.cluster.ClusterService/ResolveKubeConfig"
+	ClusterService_TestConnection_FullMethodName    = "/api.v1.cluster.ClusterService/TestConnection"
 )
 
 // ClusterServiceClient is the client API for ClusterService service.
@@ -38,6 +39,7 @@ type ClusterServiceClient interface {
 	UpdateCluster(ctx context.Context, in *Cluster, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCluster(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ResolveKubeConfig(ctx context.Context, in *ResolveKubeConfigRequest, opts ...grpc.CallOption) (*ResolveKubeConfigResponse, error)
+	TestConnection(ctx context.Context, in *Connection, opts ...grpc.CallOption) (*TestConnectionResponse, error)
 }
 
 type clusterServiceClient struct {
@@ -108,6 +110,16 @@ func (c *clusterServiceClient) ResolveKubeConfig(ctx context.Context, in *Resolv
 	return out, nil
 }
 
+func (c *clusterServiceClient) TestConnection(ctx context.Context, in *Connection, opts ...grpc.CallOption) (*TestConnectionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TestConnectionResponse)
+	err := c.cc.Invoke(ctx, ClusterService_TestConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClusterServiceServer is the server API for ClusterService service.
 // All implementations must embed UnimplementedClusterServiceServer
 // for forward compatibility.
@@ -118,6 +130,7 @@ type ClusterServiceServer interface {
 	UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
 	DeleteCluster(context.Context, *IdRequest) (*emptypb.Empty, error)
 	ResolveKubeConfig(context.Context, *ResolveKubeConfigRequest) (*ResolveKubeConfigResponse, error)
+	TestConnection(context.Context, *Connection) (*TestConnectionResponse, error)
 	mustEmbedUnimplementedClusterServiceServer()
 }
 
@@ -145,6 +158,9 @@ func (UnimplementedClusterServiceServer) DeleteCluster(context.Context, *IdReque
 }
 func (UnimplementedClusterServiceServer) ResolveKubeConfig(context.Context, *ResolveKubeConfigRequest) (*ResolveKubeConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResolveKubeConfig not implemented")
+}
+func (UnimplementedClusterServiceServer) TestConnection(context.Context, *Connection) (*TestConnectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TestConnection not implemented")
 }
 func (UnimplementedClusterServiceServer) mustEmbedUnimplementedClusterServiceServer() {}
 func (UnimplementedClusterServiceServer) testEmbeddedByValue()                        {}
@@ -275,6 +291,24 @@ func _ClusterService_ResolveKubeConfig_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClusterService_TestConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Connection)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClusterServiceServer).TestConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClusterService_TestConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClusterServiceServer).TestConnection(ctx, req.(*Connection))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClusterService_ServiceDesc is the grpc.ServiceDesc for ClusterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -305,6 +339,10 @@ var ClusterService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResolveKubeConfig",
 			Handler:    _ClusterService_ResolveKubeConfig_Handler,
+		},
+		{
+			MethodName: "TestConnection",
+			Handler:    _ClusterService_TestConnection_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,12 +2,11 @@ package schema
 
 import (
 	"api-server/internal/data/mixin"
-	"regexp"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"regexp"
 )
 
 type Cluster struct {
@@ -25,10 +24,6 @@ func (Cluster) Fields() []ent.Field {
 			Default("").
 			MaxLen(1024).
 			Comment("集群描述"),
-		field.String("address").
-			NotEmpty().
-			MaxLen(512).
-			Comment("集群地址"),
 	}
 }
 
@@ -48,7 +43,7 @@ func (Cluster) Indexes() []ent.Index {
 
 func (Cluster) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("security", ClusterSecurity.Type).
+		edge.To("connection", ClusterConnection.Type).
 			Unique(),
 	}
 }

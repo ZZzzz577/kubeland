@@ -4,7 +4,7 @@ package generated
 
 import (
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clustersecurity"
+	"api-server/internal/data/generated/clusterconnection"
 	"api-server/internal/data/generated/predicate"
 	"context"
 	"database/sql/driver"
@@ -20,11 +20,11 @@ import (
 // ClusterQuery is the builder for querying Cluster entities.
 type ClusterQuery struct {
 	config
-	ctx          *QueryContext
-	order        []cluster.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Cluster
-	withSecurity *ClusterSecurityQuery
+	ctx            *QueryContext
+	order          []cluster.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Cluster
+	withConnection *ClusterConnectionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,9 +61,9 @@ func (_q *ClusterQuery) Order(o ...cluster.OrderOption) *ClusterQuery {
 	return _q
 }
 
-// QuerySecurity chains the current query on the "security" edge.
-func (_q *ClusterQuery) QuerySecurity() *ClusterSecurityQuery {
-	query := (&ClusterSecurityClient{config: _q.config}).Query()
+// QueryConnection chains the current query on the "connection" edge.
+func (_q *ClusterQuery) QueryConnection() *ClusterConnectionQuery {
+	query := (&ClusterConnectionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,8 +74,8 @@ func (_q *ClusterQuery) QuerySecurity() *ClusterSecurityQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
-			sqlgraph.To(clustersecurity.Table, clustersecurity.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, cluster.SecurityTable, cluster.SecurityColumn),
+			sqlgraph.To(clusterconnection.Table, clusterconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, cluster.ConnectionTable, cluster.ConnectionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,26 +270,26 @@ func (_q *ClusterQuery) Clone() *ClusterQuery {
 		return nil
 	}
 	return &ClusterQuery{
-		config:       _q.config,
-		ctx:          _q.ctx.Clone(),
-		order:        append([]cluster.OrderOption{}, _q.order...),
-		inters:       append([]Interceptor{}, _q.inters...),
-		predicates:   append([]predicate.Cluster{}, _q.predicates...),
-		withSecurity: _q.withSecurity.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]cluster.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.Cluster{}, _q.predicates...),
+		withConnection: _q.withConnection.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
 }
 
-// WithSecurity tells the query-builder to eager-load the nodes that are connected to
-// the "security" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *ClusterQuery) WithSecurity(opts ...func(*ClusterSecurityQuery)) *ClusterQuery {
-	query := (&ClusterSecurityClient{config: _q.config}).Query()
+// WithConnection tells the query-builder to eager-load the nodes that are connected to
+// the "connection" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ClusterQuery) WithConnection(opts ...func(*ClusterConnectionQuery)) *ClusterQuery {
+	query := (&ClusterConnectionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withSecurity = query
+	_q.withConnection = query
 	return _q
 }
 
@@ -372,7 +372,7 @@ func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 		nodes       = []*Cluster{}
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			_q.withSecurity != nil,
+			_q.withConnection != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -393,16 +393,16 @@ func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withSecurity; query != nil {
-		if err := _q.loadSecurity(ctx, query, nodes, nil,
-			func(n *Cluster, e *ClusterSecurity) { n.Edges.Security = e }); err != nil {
+	if query := _q.withConnection; query != nil {
+		if err := _q.loadConnection(ctx, query, nodes, nil,
+			func(n *Cluster, e *ClusterConnection) { n.Edges.Connection = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (_q *ClusterQuery) loadSecurity(ctx context.Context, query *ClusterSecurityQuery, nodes []*Cluster, init func(*Cluster), assign func(*Cluster, *ClusterSecurity)) error {
+func (_q *ClusterQuery) loadConnection(ctx context.Context, query *ClusterConnectionQuery, nodes []*Cluster, init func(*Cluster), assign func(*Cluster, *ClusterConnection)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uint64]*Cluster)
 	for i := range nodes {
@@ -410,10 +410,10 @@ func (_q *ClusterQuery) loadSecurity(ctx context.Context, query *ClusterSecurity
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(clustersecurity.FieldClusterID)
+		query.ctx.AppendFieldOnce(clusterconnection.FieldClusterID)
 	}
-	query.Where(predicate.ClusterSecurity(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(cluster.SecurityColumn), fks...))
+	query.Where(predicate.ClusterConnection(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(cluster.ConnectionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

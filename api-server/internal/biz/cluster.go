@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"net/url"
 )
@@ -18,8 +20,7 @@ import (
 var (
 	ClusterNotFoundError = status.Error(codes.NotFound, "cluster not found")
 
-	ClusterSecurityRequiredError = status.Error(codes.InvalidArgument, "cluster security is required")
-	ClusterSecurityNotFoundError = status.Error(codes.NotFound, "cluster security not found")
+	ClusterConnectionRequiredError = status.Error(codes.InvalidArgument, "cluster connection is required")
 )
 
 type ClusterBiz struct {
@@ -52,7 +53,7 @@ func (c *ClusterBiz) ListClusters(ctx context.Context, request *cluster.ListClus
 func (c *ClusterBiz) GetCluster(ctx context.Context, request *cluster.IdRequest) (*cluster.Cluster, error) {
 	cr, err := c.db.Cluster.Query().
 		Where(clusterdb.ID(request.Id)).
-		WithSecurity().
+		WithConnection().
 		Only(ctx)
 	if generated.IsNotFound(err) {
 		return nil, ClusterNotFoundError
@@ -65,32 +66,33 @@ func (c *ClusterBiz) GetCluster(ctx context.Context, request *cluster.IdRequest)
 }
 
 func (c *ClusterBiz) CreateCluster(ctx context.Context, request *cluster.Cluster) error {
-	if request.Security == nil {
-		return ClusterSecurityRequiredError
+	if request.Connection == nil {
+		return ClusterConnectionRequiredError
 	}
 	return c.db.WithTx(ctx, func(tx *generated.Tx) error {
 		cr, err := tx.Cluster.Create().
 			SetName(request.Name).
 			SetDescription(request.Description).
-			SetAddress(request.Address).
 			Save(ctx)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to create cluster")
 			return err
 		}
-		security := request.Security
-		css := tx.ClusterSecurity.Create().
+		connection := request.Connection
+		css := tx.ClusterConnection.Create().
 			SetCluster(cr).
-			SetType(uint8(security.Type))
-		if security.Type == cluster.Cluster_Security_TLS_CERT {
-			css.SetCert(security.Cert).
-				SetKey(security.Key)
-		} else if security.Type == cluster.Cluster_Security_TLS_TOKEN {
-			css.SetToken(security.Token)
+			SetAddress(connection.Address).
+			SetCa(connection.Ca).
+			SetType(uint8(connection.Type))
+		if connection.Type == cluster.Connection_TLS_CERT {
+			css.SetCert(connection.Cert).
+				SetKey(connection.Key)
+		} else if connection.Type == cluster.Connection_TLS_TOKEN {
+			css.SetToken(connection.Token)
 		}
 		err = css.Exec(ctx)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to create cluster security")
+			log.Error().Err(err).Msg("failed to create cluster connection")
 			return err
 		}
 		return nil
@@ -100,8 +102,8 @@ func (c *ClusterBiz) CreateCluster(ctx context.Context, request *cluster.Cluster
 func (c *ClusterBiz) UpdateCluster(ctx context.Context, request *cluster.Cluster) error {
 	return c.db.WithTx(ctx, func(tx *generated.Tx) error {
 		cr, err := tx.Cluster.Query().
-			WithSecurity().
-			Where().
+			WithConnection().
+			Where(clusterdb.ID(request.Id)).
 			Only(ctx)
 		if generated.IsNotFound(err) {
 			return ClusterNotFoundError
@@ -114,30 +116,28 @@ func (c *ClusterBiz) UpdateCluster(ctx context.Context, request *cluster.Cluster
 		err = tx.Cluster.UpdateOne(cr).
 			SetName(request.Name).
 			SetDescription(request.Description).
-			SetAddress(request.Address).
 			Exec(ctx)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to update cluster")
 			return err
 		}
-		if request.Security == nil {
+		if request.Connection == nil {
 			return nil
 		}
 		// 更新安全配置
-		security := request.Security
-		csr := cr.Edges.Security
-		if csr == nil {
-			return ClusterSecurityNotFoundError
+		connection := request.Connection
+		ccr := cr.Edges.Connection
+		ccs := tx.ClusterConnection.UpdateOne(ccr).
+			SetAddress(connection.Address).
+			SetCa(connection.Ca).
+			SetType(uint8(connection.Type))
+		if connection.Type == cluster.Connection_TLS_CERT {
+			ccs.SetCert(connection.Cert).
+				SetKey(connection.Key)
+		} else if connection.Type == cluster.Connection_TLS_TOKEN {
+			ccs.SetToken(connection.Token)
 		}
-		css := tx.ClusterSecurity.UpdateOne(csr).
-			SetType(uint8(security.Type))
-		if security.Type == cluster.Cluster_Security_TLS_CERT {
-			css.SetCert(security.Cert).
-				SetKey(security.Key)
-		} else if security.Type == cluster.Cluster_Security_TLS_TOKEN {
-			css.SetToken(security.Token)
-		}
-		return css.Exec(ctx)
+		return ccs.Exec(ctx)
 	})
 
 }
@@ -145,7 +145,7 @@ func (c *ClusterBiz) UpdateCluster(ctx context.Context, request *cluster.Cluster
 func (c *ClusterBiz) DeleteCluster(ctx context.Context, request *cluster.IdRequest) error {
 	return c.db.WithTx(ctx, func(tx *generated.Tx) error {
 		cr, err := tx.Cluster.Query().
-			WithSecurity().
+			WithConnection().
 			Where(clusterdb.ID(request.Id)).
 			Only(ctx)
 		if generated.IsNotFound(err) {
@@ -159,8 +159,8 @@ func (c *ClusterBiz) DeleteCluster(ctx context.Context, request *cluster.IdReque
 			log.Error().Err(err).Msg("failed to delete cluster")
 			return err
 		}
-		if err = tx.ClusterSecurity.DeleteOne(cr.Edges.Security).Exec(ctx); err != nil {
-			log.Error().Err(err).Msg("failed to delete cluster security")
+		if err = tx.ClusterConnection.DeleteOne(cr.Edges.Connection).Exec(ctx); err != nil {
+			log.Error().Err(err).Msg("failed to delete cluster connection")
 			return err
 		}
 		return nil
@@ -168,23 +168,23 @@ func (c *ClusterBiz) DeleteCluster(ctx context.Context, request *cluster.IdReque
 }
 
 func (c *ClusterBiz) toProto(cr *generated.Cluster) *cluster.Cluster {
-	var security *cluster.Cluster_Security
-	csr := cr.Edges.Security
-	if csr != nil {
-		security = &cluster.Cluster_Security{
-			Type:  cluster.Cluster_Security_Type(csr.Type),
-			Ca:    csr.Ca,
-			Cert:  csr.Cert,
-			Key:   csr.Key,
-			Token: csr.Token,
+	var connection *cluster.Connection
+	ccr := cr.Edges.Connection
+	if ccr != nil {
+		connection = &cluster.Connection{
+			Address: ccr.Address,
+			Type:    cluster.Connection_Type(ccr.Type),
+			Ca:      ccr.Ca,
+			Cert:    ccr.Cert,
+			Key:     ccr.Key,
+			Token:   ccr.Token,
 		}
 	}
 	return &cluster.Cluster{
 		Id:          cr.ID,
 		Name:        cr.Name,
 		Description: cr.Description,
-		Address:     cr.Address,
-		Security:    security,
+		Connection:  connection,
 		CreatedAt:   timestamppb.New(cr.CreatedAt),
 		UpdatedAt:   timestamppb.New(cr.UpdatedAt),
 	}
@@ -246,4 +246,29 @@ func (c *ClusterBiz) ResolveKubeConfig(_ context.Context, request *cluster.Resol
 		res = append(res, current)
 	}
 	return &cluster.ResolveKubeConfigResponse{Items: res}, nil
+}
+
+func (c *ClusterBiz) TestConnection(_ context.Context, request *cluster.Connection) (*cluster.TestConnectionResponse, error) {
+	config := &rest.Config{
+		Host: request.Address,
+		TLSClientConfig: rest.TLSClientConfig{
+			CAData: []byte(request.Ca),
+		},
+	}
+	if request.Type == cluster.Connection_TLS_CERT {
+		config.TLSClientConfig.CertData = []byte(request.Cert)
+		config.TLSClientConfig.KeyData = []byte(request.Key)
+	} else if request.Type == cluster.Connection_TLS_TOKEN {
+		config.BearerToken = request.Token
+	}
+	client, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	if version, err := client.ServerVersion(); err != nil {
+		return nil, err
+	} else {
+		return &cluster.TestConnectionResponse{Version: version.String()}, nil
+	}
+
 }
