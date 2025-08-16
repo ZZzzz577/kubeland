@@ -13,7 +13,7 @@ export default function ConnectionForm() {
         <>
             <UploadKubeConfig />
             <Item
-                label={t`address`}
+                label={t`Address`}
                 name={["connection", "address"]}
                 rules={[
                     {
@@ -27,7 +27,12 @@ export default function ConnectionForm() {
             <Item label={t`CA`} name={["connection", "ca"]} rules={[{ required: true }]}>
                 <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
             </Item>
-            <Item label={t`type`} name={["connection", "type"]} initialValue={2} rules={[{ required: true }]}>
+            <Item
+                label={t`Auth type`}
+                name={["connection", "type"]}
+                initialValue={ApiV1ClusterConnectionTypeEnum.TlsCert}
+                rules={[{ required: true }]}
+            >
                 <Radio.Group
                     optionType={"button"}
                     options={[
@@ -38,10 +43,10 @@ export default function ConnectionForm() {
             </Item>
             {connectionType === ApiV1ClusterConnectionTypeEnum.TlsCert && (
                 <>
-                    <Item label={t`cert`} name={["connection", "cert"]} rules={[{ required: true }]}>
+                    <Item label={t`Cert`} name={["connection", "cert"]} rules={[{ required: true }]}>
                         <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
                     </Item>
-                    <Item label={t`key`} name={["connection", "key"]} rules={[{ required: true }]}>
+                    <Item label={t`Key`} name={["connection", "key"]} rules={[{ required: true }]}>
                         <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
                     </Item>
                 </>

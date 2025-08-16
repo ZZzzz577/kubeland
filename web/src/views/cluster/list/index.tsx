@@ -9,11 +9,11 @@ export default function ClusterList() {
     const navigate = useNavigate();
     return (
         <Card
-            title={t`cluster list`}
+            title={t`Cluster list`}
             extra={
                 <Space>
                     <Button icon={<PlusOutlined />} type={"primary"} onClick={() => navigate("/cluster/create")}>
-                        {t`create`}
+                        {t`Create`}
                     </Button>
                 </Space>
             }

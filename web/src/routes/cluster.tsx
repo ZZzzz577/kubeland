@@ -4,6 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { KubernetesOutlined } from "@ant-design/icons";
 import ClusterModify from "@/views/cluster/modify";
 import ClusterList from "@/views/cluster/list";
+import ClusterDetail from "@/views/cluster/detail";
 
 export const Cluster = (): Route => {
     return {
@@ -17,6 +18,10 @@ export const Cluster = (): Route => {
             {
                 path: "",
                 element: <ClusterList />,
+            },
+            {
+                path: ":id/detail",
+                element: <ClusterDetail />,
             },
             {
                 path: "create",

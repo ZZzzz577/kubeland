@@ -72,7 +72,7 @@ export default function UploadKubeConfig() {
         <>
             {notifyContext}
             <Flex className={"!mb-5"} align={"center"}>
-                <div className={"w-25 text-base font-medium"}>{t`connection`}</div>
+                <div className={"w-25 text-base font-medium"}>{t`Connection`}</div>
                 <Alert
                     type={"info"}
                     message={

@@ -1,35 +1,32 @@
-import { Button, Card } from "antd";
+import { Card } from "antd";
 import { useLingui } from "@lingui/react/macro";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import ClusterModifyForm from "@/views/cluster/modify/components/form/ClusterModifyForm.tsx";
-import { DoubleLeftOutlined } from "@ant-design/icons";
 import { useRequest } from "ahooks";
 import { clusterApi } from "@/api";
+import BackButton from "@/components/back/BackButton.tsx";
 
 export default function ClusterModify() {
     const { t } = useLingui();
-    const navigate = useNavigate();
     const { id } = useParams();
     const isUpdate = !!id;
-    const title = isUpdate ? t`create cluster` : t`modify cluster`;
+    const title = isUpdate ? t`Update cluster` : t`Create cluster`;
 
-    const { data } = useRequest(() => (id ? clusterApi.clusterServiceGetCluster({ id }) : Promise.resolve(undefined)), {
-        ready: isUpdate,
-        refreshDeps: [id],
-    });
+    const { data, loading } = useRequest(
+        () => {
+            if (id) {
+                return clusterApi.clusterServiceGetCluster({ id });
+            }
+            return Promise.resolve(undefined);
+        },
+        {
+            ready: isUpdate,
+            refreshDeps: [id],
+        },
+    );
 
     return (
-        <Card
-            title={title}
-            extra={
-                <Button
-                    size={"large"}
-                    icon={<DoubleLeftOutlined />}
-                    type={"link"}
-                    onClick={() => navigate("/cluster")}
-                >{t`back`}</Button>
-            }
-        >
+        <Card title={title} loading={loading} extra={<BackButton />}>
             <ClusterModifyForm cluster={data} />
         </Card>
     );

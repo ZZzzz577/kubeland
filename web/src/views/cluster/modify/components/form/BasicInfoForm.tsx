@@ -6,9 +6,9 @@ export default function BasicInfoForm() {
     const { Item } = Form;
     return (
         <>
-            <div className={"text-base font-medium mb-5"}>{t`basic info`}</div>
+            <div className={"text-base font-medium mb-5"}>{t`Basic info`}</div>
             <Item
-                label={t`name`}
+                label={t`Name`}
                 name={"name"}
                 rules={[
                     {
@@ -20,7 +20,7 @@ export default function BasicInfoForm() {
             >
                 <Input />
             </Item>
-            <Item label={t`description`} name={"description"}>
+            <Item label={t`Description`} name={"description"}>
                 <Input.TextArea rows={4} />
             </Item>
         </>

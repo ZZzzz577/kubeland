@@ -19,6 +19,7 @@ export default function TestConnection() {
         onError: (error) => {
             notify.error({
                 message: t`test connection error`,
+                description: error.message,
             });
             console.log(error);
         },
@@ -35,7 +36,7 @@ export default function TestConnection() {
     return (
         <>
             {notifyContext}
-            <Button loading={loading} onClick={handleTestConnection}>{t`test connection`}</Button>
+            <Button type={"primary"} ghost loading={loading} onClick={handleTestConnection}>{t`test connection`}</Button>
         </>
     );
 }

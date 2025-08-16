@@ -8,7 +8,7 @@ export default function getClusterTableColumns(): ColumnsType<ApiV1ClusterCluste
     return [
         {
             dataIndex: "name",
-            title: <Trans>name</Trans>,
+            title: <Trans>Name</Trans>,
             render: (name: string, record) => {
                 return <Link to={`/cluster/${record.id}/detail`}>{name}</Link>;
             },
@@ -19,21 +19,21 @@ export default function getClusterTableColumns(): ColumnsType<ApiV1ClusterCluste
             ellipsis: true,
         },
         {
-            title: <Trans>create time</Trans>,
+            title: <Trans>Create time</Trans>,
             dataIndex: "createdAt",
             render: (createdAt: Date) => {
                 return createdAt.toLocaleString();
             },
         },
         {
-            title: <Trans>update time</Trans>,
+            title: <Trans>Update time</Trans>,
             dataIndex: "updatedAt",
             render: (updatedAt: Date) => {
                 return updatedAt.toLocaleString();
             },
         },
         {
-            title: <Trans>actions</Trans>,
+            title: <Trans>Actions</Trans>,
             render: (_, record) => {
                 return (
                     <Space>

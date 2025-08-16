@@ -9,6 +9,7 @@ import ConnectionForm from "@/views/cluster/modify/components/form/ConnectionFor
 import TestConnection from "@/views/cluster/modify/components/form/TestConnection.tsx";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
+import { SaveOutlined } from "@ant-design/icons";
 
 export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster }) {
     const { cluster } = props;
@@ -93,11 +94,17 @@ export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster
             <Divider />
             <ConnectionForm />
 
-            <Space className={"ml-25"}>
+            <Space className={"ml-25"} size={"large"}>
                 <TestConnection />
-                <Button type="primary" htmlType="submit" loading={isUpdate ? updateLoading : createLoading}>
-                    {isUpdate ? t`update` : t`create`}
+                <Button
+                    icon={<SaveOutlined />}
+                    type="primary"
+                    htmlType="submit"
+                    loading={isUpdate ? updateLoading : createLoading}
+                >
+                    {t`Save`}
                 </Button>
+                <Button onClick={() => navigate(-1)}>{t`Cancel`}</Button>
             </Space>
         </Form>
     );
