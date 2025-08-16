@@ -47,6 +47,7 @@ func (ClusterConnection) Mixin() []ent.Mixin {
 func (ClusterConnection) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("cluster_id"),
+		index.Fields("address").Unique(),
 	}
 }
 
