@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/rs/zerolog/log"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sync"
@@ -17,17 +18,19 @@ var (
 	ErrClientNotFound = errors.New("kubernetes client not found")
 )
 
-type Client struct {
+type ClientWrapper struct {
+	updateAt time.Time
 	*kubernetes.Clientset
-	UpdateAt time.Time
+	*dynamic.DynamicClient
 }
 
 type ClientManager struct {
-	mu              sync.RWMutex
-	db              *data.Data
+	db *data.Data
+	// 同步间隔
 	refreshInterval time.Duration
 	ticker          *time.Ticker
-	clients         map[uint64]*Client
+	mu              sync.RWMutex
+	clients         map[uint64]*ClientWrapper
 }
 
 func NewClientManager(db *data.Data) (*ClientManager, func(), error) {
@@ -37,14 +40,14 @@ func NewClientManager(db *data.Data) (*ClientManager, func(), error) {
 		log.Error().Err(err).Msg("list clusters error")
 		return nil, nil, err
 	}
-	clients := make(map[uint64]*Client, len(connections))
+	clients := make(map[uint64]*ClientWrapper, len(connections))
 
 	cm := &ClientManager{
 		db:              db,
 		refreshInterval: 30 * time.Second,
 		clients:         clients,
 	}
-
+	// 启动时首次同步
 	if err = cm.Refresh(); err != nil {
 		log.Error().Err(err).Msg("refresh client error")
 		return nil, nil, err
@@ -74,13 +77,13 @@ func (c *ClientManager) Refresh() error {
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	// add or update client
+	// 新增或更新client
 	dbConnIds := make(map[uint64]struct{}, len(connections))
 	for _, conn := range connections {
 		id := conn.ID
 		dbConnIds[id] = struct{}{}
-		if c.clients[id] == nil || conn.UpdatedAt.After(c.clients[id].UpdateAt) {
-			client, err := GetClientByConfig(conn)
+		if c.clients[id] == nil || conn.UpdatedAt.After(c.clients[id].updateAt) {
+			client, err := c.GetClientByConfig(conn)
 			if err != nil {
 				log.Error().
 					Err(err).
@@ -91,7 +94,7 @@ func (c *ClientManager) Refresh() error {
 			c.clients[id] = client
 		}
 	}
-	// delete client
+	// 删除client
 	for id := range c.clients {
 		if _, ok := dbConnIds[id]; !ok {
 			delete(c.clients, id)
@@ -100,7 +103,7 @@ func (c *ClientManager) Refresh() error {
 	return nil
 }
 
-func GetClientByConfig(conn *generated.ClusterConnection) (*Client, error) {
+func (c *ClientManager) GetClientByConfig(conn *generated.ClusterConnection) (*ClientWrapper, error) {
 	config := &rest.Config{
 		Host: conn.Address,
 		TLSClientConfig: rest.TLSClientConfig{
@@ -114,20 +117,24 @@ func GetClientByConfig(conn *generated.ClusterConnection) (*Client, error) {
 	case uint8(cluster.Connection_TLS_TOKEN):
 		config.BearerToken = conn.Token
 	}
-	clientSet, err := kubernetes.NewForConfig(config)
+	// 获取普通资源的client
+	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
-	if _, err = clientSet.ServerVersion(); err != nil {
+	// 获取crd资源的client
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
 		return nil, err
 	}
-	return &Client{
-		clientSet,
-		conn.UpdatedAt,
+	return &ClientWrapper{
+		updateAt:      conn.UpdatedAt,
+		Clientset:     client,
+		DynamicClient: dynamicClient,
 	}, nil
 }
 
-func (c *ClientManager) Get(clusterId uint64) (*Client, error) {
+func (c *ClientManager) Get(clusterId uint64) (*ClientWrapper, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	if client := c.clients[clusterId]; client == nil {

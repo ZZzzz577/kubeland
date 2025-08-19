@@ -62,6 +62,10 @@ export interface ClusterServiceTestConnectionRequest {
     apiV1ClusterConnection: ApiV1ClusterConnection;
 }
 
+export interface ClusterServiceTestOperatorRequest {
+    apiV1ClusterConnection: ApiV1ClusterConnection;
+}
+
 export interface ClusterServiceUpdateClusterRequest {
     id: string;
     apiV1ClusterCluster: Omit<ApiV1ClusterCluster, 'createdAt'|'updatedAt'>;
@@ -283,6 +287,43 @@ export class ClusterServiceApi extends runtime.BaseAPI {
      */
     async clusterServiceTestConnection(requestParameters: ClusterServiceTestConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1ClusterTestConnectionResponse> {
         const response = await this.clusterServiceTestConnectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async clusterServiceTestOperatorRaw(requestParameters: ClusterServiceTestOperatorRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters['apiV1ClusterConnection'] == null) {
+            throw new runtime.RequiredError(
+                'apiV1ClusterConnection',
+                'Required parameter "apiV1ClusterConnection" was null or undefined when calling clusterServiceTestOperator().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/v1/cluster/operator/test`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApiV1ClusterConnectionToJSON(requestParameters['apiV1ClusterConnection']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async clusterServiceTestOperator(requestParameters: ClusterServiceTestOperatorRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.clusterServiceTestOperatorRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

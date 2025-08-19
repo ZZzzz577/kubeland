@@ -51,3 +51,7 @@ func (c *ClusterService) ResolveKubeConfig(ctx context.Context, request *cluster
 func (c *ClusterService) TestConnection(ctx context.Context, request *cluster.Connection) (*cluster.TestConnectionResponse, error) {
 	return c.clusterBiz.TestConnection(ctx, request)
 }
+
+func (c *ClusterService) TestOperator(ctx context.Context, request *cluster.Connection) (*cluster.TestOperatorResponse, error) {
+	return c.clusterBiz.TestOperator(ctx, request)
+}

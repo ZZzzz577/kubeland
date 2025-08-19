@@ -52,6 +52,12 @@ service ClusterService {
       body: "*"
     };
   }
+  rpc TestOperator(Connection) returns (TestOperatorResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cluster/operator/test"
+      body: "*"
+    };
+  }
 }
 
 message Connection {
@@ -152,4 +158,7 @@ message ResolveKubeConfigResponse {
 
 message TestConnectionResponse {
   string version = 1;
+}
+
+message TestOperatorResponse {
 }

@@ -79,6 +79,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.cluster.ResolveKubeConfigResponse'
+    /api/v1/cluster/operator/test:
+        post:
+            tags:
+                - ClusterService
+            operationId: ClusterService_TestOperator
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.cluster.Connection'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.cluster.TestOperatorResponse'
     /api/v1/cluster/{id}:
         get:
             tags:
@@ -236,6 +254,9 @@ components:
             properties:
                 version:
                     type: string
+        api.v1.cluster.TestOperatorResponse:
+            type: object
+            properties: {}
         api.v1.common.Pagination:
             type: object
             properties:

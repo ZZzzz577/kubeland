@@ -63,6 +63,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{ClusterConnectionsColumns[10]},
 			},
+			{
+				Name:    "clusterconnection_address",
+				Unique:  true,
+				Columns: []*schema.Column{ClusterConnectionsColumns[4]},
+			},
 		},
 	}
 	// Tables holds all the tables in the schema.

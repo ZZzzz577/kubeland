@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -18,8 +20,7 @@ import (
 )
 
 var (
-	ClusterNotFoundError = status.Error(codes.NotFound, "cluster not found")
-
+	ClusterNotFoundError           = status.Error(codes.NotFound, "cluster not found")
 	ClusterConnectionRequiredError = status.Error(codes.InvalidArgument, "cluster connection is required")
 )
 
@@ -36,7 +37,7 @@ func NewClusterBiz(
 }
 
 func (c *ClusterBiz) ListClusters(ctx context.Context, request *cluster.ListClustersRequest) (*cluster.ListClustersResponse, error) {
-	query := c.db.Cluster.Query()
+	query := c.db.Cluster.Query().WithConnection()
 	page, list, err := data.Page[*generated.ClusterQuery, *generated.Cluster](ctx, query, request.Page)
 	if err != nil {
 		log.Error().Err(err).Msg("ListClusters")
@@ -248,7 +249,7 @@ func (c *ClusterBiz) ResolveKubeConfig(_ context.Context, request *cluster.Resol
 	return &cluster.ResolveKubeConfigResponse{Items: res}, nil
 }
 
-func (c *ClusterBiz) TestConnection(_ context.Context, request *cluster.Connection) (*cluster.TestConnectionResponse, error) {
+func (c *ClusterBiz) getKubeRestConfig(request *cluster.Connection) *rest.Config {
 	config := &rest.Config{
 		Host: request.Address,
 		TLSClientConfig: rest.TLSClientConfig{
@@ -261,6 +262,11 @@ func (c *ClusterBiz) TestConnection(_ context.Context, request *cluster.Connecti
 	} else if request.Type == cluster.Connection_TLS_TOKEN {
 		config.BearerToken = request.Token
 	}
+	return config
+}
+
+func (c *ClusterBiz) TestConnection(_ context.Context, request *cluster.Connection) (*cluster.TestConnectionResponse, error) {
+	config := c.getKubeRestConfig(request)
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, err
@@ -270,5 +276,20 @@ func (c *ClusterBiz) TestConnection(_ context.Context, request *cluster.Connecti
 	} else {
 		return &cluster.TestConnectionResponse{Version: version.String()}, nil
 	}
+}
 
+func (c *ClusterBiz) TestOperator(ctx context.Context, request *cluster.Connection) (*cluster.TestOperatorResponse, error) {
+	config := c.getKubeRestConfig(request)
+	client, err := apiextensionsclient.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	// 检查crd是否创建
+	_, err = client.ApiextensionsV1().
+		CustomResourceDefinitions().
+		Get(ctx, "applications.app.kubeland", metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return &cluster.TestOperatorResponse{}, nil
 }

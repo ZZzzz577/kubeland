@@ -26,6 +26,7 @@ const OperationClusterServiceGetCluster = "/api.v1.cluster.ClusterService/GetClu
 const OperationClusterServiceListClusters = "/api.v1.cluster.ClusterService/ListClusters"
 const OperationClusterServiceResolveKubeConfig = "/api.v1.cluster.ClusterService/ResolveKubeConfig"
 const OperationClusterServiceTestConnection = "/api.v1.cluster.ClusterService/TestConnection"
+const OperationClusterServiceTestOperator = "/api.v1.cluster.ClusterService/TestOperator"
 const OperationClusterServiceUpdateCluster = "/api.v1.cluster.ClusterService/UpdateCluster"
 
 type ClusterServiceHTTPServer interface {
@@ -35,6 +36,7 @@ type ClusterServiceHTTPServer interface {
 	ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error)
 	ResolveKubeConfig(context.Context, *ResolveKubeConfigRequest) (*ResolveKubeConfigResponse, error)
 	TestConnection(context.Context, *Connection) (*TestConnectionResponse, error)
+	TestOperator(context.Context, *Connection) (*TestOperatorResponse, error)
 	UpdateCluster(context.Context, *Cluster) (*emptypb.Empty, error)
 }
 
@@ -47,6 +49,7 @@ func RegisterClusterServiceHTTPServer(s *http.Server, srv ClusterServiceHTTPServ
 	r.DELETE("/api/v1/cluster/{id}", _ClusterService_DeleteCluster0_HTTP_Handler(srv))
 	r.POST("/api/v1/cluster/kube/config", _ClusterService_ResolveKubeConfig0_HTTP_Handler(srv))
 	r.POST("/api/v1/cluster/connection/test", _ClusterService_TestConnection0_HTTP_Handler(srv))
+	r.POST("/api/v1/cluster/operator/test", _ClusterService_TestOperator0_HTTP_Handler(srv))
 }
 
 func _ClusterService_ListClusters0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
@@ -203,6 +206,28 @@ func _ClusterService_TestConnection0_HTTP_Handler(srv ClusterServiceHTTPServer) 
 	}
 }
 
+func _ClusterService_TestOperator0_HTTP_Handler(srv ClusterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Connection
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationClusterServiceTestOperator)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TestOperator(ctx, req.(*Connection))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TestOperatorResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ClusterServiceHTTPClient interface {
 	CreateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteCluster(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
@@ -210,6 +235,7 @@ type ClusterServiceHTTPClient interface {
 	ListClusters(ctx context.Context, req *ListClustersRequest, opts ...http.CallOption) (rsp *ListClustersResponse, err error)
 	ResolveKubeConfig(ctx context.Context, req *ResolveKubeConfigRequest, opts ...http.CallOption) (rsp *ResolveKubeConfigResponse, err error)
 	TestConnection(ctx context.Context, req *Connection, opts ...http.CallOption) (rsp *TestConnectionResponse, err error)
+	TestOperator(ctx context.Context, req *Connection, opts ...http.CallOption) (rsp *TestOperatorResponse, err error)
 	UpdateCluster(ctx context.Context, req *Cluster, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -291,6 +317,19 @@ func (c *ClusterServiceHTTPClientImpl) TestConnection(ctx context.Context, in *C
 	pattern := "/api/v1/cluster/connection/test"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationClusterServiceTestConnection))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ClusterServiceHTTPClientImpl) TestOperator(ctx context.Context, in *Connection, opts ...http.CallOption) (*TestOperatorResponse, error) {
+	var out TestOperatorResponse
+	pattern := "/api/v1/cluster/operator/test"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationClusterServiceTestOperator))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
