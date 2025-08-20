@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
 	"api-server/internal/data/generated/predicate"
@@ -20,11 +21,12 @@ import (
 // ClusterQuery is the builder for querying Cluster entities.
 type ClusterQuery struct {
 	config
-	ctx            *QueryContext
-	order          []cluster.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Cluster
-	withConnection *ClusterConnectionQuery
+	ctx              *QueryContext
+	order            []cluster.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.Cluster
+	withConnection   *ClusterConnectionQuery
+	withApplications *ApplicationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (_q *ClusterQuery) QueryConnection() *ClusterConnectionQuery {
 			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
 			sqlgraph.To(clusterconnection.Table, clusterconnection.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, cluster.ConnectionTable, cluster.ConnectionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryApplications chains the current query on the "applications" edge.
+func (_q *ClusterQuery) QueryApplications() *ApplicationQuery {
+	query := (&ApplicationClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
+			sqlgraph.To(application.Table, application.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, cluster.ApplicationsTable, cluster.ApplicationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +294,13 @@ func (_q *ClusterQuery) Clone() *ClusterQuery {
 		return nil
 	}
 	return &ClusterQuery{
-		config:         _q.config,
-		ctx:            _q.ctx.Clone(),
-		order:          append([]cluster.OrderOption{}, _q.order...),
-		inters:         append([]Interceptor{}, _q.inters...),
-		predicates:     append([]predicate.Cluster{}, _q.predicates...),
-		withConnection: _q.withConnection.Clone(),
+		config:           _q.config,
+		ctx:              _q.ctx.Clone(),
+		order:            append([]cluster.OrderOption{}, _q.order...),
+		inters:           append([]Interceptor{}, _q.inters...),
+		predicates:       append([]predicate.Cluster{}, _q.predicates...),
+		withConnection:   _q.withConnection.Clone(),
+		withApplications: _q.withApplications.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -290,6 +315,17 @@ func (_q *ClusterQuery) WithConnection(opts ...func(*ClusterConnectionQuery)) *C
 		opt(query)
 	}
 	_q.withConnection = query
+	return _q
+}
+
+// WithApplications tells the query-builder to eager-load the nodes that are connected to
+// the "applications" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ClusterQuery) WithApplications(opts ...func(*ApplicationQuery)) *ClusterQuery {
+	query := (&ApplicationClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withApplications = query
 	return _q
 }
 
@@ -371,8 +407,9 @@ func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 	var (
 		nodes       = []*Cluster{}
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			_q.withConnection != nil,
+			_q.withApplications != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -399,6 +436,13 @@ func (_q *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 			return nil, err
 		}
 	}
+	if query := _q.withApplications; query != nil {
+		if err := _q.loadApplications(ctx, query, nodes,
+			func(n *Cluster) { n.Edges.Applications = []*Application{} },
+			func(n *Cluster, e *Application) { n.Edges.Applications = append(n.Edges.Applications, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -414,6 +458,36 @@ func (_q *ClusterQuery) loadConnection(ctx context.Context, query *ClusterConnec
 	}
 	query.Where(predicate.ClusterConnection(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(cluster.ConnectionColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ClusterID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "cluster_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ClusterQuery) loadApplications(ctx context.Context, query *ApplicationQuery, nodes []*Cluster, init func(*Cluster), assign func(*Cluster, *Application)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*Cluster)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(application.FieldClusterID)
+	}
+	query.Where(predicate.Application(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(cluster.ApplicationsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

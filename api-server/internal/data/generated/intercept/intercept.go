@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"api-server/internal/data/generated"
+	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
 	"api-server/internal/data/generated/predicate"
@@ -70,6 +71,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q generated.Query) error {
 	return f(ctx, query)
 }
 
+// The ApplicationFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ApplicationFunc func(context.Context, *generated.ApplicationQuery) (generated.Value, error)
+
+// Query calls f(ctx, q).
+func (f ApplicationFunc) Query(ctx context.Context, q generated.Query) (generated.Value, error) {
+	if q, ok := q.(*generated.ApplicationQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *generated.ApplicationQuery", q)
+}
+
+// The TraverseApplication type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseApplication func(context.Context, *generated.ApplicationQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseApplication) Intercept(next generated.Querier) generated.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseApplication) Traverse(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.ApplicationQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *generated.ApplicationQuery", q)
+}
+
 // The ClusterFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ClusterFunc func(context.Context, *generated.ClusterQuery) (generated.Value, error)
 
@@ -127,6 +155,8 @@ func (f TraverseClusterConnection) Traverse(ctx context.Context, q generated.Que
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q generated.Query) (Query, error) {
 	switch q := q.(type) {
+	case *generated.ApplicationQuery:
+		return &query[*generated.ApplicationQuery, predicate.Application, application.OrderOption]{typ: generated.TypeApplication, tq: q}, nil
 	case *generated.ClusterQuery:
 		return &query[*generated.ClusterQuery, predicate.Cluster, cluster.OrderOption]{typ: generated.TypeCluster, tq: q}, nil
 	case *generated.ClusterConnectionQuery:

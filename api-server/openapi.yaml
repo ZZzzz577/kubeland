@@ -3,9 +3,24 @@
 
 openapi: 3.0.3
 info:
-    title: ClusterService API
+    title: ""
     version: 0.0.1
 paths:
+    /api/v1/application:
+        post:
+            tags:
+                - ApplicationService
+            operationId: ApplicationService_CreateApplication
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.application.Application'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/cluster:
         get:
             tags:
@@ -151,6 +166,20 @@ paths:
                     content: {}
 components:
     schemas:
+        api.v1.application.Application:
+            required:
+                - clusterId
+                - name
+            type: object
+            properties:
+                id:
+                    type: string
+                clusterId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
         api.v1.cluster.Cluster:
             required:
                 - name
@@ -270,4 +299,5 @@ components:
                     type: integer
                     format: uint32
 tags:
+    - name: ApplicationService
     - name: ClusterService

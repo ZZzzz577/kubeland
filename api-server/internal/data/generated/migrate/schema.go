@@ -8,6 +8,37 @@ import (
 )
 
 var (
+	// ApplicationsColumns holds the columns for the "applications" table.
+	ApplicationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "description", Type: field.TypeString, Size: 512, Default: ""},
+		{Name: "cluster_id", Type: field.TypeUint64},
+	}
+	// ApplicationsTable holds the schema information for the "applications" table.
+	ApplicationsTable = &schema.Table{
+		Name:       "applications",
+		Columns:    ApplicationsColumns,
+		PrimaryKey: []*schema.Column{ApplicationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "applications_clusters_applications",
+				Columns:    []*schema.Column{ApplicationsColumns[6]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "application_cluster_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{ApplicationsColumns[6], ApplicationsColumns[4]},
+			},
+		},
+	}
 	// ClustersColumns holds the columns for the "clusters" table.
 	ClustersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
@@ -72,11 +103,13 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ApplicationsTable,
 		ClustersTable,
 		ClusterConnectionsTable,
 	}
 )
 
 func init() {
+	ApplicationsTable.ForeignKeys[0].RefTable = ClustersTable
 	ClusterConnectionsTable.ForeignKeys[0].RefTable = ClustersTable
 }

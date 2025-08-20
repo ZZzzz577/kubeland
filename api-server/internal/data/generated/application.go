@@ -3,8 +3,8 @@
 package generated
 
 import (
+	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
-	"api-server/internal/data/generated/clusterconnection"
 	"fmt"
 	"strings"
 	"time"
@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Cluster is the model entity for the Cluster schema.
-type Cluster struct {
+// Application is the model entity for the Application schema.
+type Application struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
@@ -24,57 +24,48 @@ type Cluster struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeleteAt holds the value of the "delete_at" field.
 	DeleteAt time.Time `json:"delete_at,omitempty"`
-	// 集群名称
+	// 集群ID
+	ClusterID uint64 `json:"cluster_id,omitempty"`
+	// 名称
 	Name string `json:"name,omitempty"`
-	// 集群描述
+	// 描述
 	Description string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ClusterQuery when eager-loading is set.
-	Edges        ClusterEdges `json:"edges"`
+	// The values are being populated by the ApplicationQuery when eager-loading is set.
+	Edges        ApplicationEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// ClusterEdges holds the relations/edges for other nodes in the graph.
-type ClusterEdges struct {
-	// Connection holds the value of the connection edge.
-	Connection *ClusterConnection `json:"connection,omitempty"`
-	// Applications holds the value of the applications edge.
-	Applications []*Application `json:"applications,omitempty"`
+// ApplicationEdges holds the relations/edges for other nodes in the graph.
+type ApplicationEdges struct {
+	// Cluster holds the value of the cluster edge.
+	Cluster *Cluster `json:"cluster,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
-// ConnectionOrErr returns the Connection value or an error if the edge
+// ClusterOrErr returns the Cluster value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClusterEdges) ConnectionOrErr() (*ClusterConnection, error) {
-	if e.Connection != nil {
-		return e.Connection, nil
+func (e ApplicationEdges) ClusterOrErr() (*Cluster, error) {
+	if e.Cluster != nil {
+		return e.Cluster, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: clusterconnection.Label}
+		return nil, &NotFoundError{label: cluster.Label}
 	}
-	return nil, &NotLoadedError{edge: "connection"}
-}
-
-// ApplicationsOrErr returns the Applications value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClusterEdges) ApplicationsOrErr() ([]*Application, error) {
-	if e.loadedTypes[1] {
-		return e.Applications, nil
-	}
-	return nil, &NotLoadedError{edge: "applications"}
+	return nil, &NotLoadedError{edge: "cluster"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Cluster) scanValues(columns []string) ([]any, error) {
+func (*Application) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cluster.FieldID:
+		case application.FieldID, application.FieldClusterID:
 			values[i] = new(sql.NullInt64)
-		case cluster.FieldName, cluster.FieldDescription:
+		case application.FieldName, application.FieldDescription:
 			values[i] = new(sql.NullString)
-		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeleteAt:
+		case application.FieldCreatedAt, application.FieldUpdatedAt, application.FieldDeleteAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,44 +75,50 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Cluster fields.
-func (_m *Cluster) assignValues(columns []string, values []any) error {
+// to the Application fields.
+func (_m *Application) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case cluster.FieldID:
+		case application.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = uint64(value.Int64)
-		case cluster.FieldCreatedAt:
+		case application.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
 			}
-		case cluster.FieldUpdatedAt:
+		case application.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case cluster.FieldDeleteAt:
+		case application.FieldDeleteAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_at", values[i])
 			} else if value.Valid {
 				_m.DeleteAt = value.Time
 			}
-		case cluster.FieldName:
+		case application.FieldClusterID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field cluster_id", values[i])
+			} else if value.Valid {
+				_m.ClusterID = uint64(value.Int64)
+			}
+		case application.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				_m.Name = value.String
 			}
-		case cluster.FieldDescription:
+		case application.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
@@ -134,44 +131,39 @@ func (_m *Cluster) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Cluster.
+// Value returns the ent.Value that was dynamically selected and assigned to the Application.
 // This includes values selected through modifiers, order, etc.
-func (_m *Cluster) Value(name string) (ent.Value, error) {
+func (_m *Application) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryConnection queries the "connection" edge of the Cluster entity.
-func (_m *Cluster) QueryConnection() *ClusterConnectionQuery {
-	return NewClusterClient(_m.config).QueryConnection(_m)
+// QueryCluster queries the "cluster" edge of the Application entity.
+func (_m *Application) QueryCluster() *ClusterQuery {
+	return NewApplicationClient(_m.config).QueryCluster(_m)
 }
 
-// QueryApplications queries the "applications" edge of the Cluster entity.
-func (_m *Cluster) QueryApplications() *ApplicationQuery {
-	return NewClusterClient(_m.config).QueryApplications(_m)
-}
-
-// Update returns a builder for updating this Cluster.
-// Note that you need to call Cluster.Unwrap() before calling this method if this Cluster
+// Update returns a builder for updating this Application.
+// Note that you need to call Application.Unwrap() before calling this method if this Application
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (_m *Cluster) Update() *ClusterUpdateOne {
-	return NewClusterClient(_m.config).UpdateOne(_m)
+func (_m *Application) Update() *ApplicationUpdateOne {
+	return NewApplicationClient(_m.config).UpdateOne(_m)
 }
 
-// Unwrap unwraps the Cluster entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Application entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (_m *Cluster) Unwrap() *Cluster {
+func (_m *Application) Unwrap() *Application {
 	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
-		panic("generated: Cluster is not a transactional entity")
+		panic("generated: Application is not a transactional entity")
 	}
 	_m.config.driver = _tx.drv
 	return _m
 }
 
 // String implements the fmt.Stringer.
-func (_m *Cluster) String() string {
+func (_m *Application) String() string {
 	var builder strings.Builder
-	builder.WriteString("Cluster(")
+	builder.WriteString("Application(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
@@ -182,6 +174,9 @@ func (_m *Cluster) String() string {
 	builder.WriteString("delete_at=")
 	builder.WriteString(_m.DeleteAt.Format(time.ANSIC))
 	builder.WriteString(", ")
+	builder.WriteString("cluster_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ClusterID))
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
@@ -191,5 +186,5 @@ func (_m *Cluster) String() string {
 	return builder.String()
 }
 
-// Clusters is a parsable slice of Cluster.
-type Clusters []*Cluster
+// Applications is a parsable slice of Application.
+type Applications []*Application

@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
 	"context"
@@ -74,6 +75,7 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			application.Table:       application.ValidColumn,
 			cluster.Table:           cluster.ValidColumn,
 			clusterconnection.Table: clusterconnection.ValidColumn,
 		})

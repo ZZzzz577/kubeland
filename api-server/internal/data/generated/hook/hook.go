@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The ApplicationFunc type is an adapter to allow the use of ordinary
+// function as Application mutator.
+type ApplicationFunc func(context.Context, *generated.ApplicationMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ApplicationFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	if mv, ok := m.(*generated.ApplicationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ApplicationMutation", m)
+}
+
 // The ClusterFunc type is an adapter to allow the use of ordinary
 // function as Cluster mutator.
 type ClusterFunc func(context.Context, *generated.ClusterMutation) (generated.Value, error)

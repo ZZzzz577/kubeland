@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
 	"api-server/internal/data/schema"
@@ -13,6 +14,49 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	applicationMixin := schema.Application{}.Mixin()
+	applicationMixinHooks1 := applicationMixin[1].Hooks()
+	application.Hooks[0] = applicationMixinHooks1[0]
+	applicationMixinInters1 := applicationMixin[1].Interceptors()
+	application.Interceptors[0] = applicationMixinInters1[0]
+	applicationMixinFields0 := applicationMixin[0].Fields()
+	_ = applicationMixinFields0
+	applicationFields := schema.Application{}.Fields()
+	_ = applicationFields
+	// applicationDescCreatedAt is the schema descriptor for created_at field.
+	applicationDescCreatedAt := applicationMixinFields0[0].Descriptor()
+	// application.DefaultCreatedAt holds the default value on creation for the created_at field.
+	application.DefaultCreatedAt = applicationDescCreatedAt.Default.(func() time.Time)
+	// applicationDescUpdatedAt is the schema descriptor for updated_at field.
+	applicationDescUpdatedAt := applicationMixinFields0[1].Descriptor()
+	// application.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	application.DefaultUpdatedAt = applicationDescUpdatedAt.Default.(func() time.Time)
+	// application.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	application.UpdateDefaultUpdatedAt = applicationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// applicationDescName is the schema descriptor for name field.
+	applicationDescName := applicationFields[1].Descriptor()
+	// application.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	application.NameValidator = func() func(string) error {
+		validators := applicationDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// applicationDescDescription is the schema descriptor for description field.
+	applicationDescDescription := applicationFields[2].Descriptor()
+	// application.DefaultDescription holds the default value on creation for the description field.
+	application.DefaultDescription = applicationDescDescription.Default.(string)
+	// application.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	application.DescriptionValidator = applicationDescDescription.Validators[0].(func(string) error)
 	clusterMixin := schema.Cluster{}.Mixin()
 	clusterMixinHooks1 := clusterMixin[1].Hooks()
 	cluster.Hooks[0] = clusterMixinHooks1[0]

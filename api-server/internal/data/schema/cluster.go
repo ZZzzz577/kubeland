@@ -45,5 +45,6 @@ func (Cluster) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connection", ClusterConnection.Type).
 			Unique(),
+		edge.To("applications", Application.Type),
 	}
 }
