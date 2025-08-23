@@ -8,6 +8,7 @@ import (
 	"context"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -37,11 +38,23 @@ func (a *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (a *ApplicationReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
 	app := &appv1.Application{}
-	if err := a.client.Get(ctx, request.NamespacedName, app); err != nil {
+	err := a.client.Get(ctx, request.NamespacedName, app)
+	if errors.IsNotFound(err) {
+		_, err = a.db.Application.Delete().Where(
+			application.ClusterID(a.clusterId),
+			application.Name(app.Name),
+		).Exec(ctx)
+		if err != nil {
+			log.Error().Err(err).Msg("delete application error")
+			return ctrl.Result{}, err
+		}
+	}
+	if err != nil {
 		log.Error().Err(err).Msg("get application error")
 		return ctrl.Result{}, err
 	}
-	err := a.db.WithTx(ctx, func(tx *generated.Tx) error {
+
+	err = a.db.WithTx(ctx, func(tx *generated.Tx) error {
 		exist, err := tx.Application.Query().Where(
 			application.ClusterID(a.clusterId),
 			application.Name(app.Name),

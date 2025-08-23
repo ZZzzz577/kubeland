@@ -7,13 +7,13 @@
 package application
 
 import (
-	_ "api-server/api/v1/common"
+	common "api-server/api/v1/common"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -32,6 +32,7 @@ type Application struct {
 	ClusterId     uint64                 `protobuf:"varint,2,opt,name=cluster_id,json=clusterId,proto3" json:"cluster_id,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,100,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,19 +95,181 @@ func (x *Application) GetDescription() string {
 	return ""
 }
 
+func (x *Application) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type IdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdRequest) Reset() {
+	*x = IdRequest{}
+	mi := &file_v1_application_application_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdRequest) ProtoMessage() {}
+
+func (x *IdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_application_application_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdRequest.ProtoReflect.Descriptor instead.
+func (*IdRequest) Descriptor() ([]byte, []int) {
+	return file_v1_application_application_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *IdRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type ListApplicationsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.Page           `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListApplicationsRequest) Reset() {
+	*x = ListApplicationsRequest{}
+	mi := &file_v1_application_application_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListApplicationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListApplicationsRequest) ProtoMessage() {}
+
+func (x *ListApplicationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_application_application_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListApplicationsRequest.ProtoReflect.Descriptor instead.
+func (*ListApplicationsRequest) Descriptor() ([]byte, []int) {
+	return file_v1_application_application_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ListApplicationsRequest) GetPage() *common.Page {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+type ListApplicationsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pagination    *common.Pagination     `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Items         []*Application         `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListApplicationsResponse) Reset() {
+	*x = ListApplicationsResponse{}
+	mi := &file_v1_application_application_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListApplicationsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListApplicationsResponse) ProtoMessage() {}
+
+func (x *ListApplicationsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_application_application_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListApplicationsResponse.ProtoReflect.Descriptor instead.
+func (*ListApplicationsResponse) Descriptor() ([]byte, []int) {
+	return file_v1_application_application_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ListApplicationsResponse) GetPagination() *common.Pagination {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *ListApplicationsResponse) GetItems() []*Application {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_v1_application_application_proto protoreflect.FileDescriptor
 
 const file_v1_application_application_proto_rawDesc = "" +
 	"\n" +
-	" v1/application/application.proto\x12\x12api.v1.application\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14v1/common/page.proto\"\xa0\x01\n" +
+	" v1/application/application.proto\x12\x12api.v1.application\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14v1/common/page.proto\"\xda\x01\n" +
 	"\vApplication\x12\x14\n" +
-	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x05R\x02id\x12*\n" +
+	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x05R\x02id\x12#\n" +
 	"\n" +
-	"cluster_id\x18\x02 \x01(\x04B\v\xe2A\x01\x02\xfaB\x042\x02 \x00R\tclusterId\x12\x1f\n" +
-	"\x04name\x18\x03 \x01(\tB\v\xe2A\x01\x02\xfaB\x04r\x02\x18@R\x04name\x12.\n" +
-	"\vdescription\x18\x04 \x01(\tB\f\xe2A\x01\x01\xfaB\x05r\x03\x18\x80\x04R\vdescription2\x82\x01\n" +
-	"\x12ApplicationService\x12l\n" +
-	"\x11CreateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/applicationB+Z)api-server/api/v1/application;applicationb\x06proto3"
+	"cluster_id\x18\x02 \x01(\x04B\x04\xe2A\x01\x05R\tclusterId\x12\x1f\n" +
+	"\x04name\x18\x03 \x01(\tB\v\xe2A\x01\x05\xfaB\x04r\x02\x18@R\x04name\x12.\n" +
+	"\vdescription\x18\x04 \x01(\tB\f\xe2A\x01\x01\xfaB\x05r\x03\x18\x80\x04R\vdescription\x12?\n" +
+	"\n" +
+	"created_at\x18d \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tcreatedAt\"!\n" +
+	"\tIdRequest\x12\x14\n" +
+	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x02R\x02id\"B\n" +
+	"\x17ListApplicationsRequest\x12'\n" +
+	"\x04page\x18\x01 \x01(\v2\x13.api.v1.common.PageR\x04page\"\x8c\x01\n" +
+	"\x18ListApplicationsResponse\x129\n" +
+	"\n" +
+	"pagination\x18\x01 \x01(\v2\x19.api.v1.common.PaginationR\n" +
+	"pagination\x125\n" +
+	"\x05items\x18\x02 \x03(\v2\x1f.api.v1.application.ApplicationR\x05items2\xe4\x04\n" +
+	"\x12ApplicationService\x12\x8a\x01\n" +
+	"\x10ListApplications\x12+.api.v1.application.ListApplicationsRequest\x1a,.api.v1.application.ListApplicationsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/application\x12r\n" +
+	"\x0eGetApplication\x12\x1d.api.v1.application.IdRequest\x1a\x1f.api.v1.application.Application\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/application/{id}\x12l\n" +
+	"\x11CreateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/application\x12q\n" +
+	"\x11UpdateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/api/v1/application/{id}\x12l\n" +
+	"\x11DeleteApplication\x12\x1d.api.v1.application.IdRequest\x1a\x16.google.protobuf.Empty\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/application/{id}B+Z)api-server/api/v1/application;applicationb\x06proto3"
 
 var (
 	file_v1_application_application_proto_rawDescOnce sync.Once
@@ -120,19 +283,37 @@ func file_v1_application_application_proto_rawDescGZIP() []byte {
 	return file_v1_application_application_proto_rawDescData
 }
 
-var file_v1_application_application_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_v1_application_application_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_v1_application_application_proto_goTypes = []any{
-	(*Application)(nil),   // 0: api.v1.application.Application
-	(*emptypb.Empty)(nil), // 1: google.protobuf.Empty
+	(*Application)(nil),              // 0: api.v1.application.Application
+	(*IdRequest)(nil),                // 1: api.v1.application.IdRequest
+	(*ListApplicationsRequest)(nil),  // 2: api.v1.application.ListApplicationsRequest
+	(*ListApplicationsResponse)(nil), // 3: api.v1.application.ListApplicationsResponse
+	(*timestamppb.Timestamp)(nil),    // 4: google.protobuf.Timestamp
+	(*common.Page)(nil),              // 5: api.v1.common.Page
+	(*common.Pagination)(nil),        // 6: api.v1.common.Pagination
+	(*emptypb.Empty)(nil),            // 7: google.protobuf.Empty
 }
 var file_v1_application_application_proto_depIdxs = []int32{
-	0, // 0: api.v1.application.ApplicationService.CreateApplication:input_type -> api.v1.application.Application
-	1, // 1: api.v1.application.ApplicationService.CreateApplication:output_type -> google.protobuf.Empty
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: api.v1.application.Application.created_at:type_name -> google.protobuf.Timestamp
+	5, // 1: api.v1.application.ListApplicationsRequest.page:type_name -> api.v1.common.Page
+	6, // 2: api.v1.application.ListApplicationsResponse.pagination:type_name -> api.v1.common.Pagination
+	0, // 3: api.v1.application.ListApplicationsResponse.items:type_name -> api.v1.application.Application
+	2, // 4: api.v1.application.ApplicationService.ListApplications:input_type -> api.v1.application.ListApplicationsRequest
+	1, // 5: api.v1.application.ApplicationService.GetApplication:input_type -> api.v1.application.IdRequest
+	0, // 6: api.v1.application.ApplicationService.CreateApplication:input_type -> api.v1.application.Application
+	0, // 7: api.v1.application.ApplicationService.UpdateApplication:input_type -> api.v1.application.Application
+	1, // 8: api.v1.application.ApplicationService.DeleteApplication:input_type -> api.v1.application.IdRequest
+	3, // 9: api.v1.application.ApplicationService.ListApplications:output_type -> api.v1.application.ListApplicationsResponse
+	0, // 10: api.v1.application.ApplicationService.GetApplication:output_type -> api.v1.application.Application
+	7, // 11: api.v1.application.ApplicationService.CreateApplication:output_type -> google.protobuf.Empty
+	7, // 12: api.v1.application.ApplicationService.UpdateApplication:output_type -> google.protobuf.Empty
+	7, // 13: api.v1.application.ApplicationService.DeleteApplication:output_type -> google.protobuf.Empty
+	9, // [9:14] is the sub-list for method output_type
+	4, // [4:9] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_v1_application_application_proto_init() }
@@ -146,7 +327,7 @@ func file_v1_application_application_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_application_application_proto_rawDesc), len(file_v1_application_application_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

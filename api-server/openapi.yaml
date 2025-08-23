@@ -7,6 +7,28 @@ info:
     version: 0.0.1
 paths:
     /api/v1/application:
+        get:
+            tags:
+                - ApplicationService
+            operationId: ApplicationService_ListApplications
+            parameters:
+                - name: page.current
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: page.size
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.application.ListApplicationsResponse'
         post:
             tags:
                 - ApplicationService
@@ -17,6 +39,58 @@ paths:
                         schema:
                             $ref: '#/components/schemas/api.v1.application.Application'
                 required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/application/{id}:
+        get:
+            tags:
+                - ApplicationService
+            operationId: ApplicationService_GetApplication
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.application.Application'
+        put:
+            tags:
+                - ApplicationService
+            operationId: ApplicationService_UpdateApplication
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.application.Application'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        delete:
+            tags:
+                - ApplicationService
+            operationId: ApplicationService_DeleteApplication
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -167,9 +241,6 @@ paths:
 components:
     schemas:
         api.v1.application.Application:
-            required:
-                - clusterId
-                - name
             type: object
             properties:
                 id:
@@ -180,6 +251,19 @@ components:
                     type: string
                 description:
                     type: string
+                createdAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
+        api.v1.application.ListApplicationsResponse:
+            type: object
+            properties:
+                pagination:
+                    $ref: '#/components/schemas/api.v1.common.Pagination'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.application.Application'
         api.v1.cluster.Cluster:
             required:
                 - name

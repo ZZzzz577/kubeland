@@ -12,12 +12,38 @@ import "v1/common/page.proto";
 option go_package = "api-server/api/v1/application;application";
 
 service ApplicationService {
+  rpc ListApplications (ListApplicationsRequest) returns (ListApplicationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/application"
+    };
+  }
+
+  rpc GetApplication (IdRequest) returns (Application) {
+    option (google.api.http) = {
+      get: "/api/v1/application/{id}"
+    };
+  }
+
   rpc CreateApplication (Application) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/application"
       body: "*"
     };
   }
+
+  rpc UpdateApplication (Application) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/application/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteApplication (IdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/application/{id}"
+    };
+  }
+
 }
 
 message Application {
@@ -25,15 +51,33 @@ message Application {
     (google.api.field_behavior) = IMMUTABLE
   ];
   uint64 cluster_id = 2 [
-    (google.api.field_behavior) = REQUIRED,
-    (validate.rules).uint64 = {gt: 0}
+    (google.api.field_behavior) = IMMUTABLE
   ];
   string name = 3 [
-    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE,
     (validate.rules).string = {max_len: 64}
   ];
   string description = 4 [
     (google.api.field_behavior) = OPTIONAL,
     (validate.rules).string = {max_len: 512}
   ];
+
+  google.protobuf.Timestamp created_at = 100 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+message IdRequest {
+  uint64 id = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ListApplicationsRequest {
+  common.Page page = 1;
+}
+
+message ListApplicationsResponse {
+  common.Pagination pagination = 1;
+  repeated Application items = 2;
 }
