@@ -3,7 +3,7 @@ package biz
 import (
 	"api-server/api/v1/application"
 	"api-server/internal/data"
-	applicationv1 "api-server/internal/kube/apis/application/v1"
+	appv1 "api-server/internal/kube/api/v1"
 	"context"
 	"github.com/rs/zerolog/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,17 +30,13 @@ func (a *ApplicationBiz) CreateApplication(ctx context.Context, request *applica
 		log.Error().Err(err).Msg("get cluster error")
 		return err
 	}
-	_, err = client.KubelandV1().Applications("default").Create(ctx, &applicationv1.Application{
+	return client.Create(ctx, &appv1.Application{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: request.Name,
+			Namespace: "default",
+			Name:      request.Name,
 		},
-		Spec: applicationv1.ApplicationSpec{
+		Spec: appv1.ApplicationSpec{
 			Description: request.Description,
 		},
-	}, metav1.CreateOptions{})
-	if err != nil {
-		log.Error().Err(err).Msg("create application error")
-		return err
-	}
-	return nil
+	})
 }
