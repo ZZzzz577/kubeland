@@ -4,14 +4,12 @@ import (
 	"api-server/api/v1/cluster"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
-	"api-server/internal/kube/controller"
+	"api-server/internal/kube/clientset/versioned"
+	"api-server/internal/kube/informers/externalversions"
 	"context"
 	"errors"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sync"
 	"time"
 )
@@ -20,10 +18,82 @@ var (
 	ErrClientNotFound = errors.New("kubernetes client not found")
 )
 
-type ManagerWrapper struct {
-	cancel   context.CancelFunc
-	updateAt time.Time
-	Manager  manager.Manager
+const (
+	defaultRsyncInterval = 10 * time.Hour
+)
+
+type ClusterManager struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup
+
+	clusterID       uint64
+	updateAt        time.Time
+	clientset       *versioned.Clientset
+	informerFactory externalversions.SharedInformerFactory
+
+	applicationController *ApplicationController
+}
+
+func NewManagerWrapper(conn *generated.ClusterConnection) (*ClusterManager, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	config := &rest.Config{
+		Host: conn.Address,
+		TLSClientConfig: rest.TLSClientConfig{
+			CAData: []byte(conn.Ca),
+		},
+	}
+	switch conn.Type {
+	case uint8(cluster.Connection_TLS_CERT):
+		config.CertData = []byte(conn.Cert)
+		config.KeyData = []byte(conn.Key)
+	case uint8(cluster.Connection_TLS_TOKEN):
+		config.BearerToken = conn.Token
+	}
+	clientSet, err := versioned.NewForConfig(config)
+	if err != nil {
+		cancel()
+		return nil, err
+	}
+
+	informerFactory := externalversions.NewSharedInformerFactory(clientSet, defaultRsyncInterval)
+
+	applicationController := NewApplicationController(conn.ClusterID, informerFactory)
+
+	return &ClusterManager{
+		ctx:    ctx,
+		cancel: cancel,
+
+		clusterID:       conn.ClusterID,
+		updateAt:        conn.UpdatedAt,
+		clientset:       clientSet,
+		informerFactory: informerFactory,
+
+		applicationController: applicationController,
+	}, nil
+}
+
+func (m *ClusterManager) Start() {
+	log.Info().Uint64("clusterId", m.clusterID).Msg("start cluster manager")
+	m.informerFactory.Start(m.ctx.Done())
+	m.wg.Add(1)
+	go func() {
+		defer m.wg.Done()
+		log.Info().Uint64("clusterId", m.clusterID).Msg("start application controller")
+		if err := m.applicationController.Run(m.ctx, 2); err != nil {
+			log.Error().
+				Err(err).
+				Uint64("cluster_id", m.clusterID).
+				Msg("application controller start with error")
+		}
+	}()
+}
+
+func (m *ClusterManager) Stop() {
+	m.cancel()
+	m.wg.Wait()
+	log.Info().Uint64("cluster_id", m.clusterID).Msg("cluster manager stopped successfully")
 }
 
 type ClusterManagers struct {
@@ -32,7 +102,7 @@ type ClusterManagers struct {
 	refreshInterval time.Duration
 	ticker          *time.Ticker
 	mu              sync.RWMutex
-	managers        map[uint64]*ManagerWrapper
+	managers        map[uint64]*ClusterManager
 }
 
 func NewClusterManagers(db *data.Data) (*ClusterManagers, func(), error) {
@@ -42,7 +112,7 @@ func NewClusterManagers(db *data.Data) (*ClusterManagers, func(), error) {
 		log.Error().Err(err).Msg("list clusters error")
 		return nil, nil, err
 	}
-	managers := make(map[uint64]*ManagerWrapper, len(connections))
+	managers := make(map[uint64]*ClusterManager, len(connections))
 
 	cm := &ClusterManagers{
 		db:              db,
@@ -62,9 +132,8 @@ func NewClusterManagers(db *data.Data) (*ClusterManagers, func(), error) {
 		cm.ticker.Stop()
 		cm.mu.Lock()
 		defer cm.mu.Unlock()
-		for clusterID, mgr := range cm.managers {
-			log.Info().Uint64("cluster_id", clusterID).Msg("shutting down cluster manager")
-			mgr.cancel()
+		for _, mgr := range cm.managers {
+			mgr.Stop()
 		}
 		cm.managers = nil
 	}
@@ -80,7 +149,6 @@ func (c *ClusterManagers) RefreshLoop() {
 }
 
 func (c *ClusterManagers) Refresh() error {
-	ctx := context.Background()
 	connections, err := c.db.ClusterConnection.Query().
 		All(context.Background())
 	if err != nil {
@@ -94,10 +162,10 @@ func (c *ClusterManagers) Refresh() error {
 		clusterID := conn.ClusterID
 		dbClusterIds[clusterID] = struct{}{}
 		// 新增或更新
-		currentMgr, exists := c.managers[clusterID]
-		if !exists || conn.UpdatedAt.After(currentMgr.updateAt) {
+		oldManager, exists := c.managers[clusterID]
+		if !exists || conn.UpdatedAt.After(oldManager.updateAt) {
 			// 创建新manager
-			newMgr, err := c.CreateManagerByConfig(conn)
+			newManager, err := NewManagerWrapper(conn)
 			if err != nil {
 				log.Error().
 					Err(err).
@@ -107,72 +175,30 @@ func (c *ClusterManagers) Refresh() error {
 			}
 			// 停止旧manager
 			if exists {
-				log.Debug().Uint64("cluster_id", clusterID).Msg("stopping old cluster manager")
-				currentMgr.cancel()
+				oldManager.Stop()
+				delete(c.managers, clusterID)
 			}
 			// 启动新manager
-			ctx, cancel := context.WithCancel(ctx)
-			newMgr.cancel = cancel
-			go func(mgr manager.Manager, ctx context.Context, clusterID uint64) {
-				if err := mgr.Start(ctx); err != nil && !errors.Is(err, context.Canceled) {
-					log.Error().
-						Err(err).
-						Uint64("cluster_id", clusterID).
-						Msg("cluster manager stopped with error")
-				}
-			}(newMgr.Manager, ctx, clusterID)
-			c.managers[clusterID] = newMgr
-			log.Info().Uint64("cluster_id", clusterID).Msg("cluster manager updated successfully")
+			newManager.Start()
+			c.managers[clusterID] = newManager
 		}
 	}
 	// 删除manager
 	for clusterId, mgr := range c.managers {
 		if _, ok := dbClusterIds[clusterId]; !ok {
-			mgr.cancel()
+			mgr.Stop()
 			delete(c.managers, clusterId)
 		}
 	}
 	return nil
 }
 
-func (c *ClusterManagers) CreateManagerByConfig(conn *generated.ClusterConnection) (*ManagerWrapper, error) {
-	// 获取config
-	config := &rest.Config{
-		Host: conn.Address,
-		TLSClientConfig: rest.TLSClientConfig{
-			CAData: []byte(conn.Ca),
-		},
-	}
-	switch conn.Type {
-	case uint8(cluster.Connection_TLS_CERT):
-		config.CertData = []byte(conn.Cert)
-		config.KeyData = []byte(conn.Key)
-	case uint8(cluster.Connection_TLS_TOKEN):
-		config.BearerToken = conn.Token
-	}
-	// 创建manager
-	mgr, err := manager.New(config, manager.Options{
-		Logger: zap.New(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	// 创建controllers
-	if err = controller.NewControllers(conn.ClusterID, mgr, c.db); err != nil {
-		return nil, err
-	}
-	return &ManagerWrapper{
-		updateAt: conn.UpdatedAt,
-		Manager:  mgr,
-	}, nil
-}
-
-func (c *ClusterManagers) GetClient(clusterId uint64) (client.Client, error) {
+func (c *ClusterManagers) GetClient(clusterId uint64) (*versioned.Clientset, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if mgr := c.managers[clusterId]; mgr == nil || mgr.Manager == nil || mgr.Manager.GetClient() == nil {
+	if mgr := c.managers[clusterId]; mgr == nil || mgr.clientset == nil {
 		return nil, ErrClientNotFound
 	} else {
-		return mgr.Manager.GetClient(), nil
+		return mgr.clientset, nil
 	}
 }
