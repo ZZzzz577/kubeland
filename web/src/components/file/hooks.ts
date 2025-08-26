@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 
 export function useFileUpload(options?: {
     onSuccess?: (file: File, content: string) => void;
-    onError?: (error: Error | unknown) => void;
+    onError?: (error: Error) => void;
 }) {
     const { t } = useLingui();
     const [loading, setLoading] = useState<boolean>(false);
@@ -28,8 +28,13 @@ export function useFileUpload(options?: {
         try {
             const content = await readFileContent(file);
             options?.onSuccess?.(file, content);
-        } catch (error) {
-            options?.onError?.(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                options?.onError?.(error);
+            } else {
+                // 处理非 Error 类型的错误
+                options?.onError?.(new Error(String(error)));
+            }
         } finally {
             setLoading(false);
         }

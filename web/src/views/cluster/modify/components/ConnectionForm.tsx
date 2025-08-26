@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Form, Input, Radio } from "antd";
-import UploadKubeConfig from "@/views/cluster/modify/components/form/UploadKubeConfig.tsx";
+import UploadKubeConfig from "@/views/cluster/modify/components/UploadKubeConfig.tsx";
 import { type ApiV1ClusterCluster, ApiV1ClusterConnectionTypeEnum } from "@/generated";
 import useFormInstance from "antd/es/form/hooks/useFormInstance";
 

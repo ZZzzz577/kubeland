@@ -42,16 +42,17 @@ func (a *ApplicationReconciler) Reconcile(ctx context.Context, request reconcile
 	if errors.IsNotFound(err) {
 		_, err = a.db.Application.Delete().Where(
 			application.ClusterID(a.clusterId),
-			application.Name(app.Name),
+			application.Name(request.Name),
 		).Exec(ctx)
 		if err != nil {
 			log.Error().Err(err).Msg("delete application error")
-			return ctrl.Result{}, err
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
+		return ctrl.Result{}, nil
 	}
 	if err != nil {
 		log.Error().Err(err).Msg("get application error")
-		return ctrl.Result{}, err
+		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	err = a.db.WithTx(ctx, func(tx *generated.Tx) error {
@@ -87,4 +88,5 @@ func (a *ApplicationReconciler) Reconcile(ctx context.Context, request reconcile
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
+
 }

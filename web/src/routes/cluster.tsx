@@ -10,7 +10,7 @@ export const Cluster = (): Route => {
     return {
         path: "/cluster",
         element: <AppLayout />,
-        name: <Trans>cluster</Trans>,
+        name: <Trans>Cluster</Trans>,
         menu: {
             icon: <KubernetesOutlined />,
         },

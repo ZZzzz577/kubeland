@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { RouteObject } from "react-router";
 import { Home } from "@/routes/home";
 import { Cluster } from "@/routes/cluster.tsx";
+import { Application } from "@/routes/application.tsx";
 
 interface RouteMenuConfig {
     icon?: ReactNode;
@@ -13,5 +14,5 @@ export type Route = RouteObject & {
     children?: Route[];
 };
 
-const routers: Route[] = [Home(), Cluster()];
-export default routers;
+const routes: Route[] = [Home(), Cluster(), Application()];
+export default routes;

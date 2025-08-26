@@ -33,9 +33,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "application_cluster_id_name",
+				Name:    "application_cluster_id_name_delete_at",
 				Unique:  true,
-				Columns: []*schema.Column{ApplicationsColumns[6], ApplicationsColumns[4]},
+				Columns: []*schema.Column{ApplicationsColumns[6], ApplicationsColumns[4], ApplicationsColumns[3]},
 			},
 		},
 	}

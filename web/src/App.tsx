@@ -1,16 +1,19 @@
-import { createBrowserRouter } from "react-router";
-import { RouterProvider } from "react-router";
-import routers from "@/routes";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import routes from "@/routes";
 import ThemeProvider from "@/components/theme/provider";
 import LocalesProvider from "@/components/locales/provider";
+import { App as AntApp } from "antd";
 
 function App() {
+    const router = createBrowserRouter(routes);
     return (
-        <ThemeProvider>
-            <LocalesProvider>
-                <RouterProvider router={createBrowserRouter(routers)} />
-            </LocalesProvider>
-        </ThemeProvider>
+        <AntApp>
+            <ThemeProvider>
+                <LocalesProvider>
+                    <RouterProvider router={router} />
+                </LocalesProvider>
+            </ThemeProvider>
+        </AntApp>
     );
 }
 

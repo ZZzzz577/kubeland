@@ -3,10 +3,10 @@ import type {ApiV1ClusterCluster} from "@/generated";
 import {Trans} from "@lingui/react/macro";
 import {Space} from "antd";
 import {Link} from "react-router";
-import {ClusterStatus, OperatorStatus} from "@/views/cluster/list/components/table/ClusterListTable.tsx";
+import {ClusterStatus, OperatorStatus} from "@/views/cluster/list/components/ClusterListTable.tsx";
 
 
-export default function getClusterTableColumns(): ColumnsType<ApiV1ClusterCluster> {
+export default function ClusterListTableColumns(): ColumnsType<ApiV1ClusterCluster> {
     return [
         {
             dataIndex: "name",

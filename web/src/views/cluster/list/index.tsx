@@ -2,7 +2,7 @@ import { Button, Card, Space } from "antd";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "react-router";
 import { PlusOutlined } from "@ant-design/icons";
-import ClusterListTable from "@/views/cluster/list/components/table/ClusterListTable.tsx";
+import ClusterListTable from "@/views/cluster/list/components/ClusterListTable.tsx";
 
 export default function ClusterList() {
     const { t } = useLingui();

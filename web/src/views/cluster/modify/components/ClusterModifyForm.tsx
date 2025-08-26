@@ -1,21 +1,22 @@
 import { useLingui } from "@lingui/react/macro";
 import { useForm } from "antd/es/form/Form";
 import type { ApiV1ClusterCluster } from "@/generated";
-import { Button, Divider, Form, notification, Space } from "antd";
+import { Button, Divider, Form, Space } from "antd";
 import { useRequest } from "ahooks";
 import { clusterApi } from "@/api";
-import BasicInfoForm from "@/views/cluster/modify/components/form/BasicInfoForm.tsx";
-import ConnectionForm from "@/views/cluster/modify/components/form/ConnectionForm.tsx";
-import TestConnection from "@/views/cluster/modify/components/form/TestConnection.tsx";
+import BasicInfoForm from "@/views/cluster/modify/components/BasicInfoForm.tsx";
+import ConnectionForm from "@/views/cluster/modify/components/ConnectionForm.tsx";
+import TestConnection from "@/views/cluster/modify/components/TestConnection.tsx";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { SaveOutlined } from "@ant-design/icons";
+import useApp from "antd/es/app/useApp";
 
 export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster }) {
     const { cluster } = props;
     const isUpdate = !!cluster;
     const { t } = useLingui();
-    const [notify, notifyContext] = notification.useNotification();
+    const { notification } = useApp();
     const navigate = useNavigate();
 
     const [form] = useForm<ApiV1ClusterCluster>();
@@ -30,14 +31,13 @@ export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster
         {
             manual: true,
             onSuccess: () => {
-                notify.success({
+                notification.success({
                     message: t`create cluster success`,
                 });
                 setTimeout(() => navigate("/cluster"), 500);
             },
             onError: (error) => {
-                console.log(error);
-                notify.error({
+                notification.error({
                     message: t`create cluster failed`,
                     description: error.message,
                 });
@@ -50,14 +50,13 @@ export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster
         {
             manual: true,
             onSuccess: () => {
-                notify.success({
+                notification.success({
                     message: t`update cluster success`,
                 });
                 setTimeout(() => navigate("/cluster"), 500);
             },
             onError: (error) => {
-                console.log(error);
-                notify.error({
+                notification.error({
                     message: t`update cluster failed`,
                     description: error.message,
                 });
@@ -89,7 +88,6 @@ export default function ClusterModifyForm(props: { cluster?: ApiV1ClusterCluster
                 flex: "100px",
             }}
         >
-            {notifyContext}
             <BasicInfoForm />
             <Divider />
             <ConnectionForm />

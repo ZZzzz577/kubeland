@@ -4,11 +4,14 @@ import (
 	"api-server/api/v1/cluster"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
+	"api-server/internal/data/generated/application"
+	"api-server/internal/data/mixin"
 	"api-server/internal/kube/controller"
 	"context"
 	"errors"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -25,6 +28,7 @@ type ClusterManager struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
+	db        *data.Data
 	clusterID uint64
 	updateAt  time.Time
 	mgr       manager.Manager
@@ -46,8 +50,8 @@ func NewClusterManager(conn *generated.ClusterConnection, db *data.Data) (*Clust
 		config.BearerToken = conn.Token
 	}
 
+	ctrl.SetLogger(zap.New())
 	mgr, err := manager.New(config, manager.Options{
-		Logger: zap.New(),
 		Metrics: metricsserver.Options{
 			BindAddress: "0",
 		},
@@ -148,9 +152,25 @@ func (c *ClusterManagers) Refresh() error {
 	for _, conn := range connections {
 		clusterID := conn.ClusterID
 		dbClusterIds[clusterID] = struct{}{}
-		// 新增或更新
+		// 新增/更新
 		oldMgr, exists := c.managers[clusterID]
 		if !exists || conn.UpdatedAt.After(oldMgr.updateAt) {
+			// 停止旧manager
+			if exists {
+				oldMgr.Stop()
+				delete(c.managers, clusterID)
+			}
+			// 清理数据
+			if _, err = c.db.Application.Delete().
+				Where(application.ClusterID(clusterID)).
+				Exec(mixin.SkipSoftDelete(context.Background())); err != nil {
+				log.Error().
+					Err(err).
+					Uint64("clusterId", clusterID).
+					Msg("clean application error")
+				continue
+			}
+
 			// 创建新manager
 			newMgr, err := NewClusterManager(conn, c.db)
 			if err != nil {
@@ -162,11 +182,6 @@ func (c *ClusterManagers) Refresh() error {
 			}
 			// 启动新manager
 			newMgr.Start()
-			// 停止旧manager
-			if exists {
-				oldMgr.Stop()
-				delete(c.managers, clusterID)
-			}
 
 			c.managers[clusterID] = newMgr
 		}

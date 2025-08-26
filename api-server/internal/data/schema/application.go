@@ -36,7 +36,7 @@ func (Application) Mixin() []ent.Mixin {
 
 func (Application) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("cluster_id", "name").
+		index.Fields("cluster_id", "name", "delete_at").
 			Unique(),
 	}
 }

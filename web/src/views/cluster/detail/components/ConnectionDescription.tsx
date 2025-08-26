@@ -3,7 +3,7 @@ import {useLingui} from "@lingui/react/macro";
 import {Descriptions, type DescriptionsProps, Space} from "antd";
 import {useMemo} from "react";
 import {getAuthType} from "@/views/cluster/commons/components/AuthType.tsx";
-import TestConnection from "@/views/cluster/detail/components/description/TestConnection.tsx";
+import TestConnection from "@/views/cluster/detail/components/TestConnection.tsx";
 
 
 export default function ConnectionDescription(props: { connection?: ApiV1ClusterConnection }) {

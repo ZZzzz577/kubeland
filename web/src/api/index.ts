@@ -1,4 +1,4 @@
-import { ClusterServiceApi, Configuration } from "@/generated";
+import {ApplicationServiceApi, ClusterServiceApi, Configuration} from "@/generated";
 import { StatusMiddleware } from "@/api/middleware/status.ts";
 
 const config = new Configuration({
@@ -7,3 +7,4 @@ const config = new Configuration({
 });
 
 export const clusterApi = new ClusterServiceApi(config);
+export const applicationApi = new ApplicationServiceApi(config);

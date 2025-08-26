@@ -1,15 +1,16 @@
 import { useFileUpload } from "@/components/file/hooks.ts";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Alert, Button, Flex, Form, notification, Select, Space, Tag, Upload } from "antd";
+import { Alert, Button, Flex, Form, Select, Space, Tag, Upload } from "antd";
 import { clusterApi } from "@/api";
 import { useRequest } from "ahooks";
 import { type ApiV1ClusterCluster, ApiV1ClusterConnectionTypeEnum } from "@/generated";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import useApp from "antd/es/app/useApp";
 
 export default function UploadKubeConfig() {
     const { t } = useLingui();
-    const [notify, notifyContext] = notification.useNotification();
+    const { notification } = useApp();
     const form = Form.useFormInstance<ApiV1ClusterCluster>();
     const { Item } = Form;
     const [currentCtxName, setCurrentCtxName] = useState<string>();
@@ -18,7 +19,7 @@ export default function UploadKubeConfig() {
         manual: true,
         onSuccess: (data) => {
             if (!data.items?.length) {
-                notify.error({
+                notification.error({
                     message: t`resolve kubeconfig error`,
                     description: t`No valid context. Please check your kubeconfig file`,
                 });
@@ -30,10 +31,10 @@ export default function UploadKubeConfig() {
             }
         },
         onError: (error) => {
-            notify.error({
+            notification.error({
                 message: t`resolve kubeconfig error`,
+                description: error.message,
             });
-            console.log(error);
         },
     });
     useEffect(() => {
@@ -62,15 +63,14 @@ export default function UploadKubeConfig() {
             });
         },
         onError: (error) => {
-            notify.error({
-                message: t`upload kubeconfig error`,
+            notification.error({
+                message: t`failed to upload kubeconfig file`,
+                description: error.message,
             });
-            console.log(error);
         },
     });
     return (
         <>
-            {notifyContext}
             <Flex className={"!mb-5"} align={"center"}>
                 <div className={"w-25 text-base font-medium"}>{t`Connection`}</div>
                 <Alert

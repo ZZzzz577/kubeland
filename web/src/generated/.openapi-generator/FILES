@@ -1,6 +1,9 @@
+apis/ApplicationServiceApi.ts
 apis/ClusterServiceApi.ts
 apis/index.ts
 index.ts
+models/ApiV1ApplicationApplication.ts
+models/ApiV1ApplicationListApplicationsResponse.ts
 models/ApiV1ClusterCluster.ts
 models/ApiV1ClusterConnection.ts
 models/ApiV1ClusterListClustersResponse.ts

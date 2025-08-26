@@ -1,27 +1,27 @@
 import { useLingui } from "@lingui/react/macro";
-import { Button, Form, notification } from "antd";
+import { Button, Form } from "antd";
 import type { ApiV1ClusterCluster } from "@/generated";
 import { useRequest } from "ahooks";
 import { clusterApi } from "@/api";
+import useApp from "antd/es/app/useApp";
 
 export default function TestConnection() {
     const { t } = useLingui();
-    const [notify, notifyContext] = notification.useNotification();
+    const { notification } = useApp();
     const form = Form.useFormInstance<ApiV1ClusterCluster>();
     const { loading, run } = useRequest(clusterApi.clusterServiceTestConnection.bind(clusterApi), {
         manual: true,
         onSuccess: (data) => {
-            notify.success({
+            notification.success({
                 message: t`test connection success`,
                 description: t`version is ${data.version}`,
             });
         },
         onError: (error) => {
-            notify.error({
+            notification.error({
                 message: t`test connection error`,
                 description: error.message,
             });
-            console.log(error);
         },
     });
     const handleTestConnection = () => {
@@ -35,7 +35,6 @@ export default function TestConnection() {
     };
     return (
         <>
-            {notifyContext}
             <Button type={"primary"} ghost loading={loading} onClick={handleTestConnection}>{t`test connection`}</Button>
         </>
     );
