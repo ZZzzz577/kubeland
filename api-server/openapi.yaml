@@ -255,6 +255,10 @@ components:
                     readOnly: true
                     type: string
                     format: date-time
+                updateAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
         api.v1.application.ListApplicationsResponse:
             type: object
             properties:

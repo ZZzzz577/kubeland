@@ -14,13 +14,16 @@ export default function ApplicationModify() {
 
     const { data, loading } = useRequest(
         () => {
-            return applicationApi.applicationServiceGetApplication({ id: id as string });
+            return applicationApi.applicationServiceGetApplication({
+                id: id as string,
+            });
         },
         {
             ready: isUpdate,
             refreshDeps: [id],
         },
     );
+
     return (
         <Card title={title} loading={loading} extra={<BackButton />}>
             <ApplicationModifyForm app={data} />

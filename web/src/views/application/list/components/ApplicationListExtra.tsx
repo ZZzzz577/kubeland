@@ -8,7 +8,7 @@ export default function ApplicationListExtra() {
     const navigate = useNavigate();
     return (
         <Space>
-            <Button icon={<PlusOutlined />} type={"primary"} onClick={() => navigate("/app/application/create")}>
+            <Button icon={<PlusOutlined />} type={"primary"} onClick={() => navigate("/app/create")}>
                 {t`Create`}
             </Button>
         </Space>

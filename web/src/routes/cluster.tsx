@@ -25,7 +25,7 @@ export const Cluster = (): Route => {
             },
             {
                 path: "create",
-                name: <Trans>create</Trans>,
+                name: <Trans>Create</Trans>,
                 element: <ClusterModify />,
             },
             {

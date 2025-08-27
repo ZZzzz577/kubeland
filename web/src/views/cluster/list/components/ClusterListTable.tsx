@@ -5,8 +5,10 @@ import ClusterListTableColumns from "@/views/cluster/list/components/ClusterList
 import type { ApiV1ClusterConnection } from "@/generated";
 import { useState } from "react";
 import useApp from "antd/es/app/useApp";
+import { useLingui } from "@lingui/react/macro";
 
 export default function ClusterListTable() {
+    const { t } = useLingui();
     const { notification } = useApp();
     const { loading, pagination, data } = usePagination(
         async ({ current, pageSize }) => {
@@ -18,10 +20,12 @@ export default function ClusterListTable() {
             };
         },
         {
-            onError: (e) =>
+            onError: (e) => {
                 notification.error({
-                    message: e.message,
-                }),
+                    message: t`failed to get cluster list`,
+                    description: e.message,
+                });
+            },
         },
     );
 

@@ -49,6 +49,12 @@ export interface ApiV1ApplicationApplication {
      * @memberof ApiV1ApplicationApplication
      */
     readonly createdAt?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof ApiV1ApplicationApplication
+     */
+    readonly updateAt?: Date;
 }
 
 /**
@@ -73,6 +79,7 @@ export function ApiV1ApplicationApplicationFromJSONTyped(json: any, ignoreDiscri
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
+        'updateAt': json['updateAt'] == null ? undefined : (new Date(json['updateAt'])),
     };
 }
 
@@ -80,7 +87,7 @@ export function ApiV1ApplicationApplicationToJSON(json: any): ApiV1ApplicationAp
     return ApiV1ApplicationApplicationToJSONTyped(json, false);
 }
 
-export function ApiV1ApplicationApplicationToJSONTyped(value?: Omit<ApiV1ApplicationApplication, 'createdAt'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiV1ApplicationApplicationToJSONTyped(value?: Omit<ApiV1ApplicationApplication, 'createdAt'|'updateAt'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

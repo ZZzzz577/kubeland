@@ -4,10 +4,11 @@ import { Trans } from "@lingui/react/macro";
 import { AppstoreOutlined } from "@ant-design/icons";
 import ApplicationList from "@/views/application/list";
 import ApplicationModify from "@/views/application/modify";
+import ApplicationDetail from "@/views/application/detail";
 
 export const Application = (): Route => {
     return {
-        path: "/app/application",
+        path: "/app",
         element: <AppLayout />,
         name: <Trans>Application</Trans>,
         menu: {
@@ -22,13 +23,18 @@ export const Application = (): Route => {
             },
             {
                 path: "create",
-                name: <Trans>create</Trans>,
+                name: <Trans>Create</Trans>,
                 element: <ApplicationModify />,
             },
             {
                 path: ":id/edit",
-                name: <Trans>create</Trans>,
+                name: <Trans>Edit</Trans>,
                 element: <ApplicationModify />,
+            },
+            {
+                path: ":id/detail",
+                name: <Trans>Detail</Trans>,
+                element: <ApplicationDetail />,
             },
         ],
     };

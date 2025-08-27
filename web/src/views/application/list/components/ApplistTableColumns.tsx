@@ -1,10 +1,11 @@
-import type {ColumnsType} from "antd/es/table";
-import type {ApiV1ApplicationApplication} from "@/generated";
-import {Trans} from "@lingui/react/macro";
-import {Link} from "react-router";
-import {Space} from "antd";
-import ApplicationDeleteButton from "@/views/application/list/components/ApplicationDeleteButton.tsx";
-import {ApplicationCluster} from "@/views/application/list/components/ApplicationListTable.tsx";
+import type { ColumnsType } from "antd/es/table";
+import type { ApiV1ApplicationApplication } from "@/generated";
+import { Trans } from "@lingui/react/macro";
+import { Link } from "react-router";
+import { Space } from "antd";
+import { ApplicationCluster } from "@/views/application/list/components/ApplicationListTable.tsx";
+import DeleteButton from "@/views/application/common/components/DeleteButton.tsx";
+import EditorButton from "@/views/application/common/components/EditorButton.tsx";
 
 export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationApplication> {
     return [
@@ -12,13 +13,13 @@ export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationA
             dataIndex: "name",
             title: <Trans>Name</Trans>,
             render: (name: string, record) => {
-                return <Link to={`/app/application/${record.id}/detail`}>{name}</Link>;
+                return <Link to={`/app/${record.id}/detail`}>{name}</Link>;
             },
         },
         {
             title: <Trans>Cluster</Trans>,
             dataIndex: "clusterId",
-            render: (clusterId?: string) => <ApplicationCluster id={clusterId}/>,
+            render: (clusterId?: string) => <ApplicationCluster id={clusterId} />,
         },
         {
             dataIndex: "description",
@@ -30,10 +31,8 @@ export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationA
             render: (_, record) => {
                 return (
                     <Space>
-                        <Link to={`/app/application/${record.id}/edit`}>
-                            <Trans>edit</Trans>
-                        </Link>
-                        <ApplicationDeleteButton id={record.id}/>
+                        <EditorButton id={record.id} type={"link"} />
+                        <DeleteButton id={record.id} type={"link"} />
                     </Space>
                 );
             },

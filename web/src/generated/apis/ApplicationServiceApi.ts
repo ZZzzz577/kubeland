@@ -26,7 +26,7 @@ import {
 } from '../models/index';
 
 export interface ApplicationServiceCreateApplicationRequest {
-    apiV1ApplicationApplication: Omit<ApiV1ApplicationApplication, 'createdAt'>;
+    apiV1ApplicationApplication: Omit<ApiV1ApplicationApplication, 'createdAt'|'updateAt'>;
 }
 
 export interface ApplicationServiceDeleteApplicationRequest {
@@ -44,7 +44,7 @@ export interface ApplicationServiceListApplicationsRequest {
 
 export interface ApplicationServiceUpdateApplicationRequest {
     id: string;
-    apiV1ApplicationApplication: Omit<ApiV1ApplicationApplication, 'createdAt'>;
+    apiV1ApplicationApplication: Omit<ApiV1ApplicationApplication, 'createdAt'|'updateAt'>;
 }
 
 /**

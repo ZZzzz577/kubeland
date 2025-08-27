@@ -65,6 +65,9 @@ message Application {
   google.protobuf.Timestamp created_at = 100 [
     (google.api.field_behavior) = OUTPUT_ONLY
   ];
+  google.protobuf.Timestamp update_at = 101 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
 }
 
 message IdRequest {

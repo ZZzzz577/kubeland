@@ -4,26 +4,20 @@ import (
 	"api-server/api/v1/application"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
-	appv1 "api-server/internal/kube/api/v1"
 	"context"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	cr "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type ApplicationBiz struct {
-	cm *ClusterManagers
 	db *data.Data
 }
 
 func NewApplicationBiz(
-	cm *ClusterManagers,
 	db *data.Data,
 ) *ApplicationBiz {
 	return &ApplicationBiz{
-		cm: cm,
 		db: db,
 	}
 }
@@ -52,66 +46,36 @@ func (a *ApplicationBiz) GetApplication(ctx context.Context, request *applicatio
 }
 
 func (a *ApplicationBiz) CreateApplication(ctx context.Context, request *application.Application) error {
-	client, err := a.cm.GetClient(request.ClusterId)
+	err := a.db.Application.Create().
+		SetName(request.Name).
+		SetClusterID(request.ClusterId).
+		SetDescription(request.Description).
+		Exec(ctx)
 	if err != nil {
-		log.Error().Err(err).Msg("get cluster client error")
+		log.Error().Err(err).Msg("create application error")
 		return err
 	}
-	return client.Create(ctx, &appv1.Application{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
-			Name:      request.Name,
-		},
-		Spec: appv1.ApplicationSpec{
-			Description: request.Description,
-		},
-	})
+	return nil
 }
 
 func (a *ApplicationBiz) UpdateApplication(ctx context.Context, request *application.Application) error {
-	source, err := a.db.Application.Get(ctx, request.Id)
+	err := a.db.Application.UpdateOneID(request.Id).
+		SetDescription(request.Description).
+		Exec(ctx)
 	if err != nil {
-		log.Error().Err(err).Msg("get application error")
+		log.Error().Err(err).Msg("update application error")
 		return err
 	}
-
-	client, err := a.cm.GetClient(source.ClusterID)
-	if err != nil {
-		log.Error().Err(err).Msg("get cluster client error")
-		return err
-	}
-
-	var app appv1.Application
-	err = client.Get(ctx, cr.ObjectKey{
-		Name:      source.Name,
-		Namespace: "default",
-	}, &app)
-	if err != nil {
-		log.Error().Err(err).Msg("get application error")
-		return err
-	}
-	app.Spec.Description = request.Description
-	return client.Update(ctx, &app)
+	return nil
 }
 
 func (a *ApplicationBiz) DeleteApplication(ctx context.Context, request *application.IdRequest) error {
-	app, err := a.db.Application.Get(ctx, request.Id)
+	err := a.db.Application.DeleteOneID(request.Id).Exec(ctx)
 	if err != nil {
-		log.Error().Err(err).Msg("get application error")
+		log.Error().Err(err).Msg("delete application error")
 		return err
 	}
-
-	client, err := a.cm.GetClient(app.ClusterID)
-	if err != nil {
-		log.Error().Err(err).Msg("get cluster client error")
-		return err
-	}
-	return client.Delete(ctx, &appv1.Application{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
-			Name:      app.Name,
-		},
-	})
+	return nil
 }
 
 func (a *ApplicationBiz) toProto(source *generated.Application) *application.Application {
@@ -121,5 +85,6 @@ func (a *ApplicationBiz) toProto(source *generated.Application) *application.App
 		Name:        source.Name,
 		Description: source.Description,
 		CreatedAt:   timestamppb.New(source.CreatedAt),
+		UpdateAt:    timestamppb.New(source.UpdatedAt),
 	}
 }

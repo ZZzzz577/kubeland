@@ -28,7 +28,7 @@ export default function ApplicationForm(props: { app?: ApiV1ApplicationApplicati
                 notification.success({
                     message: t`create application success`,
                 });
-                setTimeout(() => navigate("/app/application"), 500);
+                setTimeout(() => navigate("/app"), 500);
             },
             onError: (error) => {
                 console.log(error);
@@ -48,11 +48,9 @@ export default function ApplicationForm(props: { app?: ApiV1ApplicationApplicati
                 notification.success({
                     message: t`update application success`,
                 });
-                // notify.success();
-                setTimeout(() => navigate("/app/application"), 500);
+                setTimeout(() => navigate("/app"), 500);
             },
             onError: (error) => {
-                console.log(error);
                 notification.error({
                     message: t`update application failed`,
                     description: error.message,

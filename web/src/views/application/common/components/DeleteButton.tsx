@@ -1,10 +1,11 @@
-import { Button, Popconfirm } from "antd";
-import { applicationApi } from "@/api";
-import { useRequest } from "ahooks";
-import useApp from "antd/es/app/useApp";
 import { useLingui } from "@lingui/react/macro";
+import useApp from "antd/es/app/useApp";
+import { useRequest } from "ahooks";
+import { applicationApi } from "@/api";
+import { Button, Popconfirm } from "antd";
+import type { BaseButtonProps } from "antd/es/button/button";
 
-export default function ApplicationDeleteButton(props: { id?: string }) {
+export default function DeleteButton(props: { id?: string } & BaseButtonProps) {
     const { id } = props;
     const { t } = useLingui();
     const { notification } = useApp();
@@ -15,6 +16,12 @@ export default function ApplicationDeleteButton(props: { id?: string }) {
                 message: t`delete application success`,
             });
         },
+        onError: (error) => {
+            notification.error({
+                message: t`delete application failed`,
+                description: error.message,
+            });
+        },
     });
     const onClick = () => {
         if (id) {
@@ -23,8 +30,8 @@ export default function ApplicationDeleteButton(props: { id?: string }) {
     };
     return (
         <Popconfirm title={t`Are you sure to delete this application?`} onConfirm={onClick}>
-            <Button type={"link"} danger loading={loading}>
-                delete
+            <Button {...props} danger loading={loading}>
+                Delete
             </Button>
         </Popconfirm>
     );

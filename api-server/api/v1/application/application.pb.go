@@ -33,6 +33,7 @@ type Application struct {
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,100,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdateAt      *timestamppb.Timestamp `protobuf:"bytes,101,opt,name=update_at,json=updateAt,proto3" json:"update_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -98,6 +99,13 @@ func (x *Application) GetDescription() string {
 func (x *Application) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Application) GetUpdateAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdateAt
 	}
 	return nil
 }
@@ -246,7 +254,7 @@ var File_v1_application_application_proto protoreflect.FileDescriptor
 
 const file_v1_application_application_proto_rawDesc = "" +
 	"\n" +
-	" v1/application/application.proto\x12\x12api.v1.application\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14v1/common/page.proto\"\xda\x01\n" +
+	" v1/application/application.proto\x12\x12api.v1.application\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14v1/common/page.proto\"\x99\x02\n" +
 	"\vApplication\x12\x14\n" +
 	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x05R\x02id\x12#\n" +
 	"\n" +
@@ -254,7 +262,8 @@ const file_v1_application_application_proto_rawDesc = "" +
 	"\x04name\x18\x03 \x01(\tB\v\xe2A\x01\x05\xfaB\x04r\x02\x18@R\x04name\x12.\n" +
 	"\vdescription\x18\x04 \x01(\tB\f\xe2A\x01\x01\xfaB\x05r\x03\x18\x80\x04R\vdescription\x12?\n" +
 	"\n" +
-	"created_at\x18d \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tcreatedAt\"!\n" +
+	"created_at\x18d \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tcreatedAt\x12=\n" +
+	"\tupdate_at\x18e \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\bupdateAt\"!\n" +
 	"\tIdRequest\x12\x14\n" +
 	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x02R\x02id\"B\n" +
 	"\x17ListApplicationsRequest\x12'\n" +
@@ -295,25 +304,26 @@ var file_v1_application_application_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),            // 7: google.protobuf.Empty
 }
 var file_v1_application_application_proto_depIdxs = []int32{
-	4, // 0: api.v1.application.Application.created_at:type_name -> google.protobuf.Timestamp
-	5, // 1: api.v1.application.ListApplicationsRequest.page:type_name -> api.v1.common.Page
-	6, // 2: api.v1.application.ListApplicationsResponse.pagination:type_name -> api.v1.common.Pagination
-	0, // 3: api.v1.application.ListApplicationsResponse.items:type_name -> api.v1.application.Application
-	2, // 4: api.v1.application.ApplicationService.ListApplications:input_type -> api.v1.application.ListApplicationsRequest
-	1, // 5: api.v1.application.ApplicationService.GetApplication:input_type -> api.v1.application.IdRequest
-	0, // 6: api.v1.application.ApplicationService.CreateApplication:input_type -> api.v1.application.Application
-	0, // 7: api.v1.application.ApplicationService.UpdateApplication:input_type -> api.v1.application.Application
-	1, // 8: api.v1.application.ApplicationService.DeleteApplication:input_type -> api.v1.application.IdRequest
-	3, // 9: api.v1.application.ApplicationService.ListApplications:output_type -> api.v1.application.ListApplicationsResponse
-	0, // 10: api.v1.application.ApplicationService.GetApplication:output_type -> api.v1.application.Application
-	7, // 11: api.v1.application.ApplicationService.CreateApplication:output_type -> google.protobuf.Empty
-	7, // 12: api.v1.application.ApplicationService.UpdateApplication:output_type -> google.protobuf.Empty
-	7, // 13: api.v1.application.ApplicationService.DeleteApplication:output_type -> google.protobuf.Empty
-	9, // [9:14] is the sub-list for method output_type
-	4, // [4:9] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4,  // 0: api.v1.application.Application.created_at:type_name -> google.protobuf.Timestamp
+	4,  // 1: api.v1.application.Application.update_at:type_name -> google.protobuf.Timestamp
+	5,  // 2: api.v1.application.ListApplicationsRequest.page:type_name -> api.v1.common.Page
+	6,  // 3: api.v1.application.ListApplicationsResponse.pagination:type_name -> api.v1.common.Pagination
+	0,  // 4: api.v1.application.ListApplicationsResponse.items:type_name -> api.v1.application.Application
+	2,  // 5: api.v1.application.ApplicationService.ListApplications:input_type -> api.v1.application.ListApplicationsRequest
+	1,  // 6: api.v1.application.ApplicationService.GetApplication:input_type -> api.v1.application.IdRequest
+	0,  // 7: api.v1.application.ApplicationService.CreateApplication:input_type -> api.v1.application.Application
+	0,  // 8: api.v1.application.ApplicationService.UpdateApplication:input_type -> api.v1.application.Application
+	1,  // 9: api.v1.application.ApplicationService.DeleteApplication:input_type -> api.v1.application.IdRequest
+	3,  // 10: api.v1.application.ApplicationService.ListApplications:output_type -> api.v1.application.ListApplicationsResponse
+	0,  // 11: api.v1.application.ApplicationService.GetApplication:output_type -> api.v1.application.Application
+	7,  // 12: api.v1.application.ApplicationService.CreateApplication:output_type -> google.protobuf.Empty
+	7,  // 13: api.v1.application.ApplicationService.UpdateApplication:output_type -> google.protobuf.Empty
+	7,  // 14: api.v1.application.ApplicationService.DeleteApplication:output_type -> google.protobuf.Empty
+	10, // [10:15] is the sub-list for method output_type
+	5,  // [5:10] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_v1_application_application_proto_init() }
