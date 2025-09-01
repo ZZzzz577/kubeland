@@ -1,18 +1,15 @@
 import { Card, Space } from "antd";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import type { CardTabListType } from "antd/es/card/Card";
-import { type ReactNode, useMemo, useState } from "react";
-import { BuildOutlined, MenuOutlined, SettingOutlined } from "@ant-design/icons";
-import BasicInfo from "@/views/application/detail/components/BasicInfo.tsx";
+import { useMemo } from "react";
+import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
 import DetailExtra from "@/views/application/detail/components/DetailExtra.tsx";
-import { useRequest } from "ahooks";
-import { applicationApi } from "@/api";
-import { useParams } from "react-router";
-import useApp from "antd/es/app/useApp";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
+import getActivePath from "@/views/application/common/utils/tab.ts";
 
 const tabList: CardTabListType[] = [
     {
-        key: "basicInfo",
+        key: "",
         label: (
             <Space>
                 <MenuOutlined />
@@ -21,7 +18,7 @@ const tabList: CardTabListType[] = [
         ),
     },
     {
-        key: "buildSettings",
+        key: "build",
         label: (
             <Space>
                 <SettingOutlined />
@@ -29,59 +26,41 @@ const tabList: CardTabListType[] = [
             </Space>
         ),
     },
-    {
-        key: "buildTasks",
-        label: (
-            <Space>
-                <BuildOutlined />
-                <Trans>Build tasks</Trans>
-            </Space>
-        ),
-    },
+    // {
+    //     key: "buildTasks",
+    //     label: (
+    //         <Space>
+    //             <BuildOutlined />
+    //             <Trans>Build tasks</Trans>
+    //         </Space>
+    //     ),
+    // },
 ];
 
 export default function ApplicationDetail() {
-    const { t } = useLingui();
     const { id } = useParams();
-    const { notification } = useApp();
+    const navigate = useNavigate();
 
-    const [activeTab, setActiveTab] = useState<string>("basicInfo");
+    const { pathname } = useLocation();
+    const defaultActiveTab = useMemo(() => {
+        return getActivePath(`/app/${id}`, pathname);
+    }, [pathname, id]);
+    console.log("defaultActiveTab", defaultActiveTab)
+
     const onTabChange = (key: string) => {
-        setActiveTab(key);
+        navigate(`/app/${id}/${key}`);
     };
-
-    const { data, loading } = useRequest(applicationApi.applicationServiceGetApplication.bind(applicationApi), {
-        ready: !!id,
-        refreshDeps: [id],
-        defaultParams: [{ id: id as string }],
-        onError: (e) => {
-            notification.error({
-                message: t`failed to get application detail`,
-                description: e.message,
-            });
-        },
-    });
-
-    const tabContent = useMemo((): ReactNode => {
-        switch (activeTab) {
-            case "basicInfo":
-                return <BasicInfo info={data} />;
-            default:
-                return <></>;
-        }
-    }, [activeTab, data]);
 
     return (
         <Card
-            loading={loading}
-            title={<div className={"text-xl"}>{data?.name}</div>}
+            title={<div className={"text-xl mb-2"}>{id}</div>}
+            defaultActiveTabKey={defaultActiveTab}
             tabList={tabList}
-            activeTabKey={activeTab}
             onTabChange={onTabChange}
             tabProps={{ size: "middle" }}
             extra={<DetailExtra />}
         >
-            {tabContent}
+            <Outlet />
         </Card>
     );
 }

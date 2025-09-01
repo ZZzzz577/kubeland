@@ -4,9 +4,7 @@ import (
 	"api-server/api/v1/cluster"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
-	"api-server/internal/data/generated/application"
-	"api-server/internal/data/mixin"
-	"api-server/internal/kube/controller"
+	"api-server/internal/kube"
 	"context"
 	"errors"
 	"github.com/rs/zerolog/log"
@@ -34,8 +32,7 @@ type ClusterManager struct {
 	mgr       manager.Manager
 }
 
-func NewClusterManager(conn *generated.ClusterConnection, db *data.Data) (*ClusterManager, error) {
-	clusterId := conn.ClusterID
+func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, error) {
 	config := &rest.Config{
 		Host: conn.Address,
 		TLSClientConfig: rest.TLSClientConfig{
@@ -59,7 +56,7 @@ func NewClusterManager(conn *generated.ClusterConnection, db *data.Data) (*Clust
 	if err != nil {
 		return nil, err
 	}
-	if err = controller.RegisterControllers(clusterId, mgr, db); err != nil {
+	if err = kube.RegisterControllers(mgr); err != nil {
 		return nil, err
 	}
 
@@ -160,19 +157,9 @@ func (c *ClusterManagers) Refresh() error {
 				oldMgr.Stop()
 				delete(c.managers, clusterID)
 			}
-			// 清理数据
-			if _, err = c.db.Application.Delete().
-				Where(application.ClusterID(clusterID)).
-				Exec(mixin.SkipSoftDelete(context.Background())); err != nil {
-				log.Error().
-					Err(err).
-					Uint64("clusterId", clusterID).
-					Msg("clean application error")
-				continue
-			}
 
 			// 创建新manager
-			newMgr, err := NewClusterManager(conn, c.db)
+			newMgr, err := NewClusterManager(conn)
 			if err != nil {
 				log.Error().
 					Err(err).
@@ -196,7 +183,13 @@ func (c *ClusterManagers) Refresh() error {
 	return nil
 }
 
-func (c *ClusterManagers) GetClient(clusterId uint64) (client.Client, error) {
+func (c *ClusterManagers) GetClient(ctx context.Context, appId uint64) (client.Client, error) {
+	app, err := c.db.Application.Get(ctx, appId)
+	if err != nil {
+		log.Error().Err(err).Msg("get application error")
+		return nil, err
+	}
+	clusterId := app.ClusterID
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	if mgr := c.managers[clusterId]; mgr == nil || mgr.mgr == nil {

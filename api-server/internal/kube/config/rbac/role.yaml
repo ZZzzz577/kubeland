@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - app.kubeland.com
   resources:
-  - applications
+  - buildsettings
   verbs:
   - create
   - delete
@@ -19,13 +19,13 @@ rules:
 - apiGroups:
   - app.kubeland.com
   resources:
-  - applications/finalizers
+  - buildsettings/finalizers
   verbs:
   - update
 - apiGroups:
   - app.kubeland.com
   resources:
-  - applications/status
+  - buildsettings/status
   verbs:
   - get
   - patch

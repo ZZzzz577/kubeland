@@ -32,11 +32,19 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	clusterService := service.NewClusterService(clusterBiz)
 	applicationBiz := biz.NewApplicationBiz(dataData)
 	applicationService := service.NewApplicationService(applicationBiz)
-	v := service.NewServices(clusterService, applicationService)
+	clusterManagers, cleanup2, err := biz.NewClusterManagers(dataData)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	buildSettingsBiz := biz.NewBuildSettingsBiz(clusterManagers)
+	buildSettingsService := service.NewBuildSettingsService(buildSettingsBiz)
+	v := service.NewServices(clusterService, applicationService, buildSettingsService)
 	grpcServer := server.NewGRPCServer(bootstrap)
 	httpServer := server.NewHTTPServer(bootstrap)
 	app := newApp(logger, v, grpcServer, httpServer)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }

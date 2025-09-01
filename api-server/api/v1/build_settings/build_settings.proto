@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package api.v1.build.settings;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+option go_package = "api-server/api/v1/build/settings;settings";
+
+service BuildSettingsService {
+
+  rpc GetBuildSettings(IdRequest) returns (BuildSettings) {
+    option (google.api.http) = {
+      get: "/v1/build/settings/{application_id}";
+    };
+  }
+
+  rpc ApplyBuildSettings(BuildSettings) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/build/settings/{application_id}";
+      body: "*";
+    };
+  }
+
+}
+
+
+
+message  IdRequest {
+  uint64 application_id = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message BuildSettings {
+  uint64 application_id = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string dockerfile = 2[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+
+
+
+message GitSettings {
+  string url = 1[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 512,
+    }
+  ];
+}

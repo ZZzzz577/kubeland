@@ -238,6 +238,44 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /v1/build/settings/{applicationId}:
+        get:
+            tags:
+                - BuildSettingsService
+            operationId: BuildSettingsService_GetBuildSettings
+            parameters:
+                - name: applicationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+        post:
+            tags:
+                - BuildSettingsService
+            operationId: BuildSettingsService_ApplyBuildSettings
+            parameters:
+                - name: applicationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
 components:
     schemas:
         api.v1.application.Application:
@@ -268,6 +306,16 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.v1.application.Application'
+        api.v1.build.settings.BuildSettings:
+            required:
+                - applicationId
+                - dockerfile
+            type: object
+            properties:
+                applicationId:
+                    type: string
+                dockerfile:
+                    type: string
         api.v1.cluster.Cluster:
             required:
                 - name
@@ -388,4 +436,5 @@ components:
                     format: uint32
 tags:
     - name: ApplicationService
+    - name: BuildSettingsService
     - name: ClusterService

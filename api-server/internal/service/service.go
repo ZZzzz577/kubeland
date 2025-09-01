@@ -13,10 +13,12 @@ type Service interface {
 func NewServices(
 	cluster *ClusterService,
 	application *ApplicationService,
+	buildSettings *BuildSettingsService,
 ) []Service {
 	return []Service{
 		cluster,
 		application,
+		buildSettings,
 	}
 }
 
@@ -25,4 +27,5 @@ var ProviderSet = wire.NewSet(
 	NewServices,
 	NewClusterService,
 	NewApplicationService,
+	NewBuildSettingsService,
 )

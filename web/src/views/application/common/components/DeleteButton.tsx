@@ -4,9 +4,10 @@ import { useRequest } from "ahooks";
 import { applicationApi } from "@/api";
 import { Button, Popconfirm } from "antd";
 import type { BaseButtonProps } from "antd/es/button/button";
+import { useParams } from "react-router";
 
-export default function DeleteButton(props: { id?: string } & BaseButtonProps) {
-    const { id } = props;
+export default function DeleteButton(props: BaseButtonProps) {
+    const { id } = useParams();
     const { t } = useLingui();
     const { notification } = useApp();
     const { run, loading } = useRequest(applicationApi.applicationServiceDeleteApplication.bind(applicationApi), {

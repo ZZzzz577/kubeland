@@ -6,6 +6,7 @@ cliVersion: 4.7.0
 domain: kubeland.com
 layout:
 - go.kubebuilder.io/v4
+projectName: kube
 repo: api-server/internal/kube
 resources:
 - api:
@@ -14,7 +15,7 @@ resources:
   controller: true
   domain: kubeland.com
   group: app
-  kind: Application
+  kind: BuildSettings
   path: api-server/internal/kube/api/v1
   version: v1
 version: "3"

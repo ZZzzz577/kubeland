@@ -1,32 +1,54 @@
-import { useParams } from "react-router";
-import { useLingui } from "@lingui/react/macro";
-import { useRequest } from "ahooks";
-import { applicationApi } from "@/api";
-import { Card } from "antd";
-import BackButton from "@/components/back/BackButton.tsx";
-import ApplicationModifyForm from "@/views/application/modify/components/ApplicationModifyForm.tsx";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
+import { Trans } from "@lingui/react/macro";
+import { Card, Space } from "antd";
+import { useMemo } from "react";
+import type { CardTabListType } from "antd/es/card/Card";
+import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
+
+const tabList: CardTabListType[] = [
+    {
+        key: "",
+        label: (
+            <Space>
+                <MenuOutlined />
+                <Trans>Basic info</Trans>
+            </Space>
+        ),
+    },
+    {
+        key: "build",
+        label: (
+            <Space>
+                <SettingOutlined />
+                <Trans>Build settings</Trans>
+            </Space>
+        ),
+    },
+];
 
 export default function ApplicationModify() {
-    const { t } = useLingui();
     const { id } = useParams();
-    const isUpdate = !!id;
-    const title = isUpdate ? t`Update cluster` : t`Create cluster`;
+    const navigate = useNavigate();
 
-    const { data, loading } = useRequest(
-        () => {
-            return applicationApi.applicationServiceGetApplication({
-                id: id as string,
-            });
-        },
-        {
-            ready: isUpdate,
-            refreshDeps: [id],
-        },
-    );
+    const location = useLocation();
+    const defaultActiveTab = useMemo(() => {
+        const segments = location.pathname.split("/").filter(Boolean);
+        return segments.length > 0 ? segments[segments.length - 1] : "";
+    }, [location]);
+
+    const onTabChange = (key: string) => {
+        navigate(`/app/${id}/edit/${key}`);
+    };
 
     return (
-        <Card title={title} loading={loading} extra={<BackButton />}>
-            <ApplicationModifyForm app={data} />
+        <Card
+            title={<div className={"text-xl mb-2"}>{id}</div>}
+            defaultActiveTabKey={defaultActiveTab}
+            tabList={tabList}
+            onTabChange={onTabChange}
+            tabProps={{ size: "middle" }}
+        >
+            <Outlet />
         </Card>
     );
 }

@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ApiV1ApplicationApplication';
 export * from './ApiV1ApplicationListApplicationsResponse';
+export * from './ApiV1BuildSettingsBuildSettings';
 export * from './ApiV1ClusterCluster';
 export * from './ApiV1ClusterConnection';
 export * from './ApiV1ClusterListClustersResponse';

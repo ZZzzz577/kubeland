@@ -5,6 +5,11 @@ import { AppstoreOutlined } from "@ant-design/icons";
 import ApplicationList from "@/views/application/list";
 import ApplicationModify from "@/views/application/modify";
 import ApplicationDetail from "@/views/application/detail";
+import ApplicationCreate from "@/views/application/create";
+import BasicInfo from "@/views/application/detail/basic";
+import BuildSettings from "@/views/application/detail/build";
+import BasicInfoEdit from "@/views/application/modify/basic";
+import BuildSettingsEdit from "@/views/application/modify/build";
 
 export const Application = (): Route => {
     return {
@@ -21,21 +26,49 @@ export const Application = (): Route => {
                 menu: {},
                 element: <ApplicationList />,
             },
+
             {
                 path: "create",
                 name: <Trans>Create</Trans>,
-                element: <ApplicationModify />,
+                element: <ApplicationCreate />,
             },
+
+            {
+                path: ":id",
+                name: <Trans>Detail</Trans>,
+                element: <ApplicationDetail />,
+                children: [
+                    {
+                        path: "",
+                        name: <Trans>Basic</Trans>,
+                        element: <BasicInfo />,
+                    },
+                    {
+                        path: "build",
+                        name: <Trans>Build</Trans>,
+                        element: <BuildSettings />
+                    }
+                ]
+            },
+
             {
                 path: ":id/edit",
                 name: <Trans>Edit</Trans>,
                 element: <ApplicationModify />,
+                children: [
+                    {
+                        path: "",
+                        name: <Trans>Basic</Trans>,
+                        element: <BasicInfoEdit />,
+                    },
+                    {
+                        path: "build",
+                        name: <Trans>Build</Trans>,
+                        element: <BuildSettingsEdit />
+                    }
+                ]
             },
-            {
-                path: ":id/detail",
-                name: <Trans>Detail</Trans>,
-                element: <ApplicationDetail />,
-            },
+
         ],
     };
 };
