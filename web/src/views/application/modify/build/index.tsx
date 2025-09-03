@@ -7,20 +7,27 @@ import {useForm} from "antd/es/form/Form";
 import type {ApiV1BuildSettingsBuildSettings} from "@/generated";
 import {Button, Form, Input, Space, Spin} from "antd";
 import {SaveOutlined} from "@ant-design/icons";
+import type {ReactNode} from "react";
+
+const Title = (props: {
+    children: ReactNode
+}) => {
+    return <div className={"text-base font-semibold  mb-4"}>{props.children}</div>
+}
 
 export default function BuildSettingsEdit() {
-    const {id} = useParams();
+    const {name} = useParams();
     const {t} = useLingui();
     const {notification} = useApp();
     const navigate = useNavigate();
-    const next = `/app/${id}/build`
+    const next = `/app/${name}/build`
 
     const [form] = useForm<ApiV1BuildSettingsBuildSettings>();
     const {Item} = Form;
 
     const {loading} = useRequest(buildSettingsApi.buildSettingsServiceGetBuildSettings.bind(buildSettingsApi), {
-        ready: !!id,
-        defaultParams: [{applicationId: id as string}],
+        ready: !!name,
+        defaultParams: [{name: name as string}],
         onSuccess: (data) => {
             form.setFieldsValue(data);
         },
@@ -51,9 +58,9 @@ export default function BuildSettingsEdit() {
         }
     );
     const submitForm = (values: ApiV1BuildSettingsBuildSettings) => {
-        if (id) {
+        if (name) {
             updateBuildSettings({
-                applicationId: id,
+                name: name,
                 apiV1BuildSettingsBuildSettings: values
             });
         }
@@ -66,12 +73,24 @@ export default function BuildSettingsEdit() {
                 form={form}
                 onFinish={submitForm}
                 labelWrap={true}
+                labelAlign={"left"}
                 labelCol={{
                     flex: "100px"
                 }}
             >
-                <Item label={t`Dockerfile`} name={"dockerfile"}>
-                    <Input.TextArea rows={4}/>
+                <Title>{t`Git repository settings`}</Title>
+                <Item label={t`URL`} name={["git", "url"]} rules={[{required: true}]}>
+                    <Input/>
+                </Item>
+
+                <Title>{t`Image repository settings`}</Title>
+                <Item label={t`URL`} name={["image", "url"]} rules={[{required: true}]}>
+                    <Input/>
+                </Item>
+
+                <Title>{t`Dockerfile`}</Title>
+                <Item name={"dockerfile"} rules={[{required: true}]}>
+                    <Input.TextArea rows={8}/>
                 </Item>
             </Form>
             <Space className={"ml-25"} size={"large"}>

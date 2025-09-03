@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
 import DetailExtra from "@/views/application/detail/components/DetailExtra.tsx";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";
-import getActivePath from "@/views/application/common/utils/tab.ts";
+import getActivePath from "@/views/application/detail/utils/tab.ts";
 
 const tabList: CardTabListType[] = [
     {
@@ -38,22 +38,21 @@ const tabList: CardTabListType[] = [
 ];
 
 export default function ApplicationDetail() {
-    const { id } = useParams();
+    const { name } = useParams();
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
     const defaultActiveTab = useMemo(() => {
-        return getActivePath(`/app/${id}`, pathname);
-    }, [pathname, id]);
-    console.log("defaultActiveTab", defaultActiveTab)
+        return getActivePath(`/app/${name}`, pathname);
+    }, [pathname, name]);
 
     const onTabChange = (key: string) => {
-        navigate(`/app/${id}/${key}`);
+        navigate(`/app/${name}/${key}`);
     };
 
     return (
         <Card
-            title={<div className={"text-xl mb-2"}>{id}</div>}
+            title={<div className={"text-xl mb-2"}>{name}</div>}
             defaultActiveTabKey={defaultActiveTab}
             tabList={tabList}
             onTabChange={onTabChange}

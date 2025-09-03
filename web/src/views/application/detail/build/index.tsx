@@ -2,17 +2,19 @@ import { useLingui } from "@lingui/react/macro";
 import useApp from "antd/es/app/useApp";
 import { useRequest } from "ahooks";
 import { buildSettingsApi } from "@/api";
-import { Descriptions, Spin } from "antd";
-import type { DescriptionsItemType } from "antd/es/descriptions";
+import { Space, Spin } from "antd";
 import { useParams } from "react-router";
+import DockerfileDescription from "@/views/application/detail/build/components/DockerfileDescription.tsx";
+import GitDescription from "@/views/application/detail/build/components/GitDescription.tsx";
+import ImageDescription from "@/views/application/detail/build/components/ImageDescription.tsx";
 
 export default function BuildSettings() {
-    const { id: appId } = useParams();
+    const { name } = useParams();
     const { t } = useLingui();
     const { notification } = useApp();
     const { data, loading } = useRequest(buildSettingsApi.buildSettingsServiceGetBuildSettings.bind(buildSettingsApi), {
-        ready: !!appId,
-        defaultParams: [{ applicationId: appId as string }],
+        ready: !!name,
+        defaultParams: [{ name: name as string }],
         onError: (error) => {
             notification.error({
                 message: t`failed to get build settings`,
@@ -21,15 +23,14 @@ export default function BuildSettings() {
         }
     });
 
-    const items: DescriptionsItemType[] = [
-        {
-            label: "",
-            children: <div className={"w-full min-h-96 border p-2 border-gray-300"}>{data?.dockerfile}</div>
-        }
-    ];
+
     return (
         <Spin spinning={loading}>
-            <Descriptions title={<div className={"text-sm"}>Dockerfile</div>} items={items} />
+            <Space direction={"vertical"} size={"large"}>
+                <GitDescription git={data?.git} />
+                <ImageDescription image={data?.image} />
+                <DockerfileDescription dockerfile={data?.dockerfile} />
+            </Space>
         </Spin>
     );
 

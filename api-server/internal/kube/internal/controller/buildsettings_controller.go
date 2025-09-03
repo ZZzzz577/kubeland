@@ -17,20 +17,31 @@ limitations under the License.
 package controller
 
 import (
+	appv1 "api-server/internal/kube/api/v1"
 	"context"
-
+	"fmt"
+	"github.com/rs/zerolog/log"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
-
-	appv1 "api-server/internal/kube/api/v1"
 )
 
 // BuildSettingsReconciler reconciles a BuildSettings object
 type BuildSettingsReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+}
+
+// SetupWithManager sets up the controller with the Manager.
+func (r *BuildSettingsReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&appv1.BuildSettings{}).
+		Owns(&v1.ConfigMap{}).
+		Named("buildsettings").
+		Complete(r)
 }
 
 // +kubebuilder:rbac:groups=app.kubeland.com,resources=buildsettings,verbs=get;list;watch;create;update;patch;delete
@@ -47,17 +58,70 @@ type BuildSettingsReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *BuildSettingsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+	var buildSettings appv1.BuildSettings
+	if err := r.Get(ctx, req.NamespacedName, &buildSettings); err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		} else {
+			log.Error().Err(err).Msg("get build settings error")
+			return ctrl.Result{}, err
+		}
+	}
+	// 检查是否创建了dockerfile configmap
+	var dockerfileConfigMap v1.ConfigMap
+	cmName := fmt.Sprintf("%s-dockerfile-cm", buildSettings.Name)
+	cmObjKey := client.ObjectKey{
+		Namespace: req.Namespace,
+		Name:      cmName,
+	}
+	err := r.Get(ctx, cmObjKey, &dockerfileConfigMap)
+	if err != nil && !errors.IsNotFound(err) {
+		log.Error().Err(err).Msg("get build settings error")
+		return ctrl.Result{}, err
+	}
 
-	// TODO(user): your logic here
+	if errors.IsNotFound(err) {
+		dockerfileConfigMap = v1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      cmObjKey.Name,
+				Namespace: cmObjKey.Namespace,
+			},
+			Data: map[string]string{
+				"Dockerfile": buildSettings.Spec.Dockerfile,
+			},
+		}
 
-	return ctrl.Result{}, nil
-}
+		if err = ctrl.SetControllerReference(&buildSettings, &dockerfileConfigMap, r.Scheme); err != nil {
+			log.Error().Err(err).Msg("set owner reference error")
+			return ctrl.Result{}, err
+		}
 
-// SetupWithManager sets up the controller with the Manager.
-func (r *BuildSettingsReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&appv1.BuildSettings{}).
-		Named("buildsettings").
-		Complete(r)
+		err = r.Create(ctx, &dockerfileConfigMap)
+		if err != nil {
+			log.Error().Err(err).Msg("create build settings dockerfile configmap error")
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+
+	} else {
+		shouldUpdate := false
+
+		if dockerfileConfigMap.Data["Dockerfile"] != buildSettings.Spec.Dockerfile {
+			dockerfileConfigMap.Data["Dockerfile"] = buildSettings.Spec.Dockerfile
+			shouldUpdate = true
+		}
+
+		if shouldUpdate {
+			if err = ctrl.SetControllerReference(&buildSettings, &dockerfileConfigMap, r.Scheme); err != nil {
+				log.Error().Err(err).Msg("set owner reference error")
+				return ctrl.Result{}, err
+			}
+
+			if err = r.Update(ctx, &dockerfileConfigMap); err != nil {
+				log.Error().Err(err).Msg("update build settings dockerfile configmap error")
+				return ctrl.Result{}, err
+			}
+		}
+		return ctrl.Result{}, nil
+	}
 }

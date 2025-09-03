@@ -30,11 +30,11 @@ export interface ApplicationServiceCreateApplicationRequest {
 }
 
 export interface ApplicationServiceDeleteApplicationRequest {
-    id: string;
+    name: string;
 }
 
 export interface ApplicationServiceGetApplicationRequest {
-    id: string;
+    name: string;
 }
 
 export interface ApplicationServiceListApplicationsRequest {
@@ -43,7 +43,7 @@ export interface ApplicationServiceListApplicationsRequest {
 }
 
 export interface ApplicationServiceUpdateApplicationRequest {
-    id: string;
+    name: string;
     apiV1ApplicationApplication: Omit<ApiV1ApplicationApplication, 'createdAt'|'updateAt'>;
 }
 
@@ -91,10 +91,10 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
     /**
      */
     async applicationServiceDeleteApplicationRaw(requestParameters: ApplicationServiceDeleteApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
+        if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling applicationServiceDeleteApplication().'
+                'name',
+                'Required parameter "name" was null or undefined when calling applicationServiceDeleteApplication().'
             );
         }
 
@@ -103,8 +103,8 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api/v1/application/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        let urlPath = `/api/v1/application/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
 
         const response = await this.request({
             path: urlPath,
@@ -125,10 +125,10 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
     /**
      */
     async applicationServiceGetApplicationRaw(requestParameters: ApplicationServiceGetApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1ApplicationApplication>> {
-        if (requestParameters['id'] == null) {
+        if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling applicationServiceGetApplication().'
+                'name',
+                'Required parameter "name" was null or undefined when calling applicationServiceGetApplication().'
             );
         }
 
@@ -137,8 +137,8 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api/v1/application/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        let urlPath = `/api/v1/application/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
 
         const response = await this.request({
             path: urlPath,
@@ -195,10 +195,10 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
     /**
      */
     async applicationServiceUpdateApplicationRaw(requestParameters: ApplicationServiceUpdateApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
+        if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling applicationServiceUpdateApplication().'
+                'name',
+                'Required parameter "name" was null or undefined when calling applicationServiceUpdateApplication().'
             );
         }
 
@@ -216,8 +216,8 @@ export class ApplicationServiceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/application/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        let urlPath = `/api/v1/application/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
 
         const response = await this.request({
             path: urlPath,

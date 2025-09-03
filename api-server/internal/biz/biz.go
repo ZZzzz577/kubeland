@@ -8,4 +8,5 @@ var ProviderSet = wire.NewSet(
 	NewClusterBiz,
 	NewApplicationBiz,
 	NewBuildSettingsBiz,
+	NewBuildTaskBiz,
 )

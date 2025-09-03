@@ -110,27 +110,27 @@ func (x *Application) GetUpdateAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type IdRequest struct {
+type IdentityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *IdRequest) Reset() {
-	*x = IdRequest{}
+func (x *IdentityRequest) Reset() {
+	*x = IdentityRequest{}
 	mi := &file_v1_application_application_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *IdRequest) String() string {
+func (x *IdentityRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IdRequest) ProtoMessage() {}
+func (*IdentityRequest) ProtoMessage() {}
 
-func (x *IdRequest) ProtoReflect() protoreflect.Message {
+func (x *IdentityRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_application_application_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -142,16 +142,16 @@ func (x *IdRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IdRequest.ProtoReflect.Descriptor instead.
-func (*IdRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use IdentityRequest.ProtoReflect.Descriptor instead.
+func (*IdentityRequest) Descriptor() ([]byte, []int) {
 	return file_v1_application_application_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *IdRequest) GetId() uint64 {
+func (x *IdentityRequest) GetName() string {
 	if x != nil {
-		return x.Id
+		return x.Name
 	}
-	return 0
+	return ""
 }
 
 type ListApplicationsRequest struct {
@@ -263,22 +263,22 @@ const file_v1_application_application_proto_rawDesc = "" +
 	"\vdescription\x18\x04 \x01(\tB\f\xe2A\x01\x01\xfaB\x05r\x03\x18\x80\x04R\vdescription\x12?\n" +
 	"\n" +
 	"created_at\x18d \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tcreatedAt\x12=\n" +
-	"\tupdate_at\x18e \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\bupdateAt\"!\n" +
-	"\tIdRequest\x12\x14\n" +
-	"\x02id\x18\x01 \x01(\x04B\x04\xe2A\x01\x02R\x02id\"B\n" +
+	"\tupdate_at\x18e \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\bupdateAt\"+\n" +
+	"\x0fIdentityRequest\x12\x18\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\"B\n" +
 	"\x17ListApplicationsRequest\x12'\n" +
 	"\x04page\x18\x01 \x01(\v2\x13.api.v1.common.PageR\x04page\"\x8c\x01\n" +
 	"\x18ListApplicationsResponse\x129\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x19.api.v1.common.PaginationR\n" +
 	"pagination\x125\n" +
-	"\x05items\x18\x02 \x03(\v2\x1f.api.v1.application.ApplicationR\x05items2\xe4\x04\n" +
+	"\x05items\x18\x02 \x03(\v2\x1f.api.v1.application.ApplicationR\x05items2\xf6\x04\n" +
 	"\x12ApplicationService\x12\x8a\x01\n" +
-	"\x10ListApplications\x12+.api.v1.application.ListApplicationsRequest\x1a,.api.v1.application.ListApplicationsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/application\x12r\n" +
-	"\x0eGetApplication\x12\x1d.api.v1.application.IdRequest\x1a\x1f.api.v1.application.Application\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/application/{id}\x12l\n" +
-	"\x11CreateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/application\x12q\n" +
-	"\x11UpdateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/api/v1/application/{id}\x12l\n" +
-	"\x11DeleteApplication\x12\x1d.api.v1.application.IdRequest\x1a\x16.google.protobuf.Empty\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/application/{id}B+Z)api-server/api/v1/application;applicationb\x06proto3"
+	"\x10ListApplications\x12+.api.v1.application.ListApplicationsRequest\x1a,.api.v1.application.ListApplicationsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/application\x12z\n" +
+	"\x0eGetApplication\x12#.api.v1.application.IdentityRequest\x1a\x1f.api.v1.application.Application\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/application/{name}\x12l\n" +
+	"\x11CreateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/application\x12s\n" +
+	"\x11UpdateApplication\x12\x1f.api.v1.application.Application\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\x1a\x1a/api/v1/application/{name}\x12t\n" +
+	"\x11DeleteApplication\x12#.api.v1.application.IdentityRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/v1/application/{name}B+Z)api-server/api/v1/application;applicationb\x06proto3"
 
 var (
 	file_v1_application_application_proto_rawDescOnce sync.Once
@@ -295,7 +295,7 @@ func file_v1_application_application_proto_rawDescGZIP() []byte {
 var file_v1_application_application_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_v1_application_application_proto_goTypes = []any{
 	(*Application)(nil),              // 0: api.v1.application.Application
-	(*IdRequest)(nil),                // 1: api.v1.application.IdRequest
+	(*IdentityRequest)(nil),          // 1: api.v1.application.IdentityRequest
 	(*ListApplicationsRequest)(nil),  // 2: api.v1.application.ListApplicationsRequest
 	(*ListApplicationsResponse)(nil), // 3: api.v1.application.ListApplicationsResponse
 	(*timestamppb.Timestamp)(nil),    // 4: google.protobuf.Timestamp
@@ -310,10 +310,10 @@ var file_v1_application_application_proto_depIdxs = []int32{
 	6,  // 3: api.v1.application.ListApplicationsResponse.pagination:type_name -> api.v1.common.Pagination
 	0,  // 4: api.v1.application.ListApplicationsResponse.items:type_name -> api.v1.application.Application
 	2,  // 5: api.v1.application.ApplicationService.ListApplications:input_type -> api.v1.application.ListApplicationsRequest
-	1,  // 6: api.v1.application.ApplicationService.GetApplication:input_type -> api.v1.application.IdRequest
+	1,  // 6: api.v1.application.ApplicationService.GetApplication:input_type -> api.v1.application.IdentityRequest
 	0,  // 7: api.v1.application.ApplicationService.CreateApplication:input_type -> api.v1.application.Application
 	0,  // 8: api.v1.application.ApplicationService.UpdateApplication:input_type -> api.v1.application.Application
-	1,  // 9: api.v1.application.ApplicationService.DeleteApplication:input_type -> api.v1.application.IdRequest
+	1,  // 9: api.v1.application.ApplicationService.DeleteApplication:input_type -> api.v1.application.IdentityRequest
 	3,  // 10: api.v1.application.ApplicationService.ListApplications:output_type -> api.v1.application.ListApplicationsResponse
 	0,  // 11: api.v1.application.ApplicationService.GetApplication:output_type -> api.v1.application.Application
 	7,  // 12: api.v1.application.ApplicationService.CreateApplication:output_type -> google.protobuf.Empty

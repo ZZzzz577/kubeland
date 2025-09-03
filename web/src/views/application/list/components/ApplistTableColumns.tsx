@@ -4,14 +4,16 @@ import { Trans } from "@lingui/react/macro";
 import { Link } from "react-router";
 import { Space } from "antd";
 import { ApplicationCluster } from "@/views/application/list/components/ApplicationListTable.tsx";
+import EditButton from "@/views/application/list/components/EditButton.tsx";
+import DeleteButton from "@/views/application/detail/components/DeleteButton.tsx";
 
 export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationApplication> {
     return [
         {
             dataIndex: "name",
             title: <Trans>Name</Trans>,
-            render: (name: string, record) => {
-                return <Link to={`/app/${record.id}`}>{name}</Link>;
+            render: (name: string) => {
+                return <Link to={`/app/${name}`}>{name}</Link>;
             },
         },
         {
@@ -26,11 +28,11 @@ export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationA
         },
         {
             title: <Trans>Actions</Trans>,
-            render: () => {
+            render: (_, record) => {
                 return (
                     <Space>
-                        {/*<EditorButton id={record.id} type={"link"} />*/}
-                        {/*<DeleteButton id={record.id} type={"link"} />*/}
+                        <EditButton name={record.name}  type={"link"} />
+                        <DeleteButton name={record.name} type={"link"} />
                     </Space>
                 );
             },

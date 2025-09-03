@@ -218,43 +218,44 @@ var _ interface {
 	ErrorName() string
 } = ApplicationValidationError{}
 
-// Validate checks the field values on IdRequest with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *IdRequest) Validate() error {
+// Validate checks the field values on IdentityRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *IdentityRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on IdRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in IdRequestMultiError, or nil
-// if none found.
-func (m *IdRequest) ValidateAll() error {
+// ValidateAll checks the field values on IdentityRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IdentityRequestMultiError, or nil if none found.
+func (m *IdentityRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *IdRequest) validate(all bool) error {
+func (m *IdentityRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for Id
+	// no validation rules for Name
 
 	if len(errors) > 0 {
-		return IdRequestMultiError(errors)
+		return IdentityRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// IdRequestMultiError is an error wrapping multiple validation errors returned
-// by IdRequest.ValidateAll() if the designated constraints aren't met.
-type IdRequestMultiError []error
+// IdentityRequestMultiError is an error wrapping multiple validation errors
+// returned by IdentityRequest.ValidateAll() if the designated constraints
+// aren't met.
+type IdentityRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m IdRequestMultiError) Error() string {
+func (m IdentityRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -263,11 +264,11 @@ func (m IdRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m IdRequestMultiError) AllErrors() []error { return m }
+func (m IdentityRequestMultiError) AllErrors() []error { return m }
 
-// IdRequestValidationError is the validation error returned by
-// IdRequest.Validate if the designated constraints aren't met.
-type IdRequestValidationError struct {
+// IdentityRequestValidationError is the validation error returned by
+// IdentityRequest.Validate if the designated constraints aren't met.
+type IdentityRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -275,22 +276,22 @@ type IdRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e IdRequestValidationError) Field() string { return e.field }
+func (e IdentityRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e IdRequestValidationError) Reason() string { return e.reason }
+func (e IdentityRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e IdRequestValidationError) Cause() error { return e.cause }
+func (e IdentityRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e IdRequestValidationError) Key() bool { return e.key }
+func (e IdentityRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e IdRequestValidationError) ErrorName() string { return "IdRequestValidationError" }
+func (e IdentityRequestValidationError) ErrorName() string { return "IdentityRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e IdRequestValidationError) Error() string {
+func (e IdentityRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -302,14 +303,14 @@ func (e IdRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sIdRequest.%s: %s%s",
+		"invalid %sIdentityRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = IdRequestValidationError{}
+var _ error = IdentityRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -317,7 +318,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = IdRequestValidationError{}
+} = IdentityRequestValidationError{}
 
 // Validate checks the field values on ListApplicationsRequest with the rules
 // defined in the proto definition for this message. If any rules are

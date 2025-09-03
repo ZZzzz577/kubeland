@@ -32,10 +32,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationServiceClient interface {
 	ListApplications(ctx context.Context, in *ListApplicationsRequest, opts ...grpc.CallOption) (*ListApplicationsResponse, error)
-	GetApplication(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Application, error)
+	GetApplication(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*Application, error)
 	CreateApplication(ctx context.Context, in *Application, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateApplication(ctx context.Context, in *Application, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	DeleteApplication(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteApplication(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type applicationServiceClient struct {
@@ -56,7 +56,7 @@ func (c *applicationServiceClient) ListApplications(ctx context.Context, in *Lis
 	return out, nil
 }
 
-func (c *applicationServiceClient) GetApplication(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Application, error) {
+func (c *applicationServiceClient) GetApplication(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*Application, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Application)
 	err := c.cc.Invoke(ctx, ApplicationService_GetApplication_FullMethodName, in, out, cOpts...)
@@ -86,7 +86,7 @@ func (c *applicationServiceClient) UpdateApplication(ctx context.Context, in *Ap
 	return out, nil
 }
 
-func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, ApplicationService_DeleteApplication_FullMethodName, in, out, cOpts...)
@@ -101,10 +101,10 @@ func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *Id
 // for forward compatibility.
 type ApplicationServiceServer interface {
 	ListApplications(context.Context, *ListApplicationsRequest) (*ListApplicationsResponse, error)
-	GetApplication(context.Context, *IdRequest) (*Application, error)
+	GetApplication(context.Context, *IdentityRequest) (*Application, error)
 	CreateApplication(context.Context, *Application) (*emptypb.Empty, error)
 	UpdateApplication(context.Context, *Application) (*emptypb.Empty, error)
-	DeleteApplication(context.Context, *IdRequest) (*emptypb.Empty, error)
+	DeleteApplication(context.Context, *IdentityRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -118,7 +118,7 @@ type UnimplementedApplicationServiceServer struct{}
 func (UnimplementedApplicationServiceServer) ListApplications(context.Context, *ListApplicationsRequest) (*ListApplicationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListApplications not implemented")
 }
-func (UnimplementedApplicationServiceServer) GetApplication(context.Context, *IdRequest) (*Application, error) {
+func (UnimplementedApplicationServiceServer) GetApplication(context.Context, *IdentityRequest) (*Application, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApplication not implemented")
 }
 func (UnimplementedApplicationServiceServer) CreateApplication(context.Context, *Application) (*emptypb.Empty, error) {
@@ -127,7 +127,7 @@ func (UnimplementedApplicationServiceServer) CreateApplication(context.Context, 
 func (UnimplementedApplicationServiceServer) UpdateApplication(context.Context, *Application) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateApplication not implemented")
 }
-func (UnimplementedApplicationServiceServer) DeleteApplication(context.Context, *IdRequest) (*emptypb.Empty, error) {
+func (UnimplementedApplicationServiceServer) DeleteApplication(context.Context, *IdentityRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApplication not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
@@ -170,7 +170,7 @@ func _ApplicationService_ListApplications_Handler(srv interface{}, ctx context.C
 }
 
 func _ApplicationService_GetApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IdRequest)
+	in := new(IdentityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func _ApplicationService_GetApplication_Handler(srv interface{}, ctx context.Con
 		FullMethod: ApplicationService_GetApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).GetApplication(ctx, req.(*IdRequest))
+		return srv.(ApplicationServiceServer).GetApplication(ctx, req.(*IdentityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -224,7 +224,7 @@ func _ApplicationService_UpdateApplication_Handler(srv interface{}, ctx context.
 }
 
 func _ApplicationService_DeleteApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IdRequest)
+	in := new(IdentityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func _ApplicationService_DeleteApplication_Handler(srv interface{}, ctx context.
 		FullMethod: ApplicationService_DeleteApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).DeleteApplication(ctx, req.(*IdRequest))
+		return srv.(ApplicationServiceServer).DeleteApplication(ctx, req.(*IdentityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

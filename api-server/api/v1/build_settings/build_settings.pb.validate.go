@@ -35,107 +35,6 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on IdRequest with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *IdRequest) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on IdRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in IdRequestMultiError, or nil
-// if none found.
-func (m *IdRequest) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *IdRequest) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for ApplicationId
-
-	if len(errors) > 0 {
-		return IdRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// IdRequestMultiError is an error wrapping multiple validation errors returned
-// by IdRequest.ValidateAll() if the designated constraints aren't met.
-type IdRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m IdRequestMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m IdRequestMultiError) AllErrors() []error { return m }
-
-// IdRequestValidationError is the validation error returned by
-// IdRequest.Validate if the designated constraints aren't met.
-type IdRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e IdRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e IdRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e IdRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e IdRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e IdRequestValidationError) ErrorName() string { return "IdRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e IdRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sIdRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = IdRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = IdRequestValidationError{}
-
 // Validate checks the field values on BuildSettings with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -158,7 +57,63 @@ func (m *BuildSettings) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ApplicationId
+	if all {
+		switch v := interface{}(m.GetGit()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BuildSettingsValidationError{
+					field:  "Git",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BuildSettingsValidationError{
+					field:  "Git",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BuildSettingsValidationError{
+				field:  "Git",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetImage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BuildSettingsValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BuildSettingsValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetImage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BuildSettingsValidationError{
+				field:  "Image",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	// no validation rules for Dockerfile
 
@@ -240,52 +195,73 @@ var _ interface {
 	ErrorName() string
 } = BuildSettingsValidationError{}
 
-// Validate checks the field values on GitSettings with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GitSettings) Validate() error {
+// Validate checks the field values on ApplyBuildSettingsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ApplyBuildSettingsRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GitSettings with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GitSettingsMultiError, or
-// nil if none found.
-func (m *GitSettings) ValidateAll() error {
+// ValidateAll checks the field values on ApplyBuildSettingsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ApplyBuildSettingsRequestMultiError, or nil if none found.
+func (m *ApplyBuildSettingsRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GitSettings) validate(all bool) error {
+func (m *ApplyBuildSettingsRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetUrl()); l < 1 || l > 512 {
-		err := GitSettingsValidationError{
-			field:  "Url",
-			reason: "value length must be between 1 and 512 runes, inclusive",
+	// no validation rules for Name
+
+	if all {
+		switch v := interface{}(m.GetBuildSettings()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ApplyBuildSettingsRequestValidationError{
+					field:  "BuildSettings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ApplyBuildSettingsRequestValidationError{
+					field:  "BuildSettings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
 		}
-		if !all {
-			return err
+	} else if v, ok := interface{}(m.GetBuildSettings()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ApplyBuildSettingsRequestValidationError{
+				field:  "BuildSettings",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
-		return GitSettingsMultiError(errors)
+		return ApplyBuildSettingsRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// GitSettingsMultiError is an error wrapping multiple validation errors
-// returned by GitSettings.ValidateAll() if the designated constraints aren't met.
-type GitSettingsMultiError []error
+// ApplyBuildSettingsRequestMultiError is an error wrapping multiple validation
+// errors returned by ApplyBuildSettingsRequest.ValidateAll() if the
+// designated constraints aren't met.
+type ApplyBuildSettingsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GitSettingsMultiError) Error() string {
+func (m ApplyBuildSettingsRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -294,11 +270,11 @@ func (m GitSettingsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GitSettingsMultiError) AllErrors() []error { return m }
+func (m ApplyBuildSettingsRequestMultiError) AllErrors() []error { return m }
 
-// GitSettingsValidationError is the validation error returned by
-// GitSettings.Validate if the designated constraints aren't met.
-type GitSettingsValidationError struct {
+// ApplyBuildSettingsRequestValidationError is the validation error returned by
+// ApplyBuildSettingsRequest.Validate if the designated constraints aren't met.
+type ApplyBuildSettingsRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -306,22 +282,24 @@ type GitSettingsValidationError struct {
 }
 
 // Field function returns field value.
-func (e GitSettingsValidationError) Field() string { return e.field }
+func (e ApplyBuildSettingsRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GitSettingsValidationError) Reason() string { return e.reason }
+func (e ApplyBuildSettingsRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GitSettingsValidationError) Cause() error { return e.cause }
+func (e ApplyBuildSettingsRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GitSettingsValidationError) Key() bool { return e.key }
+func (e ApplyBuildSettingsRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GitSettingsValidationError) ErrorName() string { return "GitSettingsValidationError" }
+func (e ApplyBuildSettingsRequestValidationError) ErrorName() string {
+	return "ApplyBuildSettingsRequestValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e GitSettingsValidationError) Error() string {
+func (e ApplyBuildSettingsRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -333,14 +311,14 @@ func (e GitSettingsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGitSettings.%s: %s%s",
+		"invalid %sApplyBuildSettingsRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GitSettingsValidationError{}
+var _ error = ApplyBuildSettingsRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -348,4 +326,231 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GitSettingsValidationError{}
+} = ApplyBuildSettingsRequestValidationError{}
+
+// Validate checks the field values on BuildSettings_GitSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *BuildSettings_GitSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BuildSettings_GitSettings with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BuildSettings_GitSettingsMultiError, or nil if none found.
+func (m *BuildSettings_GitSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BuildSettings_GitSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetUrl()); l < 1 || l > 512 {
+		err := BuildSettings_GitSettingsValidationError{
+			field:  "Url",
+			reason: "value length must be between 1 and 512 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return BuildSettings_GitSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// BuildSettings_GitSettingsMultiError is an error wrapping multiple validation
+// errors returned by BuildSettings_GitSettings.ValidateAll() if the
+// designated constraints aren't met.
+type BuildSettings_GitSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BuildSettings_GitSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BuildSettings_GitSettingsMultiError) AllErrors() []error { return m }
+
+// BuildSettings_GitSettingsValidationError is the validation error returned by
+// BuildSettings_GitSettings.Validate if the designated constraints aren't met.
+type BuildSettings_GitSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BuildSettings_GitSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BuildSettings_GitSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BuildSettings_GitSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BuildSettings_GitSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BuildSettings_GitSettingsValidationError) ErrorName() string {
+	return "BuildSettings_GitSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BuildSettings_GitSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBuildSettings_GitSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BuildSettings_GitSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BuildSettings_GitSettingsValidationError{}
+
+// Validate checks the field values on BuildSettings_ImageSettings with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *BuildSettings_ImageSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BuildSettings_ImageSettings with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BuildSettings_ImageSettingsMultiError, or nil if none found.
+func (m *BuildSettings_ImageSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BuildSettings_ImageSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetUrl()); l < 1 || l > 512 {
+		err := BuildSettings_ImageSettingsValidationError{
+			field:  "Url",
+			reason: "value length must be between 1 and 512 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return BuildSettings_ImageSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// BuildSettings_ImageSettingsMultiError is an error wrapping multiple
+// validation errors returned by BuildSettings_ImageSettings.ValidateAll() if
+// the designated constraints aren't met.
+type BuildSettings_ImageSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BuildSettings_ImageSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BuildSettings_ImageSettingsMultiError) AllErrors() []error { return m }
+
+// BuildSettings_ImageSettingsValidationError is the validation error returned
+// by BuildSettings_ImageSettings.Validate if the designated constraints
+// aren't met.
+type BuildSettings_ImageSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BuildSettings_ImageSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BuildSettings_ImageSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BuildSettings_ImageSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BuildSettings_ImageSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BuildSettings_ImageSettingsValidationError) ErrorName() string {
+	return "BuildSettings_ImageSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BuildSettings_ImageSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBuildSettings_ImageSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BuildSettings_ImageSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BuildSettings_ImageSettingsValidationError{}

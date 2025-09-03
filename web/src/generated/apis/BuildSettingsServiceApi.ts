@@ -23,12 +23,12 @@ import {
 } from '../models/index';
 
 export interface BuildSettingsServiceApplyBuildSettingsRequest {
-    applicationId: string;
+    name: string;
     apiV1BuildSettingsBuildSettings: ApiV1BuildSettingsBuildSettings;
 }
 
 export interface BuildSettingsServiceGetBuildSettingsRequest {
-    applicationId: string;
+    name: string;
 }
 
 /**
@@ -39,10 +39,10 @@ export class BuildSettingsServiceApi extends runtime.BaseAPI {
     /**
      */
     async buildSettingsServiceApplyBuildSettingsRaw(requestParameters: BuildSettingsServiceApplyBuildSettingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['applicationId'] == null) {
+        if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
-                'applicationId',
-                'Required parameter "applicationId" was null or undefined when calling buildSettingsServiceApplyBuildSettings().'
+                'name',
+                'Required parameter "name" was null or undefined when calling buildSettingsServiceApplyBuildSettings().'
             );
         }
 
@@ -60,8 +60,8 @@ export class BuildSettingsServiceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/v1/build/settings/{applicationId}`;
-        urlPath = urlPath.replace(`{${"applicationId"}}`, encodeURIComponent(String(requestParameters['applicationId'])));
+        let urlPath = `/v1/app/{name}/build/settings`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
 
         const response = await this.request({
             path: urlPath,
@@ -83,10 +83,10 @@ export class BuildSettingsServiceApi extends runtime.BaseAPI {
     /**
      */
     async buildSettingsServiceGetBuildSettingsRaw(requestParameters: BuildSettingsServiceGetBuildSettingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1BuildSettingsBuildSettings>> {
-        if (requestParameters['applicationId'] == null) {
+        if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
-                'applicationId',
-                'Required parameter "applicationId" was null or undefined when calling buildSettingsServiceGetBuildSettings().'
+                'name',
+                'Required parameter "name" was null or undefined when calling buildSettingsServiceGetBuildSettings().'
             );
         }
 
@@ -95,8 +95,8 @@ export class BuildSettingsServiceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/v1/build/settings/{applicationId}`;
-        urlPath = urlPath.replace(`{${"applicationId"}}`, encodeURIComponent(String(requestParameters['applicationId'])));
+        let urlPath = `/v1/app/{name}/build/settings`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
 
         const response = await this.request({
             path: urlPath,

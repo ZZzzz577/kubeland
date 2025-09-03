@@ -1,6 +1,7 @@
 package service
 
 import (
+	"api-server/api/v1/application"
 	settings "api-server/api/v1/build_settings"
 	"api-server/internal/biz"
 	"context"
@@ -28,10 +29,10 @@ func (b *BuildSettingsService) Register(gs *grpc.Server, hs *http.Server) {
 	settings.RegisterBuildSettingsServiceHTTPServer(hs, b)
 }
 
-func (b *BuildSettingsService) GetBuildSettings(ctx context.Context, request *settings.IdRequest) (*settings.BuildSettings, error) {
+func (b *BuildSettingsService) GetBuildSettings(ctx context.Context, request *application.IdentityRequest) (*settings.BuildSettings, error) {
 	return b.biz.GetBuildSettings(ctx, request)
 }
 
-func (b *BuildSettingsService) ApplyBuildSettings(ctx context.Context, request *settings.BuildSettings) (*emptypb.Empty, error) {
+func (b *BuildSettingsService) ApplyBuildSettings(ctx context.Context, request *settings.ApplyBuildSettingsRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, b.biz.ApplyBuildSettings(ctx, request)
 }

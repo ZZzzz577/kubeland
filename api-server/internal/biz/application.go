@@ -4,6 +4,7 @@ import (
 	"api-server/api/v1/application"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
+	applicationdb "api-server/internal/data/generated/application"
 	"context"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
@@ -36,8 +37,10 @@ func (a *ApplicationBiz) ListApplications(ctx context.Context, request *applicat
 	}, nil
 }
 
-func (a *ApplicationBiz) GetApplication(ctx context.Context, request *application.IdRequest) (*application.Application, error) {
-	app, err := a.db.Application.Get(ctx, request.Id)
+func (a *ApplicationBiz) GetApplication(ctx context.Context, request *application.IdentityRequest) (*application.Application, error) {
+	app, err := a.db.Application.Query().Where(
+		applicationdb.Name(request.GetName()),
+	).Only(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("get application error")
 		return nil, err
@@ -59,7 +62,10 @@ func (a *ApplicationBiz) CreateApplication(ctx context.Context, request *applica
 }
 
 func (a *ApplicationBiz) UpdateApplication(ctx context.Context, request *application.Application) error {
-	err := a.db.Application.UpdateOneID(request.Id).
+	err := a.db.Application.Update().
+		Where(
+			applicationdb.Name(request.GetName()),
+		).
 		SetDescription(request.Description).
 		Exec(ctx)
 	if err != nil {
@@ -69,8 +75,10 @@ func (a *ApplicationBiz) UpdateApplication(ctx context.Context, request *applica
 	return nil
 }
 
-func (a *ApplicationBiz) DeleteApplication(ctx context.Context, request *application.IdRequest) error {
-	err := a.db.Application.DeleteOneID(request.Id).Exec(ctx)
+func (a *ApplicationBiz) DeleteApplication(ctx context.Context, request *application.IdentityRequest) error {
+	_, err := a.db.Application.Delete().Where(
+		applicationdb.Name(request.GetName()),
+	).Exec(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("delete application error")
 		return err

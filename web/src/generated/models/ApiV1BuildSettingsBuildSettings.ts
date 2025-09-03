@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ApiV1BuildSettingsBuildSettingsImageSettings } from './ApiV1BuildSettingsBuildSettingsImageSettings';
+import {
+    ApiV1BuildSettingsBuildSettingsImageSettingsFromJSON,
+    ApiV1BuildSettingsBuildSettingsImageSettingsFromJSONTyped,
+    ApiV1BuildSettingsBuildSettingsImageSettingsToJSON,
+    ApiV1BuildSettingsBuildSettingsImageSettingsToJSONTyped,
+} from './ApiV1BuildSettingsBuildSettingsImageSettings';
+import type { ApiV1BuildSettingsBuildSettingsGitSettings } from './ApiV1BuildSettingsBuildSettingsGitSettings';
+import {
+    ApiV1BuildSettingsBuildSettingsGitSettingsFromJSON,
+    ApiV1BuildSettingsBuildSettingsGitSettingsFromJSONTyped,
+    ApiV1BuildSettingsBuildSettingsGitSettingsToJSON,
+    ApiV1BuildSettingsBuildSettingsGitSettingsToJSONTyped,
+} from './ApiV1BuildSettingsBuildSettingsGitSettings';
+
 /**
  * 
  * @export
@@ -21,10 +36,16 @@ import { mapValues } from '../runtime';
 export interface ApiV1BuildSettingsBuildSettings {
     /**
      * 
-     * @type {string}
+     * @type {ApiV1BuildSettingsBuildSettingsGitSettings}
      * @memberof ApiV1BuildSettingsBuildSettings
      */
-    applicationId: string;
+    git: ApiV1BuildSettingsBuildSettingsGitSettings;
+    /**
+     * 
+     * @type {ApiV1BuildSettingsBuildSettingsImageSettings}
+     * @memberof ApiV1BuildSettingsBuildSettings
+     */
+    image: ApiV1BuildSettingsBuildSettingsImageSettings;
     /**
      * 
      * @type {string}
@@ -37,7 +58,8 @@ export interface ApiV1BuildSettingsBuildSettings {
  * Check if a given object implements the ApiV1BuildSettingsBuildSettings interface.
  */
 export function instanceOfApiV1BuildSettingsBuildSettings(value: object): value is ApiV1BuildSettingsBuildSettings {
-    if (!('applicationId' in value) || value['applicationId'] === undefined) return false;
+    if (!('git' in value) || value['git'] === undefined) return false;
+    if (!('image' in value) || value['image'] === undefined) return false;
     if (!('dockerfile' in value) || value['dockerfile'] === undefined) return false;
     return true;
 }
@@ -52,7 +74,8 @@ export function ApiV1BuildSettingsBuildSettingsFromJSONTyped(json: any, ignoreDi
     }
     return {
         
-        'applicationId': json['applicationId'],
+        'git': ApiV1BuildSettingsBuildSettingsGitSettingsFromJSON(json['git']),
+        'image': ApiV1BuildSettingsBuildSettingsImageSettingsFromJSON(json['image']),
         'dockerfile': json['dockerfile'],
     };
 }
@@ -68,7 +91,8 @@ export function ApiV1BuildSettingsBuildSettingsToJSONTyped(value?: ApiV1BuildSet
 
     return {
         
-        'applicationId': value['applicationId'],
+        'git': ApiV1BuildSettingsBuildSettingsGitSettingsToJSON(value['git']),
+        'image': ApiV1BuildSettingsBuildSettingsImageSettingsToJSON(value['image']),
         'dockerfile': value['dockerfile'],
     };
 }

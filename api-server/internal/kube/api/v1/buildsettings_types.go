@@ -17,12 +17,21 @@ limitations under the License.
 package v1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+type GitSettings struct {
+	// +required
+	Url string `json:"url"`
+}
+
+type ImageSettings struct {
+	// +required
+	Url string `json:"url"`
+}
 
 // BuildSettingsSpec defines the desired state of BuildSettings
 type BuildSettingsSpec struct {
@@ -32,7 +41,13 @@ type BuildSettingsSpec struct {
 	// More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
 
 	// +required
-	Dockerfile corev1.ConfigMap `json:"dockerfile"`
+	Git GitSettings `json:"gitUrl"`
+
+	// +required
+	Image ImageSettings `json:"imageUrl"`
+
+	// +required
+	Dockerfile string `json:"dockerfile"`
 }
 
 // BuildSettingsStatus defines the observed state of BuildSettings.

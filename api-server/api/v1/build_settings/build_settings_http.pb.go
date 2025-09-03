@@ -7,6 +7,7 @@
 package settings
 
 import (
+	application "api-server/api/v1/application"
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
@@ -24,19 +25,19 @@ const OperationBuildSettingsServiceApplyBuildSettings = "/api.v1.build.settings.
 const OperationBuildSettingsServiceGetBuildSettings = "/api.v1.build.settings.BuildSettingsService/GetBuildSettings"
 
 type BuildSettingsServiceHTTPServer interface {
-	ApplyBuildSettings(context.Context, *BuildSettings) (*emptypb.Empty, error)
-	GetBuildSettings(context.Context, *IdRequest) (*BuildSettings, error)
+	ApplyBuildSettings(context.Context, *ApplyBuildSettingsRequest) (*emptypb.Empty, error)
+	GetBuildSettings(context.Context, *application.IdentityRequest) (*BuildSettings, error)
 }
 
 func RegisterBuildSettingsServiceHTTPServer(s *http.Server, srv BuildSettingsServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/build/settings/{application_id}", _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv))
-	r.POST("/v1/build/settings/{application_id}", _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv))
+	r.GET("/v1/app/{name}/build/settings", _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv))
+	r.POST("/v1/app/{name}/build/settings", _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv))
 }
 
 func _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv BuildSettingsServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in IdRequest
+		var in application.IdentityRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -45,7 +46,7 @@ func _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv BuildSettingsServi
 		}
 		http.SetOperation(ctx, OperationBuildSettingsServiceGetBuildSettings)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetBuildSettings(ctx, req.(*IdRequest))
+			return srv.GetBuildSettings(ctx, req.(*application.IdentityRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -58,8 +59,8 @@ func _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv BuildSettingsServi
 
 func _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv BuildSettingsServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in BuildSettings
-		if err := ctx.Bind(&in); err != nil {
+		var in ApplyBuildSettingsRequest
+		if err := ctx.Bind(&in.BuildSettings); err != nil {
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
@@ -70,7 +71,7 @@ func _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv BuildSettingsSer
 		}
 		http.SetOperation(ctx, OperationBuildSettingsServiceApplyBuildSettings)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ApplyBuildSettings(ctx, req.(*BuildSettings))
+			return srv.ApplyBuildSettings(ctx, req.(*ApplyBuildSettingsRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -82,8 +83,8 @@ func _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv BuildSettingsSer
 }
 
 type BuildSettingsServiceHTTPClient interface {
-	ApplyBuildSettings(ctx context.Context, req *BuildSettings, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	GetBuildSettings(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *BuildSettings, err error)
+	ApplyBuildSettings(ctx context.Context, req *ApplyBuildSettingsRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetBuildSettings(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *BuildSettings, err error)
 }
 
 type BuildSettingsServiceHTTPClientImpl struct {
@@ -94,22 +95,22 @@ func NewBuildSettingsServiceHTTPClient(client *http.Client) BuildSettingsService
 	return &BuildSettingsServiceHTTPClientImpl{client}
 }
 
-func (c *BuildSettingsServiceHTTPClientImpl) ApplyBuildSettings(ctx context.Context, in *BuildSettings, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *BuildSettingsServiceHTTPClientImpl) ApplyBuildSettings(ctx context.Context, in *ApplyBuildSettingsRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/v1/build/settings/{application_id}"
+	pattern := "/v1/app/{name}/build/settings"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBuildSettingsServiceApplyBuildSettings))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in.BuildSettings, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return &out, nil
 }
 
-func (c *BuildSettingsServiceHTTPClientImpl) GetBuildSettings(ctx context.Context, in *IdRequest, opts ...http.CallOption) (*BuildSettings, error) {
+func (c *BuildSettingsServiceHTTPClientImpl) GetBuildSettings(ctx context.Context, in *application.IdentityRequest, opts ...http.CallOption) (*BuildSettings, error) {
 	var out BuildSettings
-	pattern := "/v1/build/settings/{application_id}"
+	pattern := "/v1/app/{name}/build/settings"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationBuildSettingsServiceGetBuildSettings))
 	opts = append(opts, http.PathTemplate(pattern))

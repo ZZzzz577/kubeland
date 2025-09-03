@@ -34,7 +34,7 @@ export const Application = (): Route => {
             },
 
             {
-                path: ":id",
+                path: ":name",
                 name: <Trans>Detail</Trans>,
                 element: <ApplicationDetail />,
                 children: [
@@ -52,7 +52,7 @@ export const Application = (): Route => {
             },
 
             {
-                path: ":id/edit",
+                path: ":name/edit",
                 name: <Trans>Edit</Trans>,
                 element: <ApplicationModify />,
                 children: [

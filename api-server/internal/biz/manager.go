@@ -4,6 +4,7 @@ import (
 	"api-server/api/v1/cluster"
 	"api-server/internal/data"
 	"api-server/internal/data/generated"
+	"api-server/internal/data/generated/application"
 	"api-server/internal/kube"
 	"context"
 	"errors"
@@ -183,8 +184,12 @@ func (c *ClusterManagers) Refresh() error {
 	return nil
 }
 
-func (c *ClusterManagers) GetClient(ctx context.Context, appId uint64) (client.Client, error) {
-	app, err := c.db.Application.Get(ctx, appId)
+func (c *ClusterManagers) GetClient(ctx context.Context, appName string) (client.Client, error) {
+	app, err := c.db.Application.Query().
+		Select(application.FieldClusterID).
+		Where(
+			application.Name(appName),
+		).Only(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("get application error")
 		return nil, err

@@ -7,12 +7,12 @@
 package settings
 
 import (
+	application "api-server/api/v1/application"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -25,61 +25,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type IdRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ApplicationId uint64                 `protobuf:"varint,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *IdRequest) Reset() {
-	*x = IdRequest{}
-	mi := &file_v1_build_settings_build_settings_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *IdRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*IdRequest) ProtoMessage() {}
-
-func (x *IdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_build_settings_build_settings_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use IdRequest.ProtoReflect.Descriptor instead.
-func (*IdRequest) Descriptor() ([]byte, []int) {
-	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *IdRequest) GetApplicationId() uint64 {
-	if x != nil {
-		return x.ApplicationId
-	}
-	return 0
-}
-
 type BuildSettings struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ApplicationId uint64                 `protobuf:"varint,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
-	Dockerfile    string                 `protobuf:"bytes,2,opt,name=dockerfile,proto3" json:"dockerfile,omitempty"`
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Git           *BuildSettings_GitSettings   `protobuf:"bytes,1,opt,name=git,proto3" json:"git,omitempty"`
+	Image         *BuildSettings_ImageSettings `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	Dockerfile    string                       `protobuf:"bytes,3,opt,name=dockerfile,proto3" json:"dockerfile,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BuildSettings) Reset() {
 	*x = BuildSettings{}
-	mi := &file_v1_build_settings_build_settings_proto_msgTypes[1]
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -91,7 +48,7 @@ func (x *BuildSettings) String() string {
 func (*BuildSettings) ProtoMessage() {}
 
 func (x *BuildSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_build_settings_build_settings_proto_msgTypes[1]
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,14 +61,21 @@ func (x *BuildSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildSettings.ProtoReflect.Descriptor instead.
 func (*BuildSettings) Descriptor() ([]byte, []int) {
-	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{1}
+	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *BuildSettings) GetApplicationId() uint64 {
+func (x *BuildSettings) GetGit() *BuildSettings_GitSettings {
 	if x != nil {
-		return x.ApplicationId
+		return x.Git
 	}
-	return 0
+	return nil
+}
+
+func (x *BuildSettings) GetImage() *BuildSettings_ImageSettings {
+	if x != nil {
+		return x.Image
+	}
+	return nil
 }
 
 func (x *BuildSettings) GetDockerfile() string {
@@ -121,27 +85,79 @@ func (x *BuildSettings) GetDockerfile() string {
 	return ""
 }
 
-type GitSettings struct {
+type ApplyBuildSettingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	BuildSettings *BuildSettings         `protobuf:"bytes,2,opt,name=build_settings,json=buildSettings,proto3" json:"build_settings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApplyBuildSettingsRequest) Reset() {
+	*x = ApplyBuildSettingsRequest{}
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyBuildSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyBuildSettingsRequest) ProtoMessage() {}
+
+func (x *ApplyBuildSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyBuildSettingsRequest.ProtoReflect.Descriptor instead.
+func (*ApplyBuildSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ApplyBuildSettingsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ApplyBuildSettingsRequest) GetBuildSettings() *BuildSettings {
+	if x != nil {
+		return x.BuildSettings
+	}
+	return nil
+}
+
+type BuildSettings_GitSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GitSettings) Reset() {
-	*x = GitSettings{}
+func (x *BuildSettings_GitSettings) Reset() {
+	*x = BuildSettings_GitSettings{}
 	mi := &file_v1_build_settings_build_settings_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GitSettings) String() string {
+func (x *BuildSettings_GitSettings) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GitSettings) ProtoMessage() {}
+func (*BuildSettings_GitSettings) ProtoMessage() {}
 
-func (x *GitSettings) ProtoReflect() protoreflect.Message {
+func (x *BuildSettings_GitSettings) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_build_settings_build_settings_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -153,12 +169,56 @@ func (x *GitSettings) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GitSettings.ProtoReflect.Descriptor instead.
-func (*GitSettings) Descriptor() ([]byte, []int) {
-	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use BuildSettings_GitSettings.ProtoReflect.Descriptor instead.
+func (*BuildSettings_GitSettings) Descriptor() ([]byte, []int) {
+	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0, 0}
 }
 
-func (x *GitSettings) GetUrl() string {
+func (x *BuildSettings_GitSettings) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+type BuildSettings_ImageSettings struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildSettings_ImageSettings) Reset() {
+	*x = BuildSettings_ImageSettings{}
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildSettings_ImageSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildSettings_ImageSettings) ProtoMessage() {}
+
+func (x *BuildSettings_ImageSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_build_settings_build_settings_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildSettings_ImageSettings.ProtoReflect.Descriptor instead.
+func (*BuildSettings_ImageSettings) Descriptor() ([]byte, []int) {
+	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *BuildSettings_ImageSettings) GetUrl() string {
 	if x != nil {
 		return x.Url
 	}
@@ -169,19 +229,23 @@ var File_v1_build_settings_build_settings_proto protoreflect.FileDescriptor
 
 const file_v1_build_settings_build_settings_proto_rawDesc = "" +
 	"\n" +
-	"&v1/build_settings/build_settings.proto\x12\x15api.v1.build.settings\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"8\n" +
-	"\tIdRequest\x12+\n" +
-	"\x0eapplication_id\x18\x01 \x01(\x04B\x04\xe2A\x01\x02R\rapplicationId\"b\n" +
-	"\rBuildSettings\x12+\n" +
-	"\x0eapplication_id\x18\x01 \x01(\x04B\x04\xe2A\x01\x02R\rapplicationId\x12$\n" +
+	"&v1/build_settings/build_settings.proto\x12\x15api.v1.build.settings\x1a v1/application/application.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"\xb3\x02\n" +
+	"\rBuildSettings\x12H\n" +
+	"\x03git\x18\x01 \x01(\v20.api.v1.build.settings.BuildSettings.GitSettingsB\x04\xe2A\x01\x02R\x03git\x12N\n" +
+	"\x05image\x18\x02 \x01(\v22.api.v1.build.settings.BuildSettings.ImageSettingsB\x04\xe2A\x01\x02R\x05image\x12$\n" +
 	"\n" +
-	"dockerfile\x18\x02 \x01(\tB\x04\xe2A\x01\x02R\n" +
-	"dockerfile\"/\n" +
+	"dockerfile\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\n" +
+	"dockerfile\x1a/\n" +
 	"\vGitSettings\x12 \n" +
-	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url2\xa5\x02\n" +
-	"\x14BuildSettingsService\x12\x87\x01\n" +
-	"\x10GetBuildSettings\x12 .api.v1.build.settings.IdRequest\x1a$.api.v1.build.settings.BuildSettings\"+\x82\xd3\xe4\x93\x02%\x12#/v1/build/settings/{application_id}\x12\x82\x01\n" +
-	"\x12ApplyBuildSettings\x12$.api.v1.build.settings.BuildSettings\x1a\x16.google.protobuf.Empty\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/build/settings/{application_id}B+Z)api-server/api/v1/build/settings;settingsb\x06proto3"
+	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url\x1a1\n" +
+	"\rImageSettings\x12 \n" +
+	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url\"\x82\x01\n" +
+	"\x19ApplyBuildSettingsRequest\x12\x18\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\x12K\n" +
+	"\x0ebuild_settings\x18\x02 \x01(\v2$.api.v1.build.settings.BuildSettingsR\rbuildSettings2\xb5\x02\n" +
+	"\x14BuildSettingsService\x12\x84\x01\n" +
+	"\x10GetBuildSettings\x12#.api.v1.application.IdentityRequest\x1a$.api.v1.build.settings.BuildSettings\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/app/{name}/build/settings\x12\x95\x01\n" +
+	"\x12ApplyBuildSettings\x120.api.v1.build.settings.ApplyBuildSettingsRequest\x1a\x16.google.protobuf.Empty\"5\x82\xd3\xe4\x93\x02/:\x0ebuild_settings\"\x1d/v1/app/{name}/build/settingsB+Z)api-server/api/v1/build/settings;settingsb\x06proto3"
 
 var (
 	file_v1_build_settings_build_settings_proto_rawDescOnce sync.Once
@@ -195,23 +259,28 @@ func file_v1_build_settings_build_settings_proto_rawDescGZIP() []byte {
 	return file_v1_build_settings_build_settings_proto_rawDescData
 }
 
-var file_v1_build_settings_build_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_v1_build_settings_build_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_v1_build_settings_build_settings_proto_goTypes = []any{
-	(*IdRequest)(nil),     // 0: api.v1.build.settings.IdRequest
-	(*BuildSettings)(nil), // 1: api.v1.build.settings.BuildSettings
-	(*GitSettings)(nil),   // 2: api.v1.build.settings.GitSettings
-	(*emptypb.Empty)(nil), // 3: google.protobuf.Empty
+	(*BuildSettings)(nil),               // 0: api.v1.build.settings.BuildSettings
+	(*ApplyBuildSettingsRequest)(nil),   // 1: api.v1.build.settings.ApplyBuildSettingsRequest
+	(*BuildSettings_GitSettings)(nil),   // 2: api.v1.build.settings.BuildSettings.GitSettings
+	(*BuildSettings_ImageSettings)(nil), // 3: api.v1.build.settings.BuildSettings.ImageSettings
+	(*application.IdentityRequest)(nil), // 4: api.v1.application.IdentityRequest
+	(*emptypb.Empty)(nil),               // 5: google.protobuf.Empty
 }
 var file_v1_build_settings_build_settings_proto_depIdxs = []int32{
-	0, // 0: api.v1.build.settings.BuildSettingsService.GetBuildSettings:input_type -> api.v1.build.settings.IdRequest
-	1, // 1: api.v1.build.settings.BuildSettingsService.ApplyBuildSettings:input_type -> api.v1.build.settings.BuildSettings
-	1, // 2: api.v1.build.settings.BuildSettingsService.GetBuildSettings:output_type -> api.v1.build.settings.BuildSettings
-	3, // 3: api.v1.build.settings.BuildSettingsService.ApplyBuildSettings:output_type -> google.protobuf.Empty
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: api.v1.build.settings.BuildSettings.git:type_name -> api.v1.build.settings.BuildSettings.GitSettings
+	3, // 1: api.v1.build.settings.BuildSettings.image:type_name -> api.v1.build.settings.BuildSettings.ImageSettings
+	0, // 2: api.v1.build.settings.ApplyBuildSettingsRequest.build_settings:type_name -> api.v1.build.settings.BuildSettings
+	4, // 3: api.v1.build.settings.BuildSettingsService.GetBuildSettings:input_type -> api.v1.application.IdentityRequest
+	1, // 4: api.v1.build.settings.BuildSettingsService.ApplyBuildSettings:input_type -> api.v1.build.settings.ApplyBuildSettingsRequest
+	0, // 5: api.v1.build.settings.BuildSettingsService.GetBuildSettings:output_type -> api.v1.build.settings.BuildSettings
+	5, // 6: api.v1.build.settings.BuildSettingsService.ApplyBuildSettings:output_type -> google.protobuf.Empty
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_v1_build_settings_build_settings_proto_init() }
@@ -225,7 +294,7 @@ func file_v1_build_settings_build_settings_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_build_settings_build_settings_proto_rawDesc), len(file_v1_build_settings_build_settings_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,12 +1,12 @@
 package biz
 
 import (
+	"api-server/api/v1/application"
 	settings "api-server/api/v1/build_settings"
 	appv1 "api-server/internal/kube/api/v1"
 	"context"
 	"fmt"
 	"github.com/rs/zerolog/log"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
@@ -24,26 +24,24 @@ func NewBuildSettingsBiz(
 	}
 }
 
-func (b *BuildSettingsBiz) GetBuildSettings(ctx context.Context, request *settings.IdRequest) (*settings.BuildSettings, error) {
-	appId := request.GetApplicationId()
-	client, err := b.cm.GetClient(ctx, request.GetApplicationId())
+func (b *BuildSettingsBiz) GetBuildSettings(ctx context.Context, request *application.IdentityRequest) (*settings.BuildSettings, error) {
+	appName := request.GetName()
+	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
 		return nil, err
 	}
 
-	name := fmt.Sprintf("build-settings-%d", appId)
 	namespace := "default"
 	var buildSettings appv1.BuildSettings
 	err = client.Get(ctx, cr.ObjectKey{
 		Namespace: namespace,
-		Name:      name,
+		Name:      appName,
 	}, &buildSettings)
 
 	if errors.IsNotFound(err) {
 		return &settings.BuildSettings{
-			ApplicationId: appId,
-			Dockerfile:    "",
+			Dockerfile: "",
 		}, nil
 	}
 	if err != nil {
@@ -52,28 +50,36 @@ func (b *BuildSettingsBiz) GetBuildSettings(ctx context.Context, request *settin
 	}
 
 	return &settings.BuildSettings{
-		ApplicationId: appId,
-		Dockerfile:    buildSettings.Spec.Dockerfile.Data["dockerfile"],
+		Git: &settings.BuildSettings_GitSettings{
+			Url: buildSettings.Spec.Git.Url,
+		},
+		Image: &settings.BuildSettings_ImageSettings{
+			Url: buildSettings.Spec.Image.Url,
+		},
+		Dockerfile: buildSettings.Spec.Dockerfile,
 	}, nil
 }
 
-func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *settings.BuildSettings) error {
-	appId := request.GetApplicationId()
-	client, err := b.cm.GetClient(ctx, request.GetApplicationId())
+func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *settings.ApplyBuildSettingsRequest) error {
+	appName := request.GetName()
+	buildSettings := request.GetBuildSettings()
+	gitSettings := buildSettings.GetGit()
+	imageSettings := buildSettings.GetImage()
+	dockerfile := buildSettings.GetDockerfile()
+
+	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
 		return err
 	}
 
-	name := fmt.Sprintf("build-settings-%d", appId)
+	name := fmt.Sprintf("%s", appName)
 	namespace := "default"
-	var buildSettings appv1.BuildSettings
+	var kubeBuildSettings appv1.BuildSettings
 	err = client.Get(ctx, cr.ObjectKey{
 		Name:      name,
 		Namespace: namespace,
-	}, &buildSettings, &cr.GetOptions{
-		Raw: &metav1.GetOptions{},
-	})
+	}, &kubeBuildSettings)
 	if err != nil && !errors.IsNotFound(err) {
 		log.Error().Err(err).Msg("get build settings error")
 		return err
@@ -86,11 +92,13 @@ func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *sett
 				Namespace: namespace,
 			},
 			Spec: appv1.BuildSettingsSpec{
-				Dockerfile: v1.ConfigMap{
-					Data: map[string]string{
-						"dockerfile": request.GetDockerfile(),
-					},
+				Git: appv1.GitSettings{
+					Url: gitSettings.GetUrl(),
 				},
+				Image: appv1.ImageSettings{
+					Url: imageSettings.GetUrl(),
+				},
+				Dockerfile: dockerfile,
 			},
 		})
 		if err != nil {
@@ -98,8 +106,10 @@ func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *sett
 			return err
 		}
 	} else {
-		buildSettings.Spec.Dockerfile.Data["dockerfile"] = request.GetDockerfile()
-		err = client.Update(ctx, &buildSettings)
+		kubeBuildSettings.Spec.Git.Url = gitSettings.GetUrl()
+		kubeBuildSettings.Spec.Image.Url = imageSettings.GetUrl()
+		kubeBuildSettings.Spec.Dockerfile = dockerfile
+		err = client.Update(ctx, &kubeBuildSettings)
 		if err != nil {
 			log.Error().Err(err).Msg("update build settings error")
 			return err

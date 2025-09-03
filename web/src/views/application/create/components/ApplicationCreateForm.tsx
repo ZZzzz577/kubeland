@@ -28,7 +28,6 @@ export default function ApplicationCreateForm() {
                 setTimeout(() => navigate("/app"), 500);
             },
             onError: (error) => {
-                console.log(error);
                 notification.error({
                     message: t`create application failed`,
                     description: error.message,

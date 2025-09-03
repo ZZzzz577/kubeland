@@ -18,9 +18,9 @@ service ApplicationService {
     };
   }
 
-  rpc GetApplication (IdRequest) returns (Application) {
+  rpc GetApplication (IdentityRequest) returns (Application) {
     option (google.api.http) = {
-      get: "/api/v1/application/{id}"
+      get: "/api/v1/application/{name}"
     };
   }
 
@@ -33,14 +33,14 @@ service ApplicationService {
 
   rpc UpdateApplication (Application) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/api/v1/application/{id}"
+      put: "/api/v1/application/{name}"
       body: "*"
     };
   }
 
-  rpc DeleteApplication (IdRequest) returns (google.protobuf.Empty) {
+  rpc DeleteApplication (IdentityRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/api/v1/application/{id}"
+      delete: "/api/v1/application/{name}"
     };
   }
 
@@ -70,8 +70,8 @@ message Application {
   ];
 }
 
-message IdRequest {
-  uint64 id = 1[
+message IdentityRequest {
+  string name = 1[
     (google.api.field_behavior) = REQUIRED
   ];
 }

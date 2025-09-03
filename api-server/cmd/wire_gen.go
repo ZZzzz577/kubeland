@@ -39,7 +39,9 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	}
 	buildSettingsBiz := biz.NewBuildSettingsBiz(clusterManagers)
 	buildSettingsService := service.NewBuildSettingsService(buildSettingsBiz)
-	v := service.NewServices(clusterService, applicationService, buildSettingsService)
+	buildTaskBiz := biz.NewBuildTaskBiz(clusterManagers)
+	buildTaskService := service.NewBuildTaskService(buildTaskBiz)
+	v := service.NewServices(clusterService, applicationService, buildSettingsService, buildTaskService)
 	grpcServer := server.NewGRPCServer(bootstrap)
 	httpServer := server.NewHTTPServer(bootstrap)
 	app := newApp(logger, v, grpcServer, httpServer)

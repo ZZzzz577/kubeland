@@ -14,11 +14,13 @@ func NewServices(
 	cluster *ClusterService,
 	application *ApplicationService,
 	buildSettings *BuildSettingsService,
+	buildTask *BuildTaskService,
 ) []Service {
 	return []Service{
 		cluster,
 		application,
 		buildSettings,
+		buildTask,
 	}
 }
 
@@ -28,4 +30,5 @@ var ProviderSet = wire.NewSet(
 	NewClusterService,
 	NewApplicationService,
 	NewBuildSettingsService,
+	NewBuildTaskService,
 )

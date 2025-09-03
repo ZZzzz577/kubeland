@@ -1,11 +1,15 @@
 apis/ApplicationServiceApi.ts
 apis/BuildSettingsServiceApi.ts
+apis/BuildTaskServiceApi.ts
 apis/ClusterServiceApi.ts
 apis/index.ts
 index.ts
 models/ApiV1ApplicationApplication.ts
+models/ApiV1ApplicationIdentityRequest.ts
 models/ApiV1ApplicationListApplicationsResponse.ts
 models/ApiV1BuildSettingsBuildSettings.ts
+models/ApiV1BuildSettingsBuildSettingsGitSettings.ts
+models/ApiV1BuildSettingsBuildSettingsImageSettings.ts
 models/ApiV1ClusterCluster.ts
 models/ApiV1ClusterConnection.ts
 models/ApiV1ClusterListClustersResponse.ts

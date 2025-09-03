@@ -4,10 +4,10 @@ import { useRequest } from "ahooks";
 import { applicationApi } from "@/api";
 import { Button, Popconfirm } from "antd";
 import type { BaseButtonProps } from "antd/es/button/button";
-import { useParams } from "react-router";
+import { Fragment } from "react";
 
-export default function DeleteButton(props: BaseButtonProps) {
-    const { id } = useParams();
+export default function DeleteButton(props: { name?: string } & BaseButtonProps) {
+    const name = props.name;
     const { t } = useLingui();
     const { notification } = useApp();
     const { run, loading } = useRequest(applicationApi.applicationServiceDeleteApplication.bind(applicationApi), {
@@ -24,11 +24,16 @@ export default function DeleteButton(props: BaseButtonProps) {
             });
         },
     });
+
     const onClick = () => {
-        if (id) {
-            run({ id });
+        if (name) {
+            run({ name: name });
         }
     };
+
+    if (!name) {
+        return <Fragment />;
+    }
     return (
         <Popconfirm title={t`Are you sure to delete this application?`} onConfirm={onClick}>
             <Button {...props} danger loading={loading}>

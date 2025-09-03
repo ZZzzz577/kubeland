@@ -28,8 +28,8 @@ const OperationApplicationServiceUpdateApplication = "/api.v1.application.Applic
 
 type ApplicationServiceHTTPServer interface {
 	CreateApplication(context.Context, *Application) (*emptypb.Empty, error)
-	DeleteApplication(context.Context, *IdRequest) (*emptypb.Empty, error)
-	GetApplication(context.Context, *IdRequest) (*Application, error)
+	DeleteApplication(context.Context, *IdentityRequest) (*emptypb.Empty, error)
+	GetApplication(context.Context, *IdentityRequest) (*Application, error)
 	ListApplications(context.Context, *ListApplicationsRequest) (*ListApplicationsResponse, error)
 	UpdateApplication(context.Context, *Application) (*emptypb.Empty, error)
 }
@@ -37,10 +37,10 @@ type ApplicationServiceHTTPServer interface {
 func RegisterApplicationServiceHTTPServer(s *http.Server, srv ApplicationServiceHTTPServer) {
 	r := s.Route("/")
 	r.GET("/api/v1/application", _ApplicationService_ListApplications0_HTTP_Handler(srv))
-	r.GET("/api/v1/application/{id}", _ApplicationService_GetApplication0_HTTP_Handler(srv))
+	r.GET("/api/v1/application/{name}", _ApplicationService_GetApplication0_HTTP_Handler(srv))
 	r.POST("/api/v1/application", _ApplicationService_CreateApplication0_HTTP_Handler(srv))
-	r.PUT("/api/v1/application/{id}", _ApplicationService_UpdateApplication0_HTTP_Handler(srv))
-	r.DELETE("/api/v1/application/{id}", _ApplicationService_DeleteApplication0_HTTP_Handler(srv))
+	r.PUT("/api/v1/application/{name}", _ApplicationService_UpdateApplication0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/application/{name}", _ApplicationService_DeleteApplication0_HTTP_Handler(srv))
 }
 
 func _ApplicationService_ListApplications0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
@@ -64,7 +64,7 @@ func _ApplicationService_ListApplications0_HTTP_Handler(srv ApplicationServiceHT
 
 func _ApplicationService_GetApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in IdRequest
+		var in IdentityRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -73,7 +73,7 @@ func _ApplicationService_GetApplication0_HTTP_Handler(srv ApplicationServiceHTTP
 		}
 		http.SetOperation(ctx, OperationApplicationServiceGetApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetApplication(ctx, req.(*IdRequest))
+			return srv.GetApplication(ctx, req.(*IdentityRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -133,7 +133,7 @@ func _ApplicationService_UpdateApplication0_HTTP_Handler(srv ApplicationServiceH
 
 func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in IdRequest
+		var in IdentityRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -142,7 +142,7 @@ func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceH
 		}
 		http.SetOperation(ctx, OperationApplicationServiceDeleteApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteApplication(ctx, req.(*IdRequest))
+			return srv.DeleteApplication(ctx, req.(*IdentityRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -155,8 +155,8 @@ func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceH
 
 type ApplicationServiceHTTPClient interface {
 	CreateApplication(ctx context.Context, req *Application, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	DeleteApplication(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	GetApplication(ctx context.Context, req *IdRequest, opts ...http.CallOption) (rsp *Application, err error)
+	DeleteApplication(ctx context.Context, req *IdentityRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetApplication(ctx context.Context, req *IdentityRequest, opts ...http.CallOption) (rsp *Application, err error)
 	ListApplications(ctx context.Context, req *ListApplicationsRequest, opts ...http.CallOption) (rsp *ListApplicationsResponse, err error)
 	UpdateApplication(ctx context.Context, req *Application, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
@@ -182,9 +182,9 @@ func (c *ApplicationServiceHTTPClientImpl) CreateApplication(ctx context.Context
 	return &out, nil
 }
 
-func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context, in *IdRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context, in *IdentityRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/api/v1/application/{id}"
+	pattern := "/api/v1/application/{name}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationApplicationServiceDeleteApplication))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -195,9 +195,9 @@ func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context
 	return &out, nil
 }
 
-func (c *ApplicationServiceHTTPClientImpl) GetApplication(ctx context.Context, in *IdRequest, opts ...http.CallOption) (*Application, error) {
+func (c *ApplicationServiceHTTPClientImpl) GetApplication(ctx context.Context, in *IdentityRequest, opts ...http.CallOption) (*Application, error) {
 	var out Application
-	pattern := "/api/v1/application/{id}"
+	pattern := "/api/v1/application/{name}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationApplicationServiceGetApplication))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -223,7 +223,7 @@ func (c *ApplicationServiceHTTPClientImpl) ListApplications(ctx context.Context,
 
 func (c *ApplicationServiceHTTPClientImpl) UpdateApplication(ctx context.Context, in *Application, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/api/v1/application/{id}"
+	pattern := "/api/v1/application/{name}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationApplicationServiceUpdateApplication))
 	opts = append(opts, http.PathTemplate(pattern))

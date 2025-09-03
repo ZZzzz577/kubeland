@@ -7,6 +7,7 @@
 package settings
 
 import (
+	application "api-server/api/v1/application"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -28,8 +29,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BuildSettingsServiceClient interface {
-	GetBuildSettings(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*BuildSettings, error)
-	ApplyBuildSettings(ctx context.Context, in *BuildSettings, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetBuildSettings(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*BuildSettings, error)
+	ApplyBuildSettings(ctx context.Context, in *ApplyBuildSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type buildSettingsServiceClient struct {
@@ -40,7 +41,7 @@ func NewBuildSettingsServiceClient(cc grpc.ClientConnInterface) BuildSettingsSer
 	return &buildSettingsServiceClient{cc}
 }
 
-func (c *buildSettingsServiceClient) GetBuildSettings(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*BuildSettings, error) {
+func (c *buildSettingsServiceClient) GetBuildSettings(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*BuildSettings, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BuildSettings)
 	err := c.cc.Invoke(ctx, BuildSettingsService_GetBuildSettings_FullMethodName, in, out, cOpts...)
@@ -50,7 +51,7 @@ func (c *buildSettingsServiceClient) GetBuildSettings(ctx context.Context, in *I
 	return out, nil
 }
 
-func (c *buildSettingsServiceClient) ApplyBuildSettings(ctx context.Context, in *BuildSettings, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *buildSettingsServiceClient) ApplyBuildSettings(ctx context.Context, in *ApplyBuildSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BuildSettingsService_ApplyBuildSettings_FullMethodName, in, out, cOpts...)
@@ -64,8 +65,8 @@ func (c *buildSettingsServiceClient) ApplyBuildSettings(ctx context.Context, in 
 // All implementations must embed UnimplementedBuildSettingsServiceServer
 // for forward compatibility.
 type BuildSettingsServiceServer interface {
-	GetBuildSettings(context.Context, *IdRequest) (*BuildSettings, error)
-	ApplyBuildSettings(context.Context, *BuildSettings) (*emptypb.Empty, error)
+	GetBuildSettings(context.Context, *application.IdentityRequest) (*BuildSettings, error)
+	ApplyBuildSettings(context.Context, *ApplyBuildSettingsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedBuildSettingsServiceServer()
 }
 
@@ -76,10 +77,10 @@ type BuildSettingsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBuildSettingsServiceServer struct{}
 
-func (UnimplementedBuildSettingsServiceServer) GetBuildSettings(context.Context, *IdRequest) (*BuildSettings, error) {
+func (UnimplementedBuildSettingsServiceServer) GetBuildSettings(context.Context, *application.IdentityRequest) (*BuildSettings, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBuildSettings not implemented")
 }
-func (UnimplementedBuildSettingsServiceServer) ApplyBuildSettings(context.Context, *BuildSettings) (*emptypb.Empty, error) {
+func (UnimplementedBuildSettingsServiceServer) ApplyBuildSettings(context.Context, *ApplyBuildSettingsRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyBuildSettings not implemented")
 }
 func (UnimplementedBuildSettingsServiceServer) mustEmbedUnimplementedBuildSettingsServiceServer() {}
@@ -104,7 +105,7 @@ func RegisterBuildSettingsServiceServer(s grpc.ServiceRegistrar, srv BuildSettin
 }
 
 func _BuildSettingsService_GetBuildSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IdRequest)
+	in := new(application.IdentityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -116,13 +117,13 @@ func _BuildSettingsService_GetBuildSettings_Handler(srv interface{}, ctx context
 		FullMethod: BuildSettingsService_GetBuildSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BuildSettingsServiceServer).GetBuildSettings(ctx, req.(*IdRequest))
+		return srv.(BuildSettingsServiceServer).GetBuildSettings(ctx, req.(*application.IdentityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _BuildSettingsService_ApplyBuildSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BuildSettings)
+	in := new(ApplyBuildSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func _BuildSettingsService_ApplyBuildSettings_Handler(srv interface{}, ctx conte
 		FullMethod: BuildSettingsService_ApplyBuildSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BuildSettingsServiceServer).ApplyBuildSettings(ctx, req.(*BuildSettings))
+		return srv.(BuildSettingsServiceServer).ApplyBuildSettings(ctx, req.(*ApplyBuildSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

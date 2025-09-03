@@ -9,12 +9,12 @@ import { applicationApi } from "@/api";
 
 export default function BasicInfo() {
     const { t } = useLingui();
-    const { id } = useParams();
+    const { name } = useParams();
     const { notification } = useApp();
     const { data, loading } = useRequest(applicationApi.applicationServiceGetApplication.bind(applicationApi), {
-        ready: !!id,
-        refreshDeps: [id],
-        defaultParams: [{ id: id as string }],
+        ready: !!name,
+        refreshDeps: [name],
+        defaultParams: [{ name: name as string }],
         onError: (e) => {
             notification.error({
                 message: t`failed to get application detail`,
@@ -51,8 +51,8 @@ export default function BasicInfo() {
     return (
         <Spin spinning={loading}>
             <Descriptions
-                title={<div className={"text-base"}>{t`Basic info`}</div>}
-                styles={{ header: { marginBottom: 10 }, label: { width: 150 } }}
+                title={t`Basic info`}
+                styles={{ label: { width: 150 } }}
                 column={2}
                 bordered
                 items={items}

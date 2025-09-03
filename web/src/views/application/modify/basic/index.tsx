@@ -9,17 +9,18 @@ import { applicationApi, clusterApi } from "@/api";
 
 export default function BasicInfoEdit() {
     const { t } = useLingui();
-    const { id } = useParams();
+    const { name } = useParams();
     const { notification } = App.useApp();
     const navigate = useNavigate();
+    const next = `/app/${name}`;
 
     const [form] = useForm<ApiV1ApplicationApplication>();
     const { Item } = Form;
 
     const { data: app, loading } = useRequest(applicationApi.applicationServiceGetApplication.bind(applicationApi), {
-        ready: !!id,
-        refreshDeps: [id],
-        defaultParams: [{ id: id as string }],
+        ready: !!name,
+        refreshDeps: [name],
+        defaultParams: [{ name: name as string }],
         onSuccess: (data) => {
             form.setFieldsValue(data);
         },
@@ -44,7 +45,7 @@ export default function BasicInfoEdit() {
                 notification.success({
                     message: t`update application success`,
                 });
-                setTimeout(() => navigate(`/app/${id}`), 500);
+                setTimeout(() => navigate(next), 500);
             },
             onError: (error) => {
                 notification.error({
@@ -56,9 +57,9 @@ export default function BasicInfoEdit() {
     );
 
     const submitForm = (values: ApiV1ApplicationApplication) => {
-        if (id) {
+        if (name) {
             updateApp({
-                id: id,
+                name: name,
                 apiV1ApplicationApplication: values,
             });
         }
@@ -90,7 +91,7 @@ export default function BasicInfoEdit() {
                     <Button icon={<SaveOutlined />} type="primary" htmlType="submit" loading={updateLoading}>
                         {t`Save`}
                     </Button>
-                    <Button onClick={() => navigate(`/app/${id}`)}>{t`Cancel`}</Button>
+                    <Button onClick={() => navigate(next)}>{t`Cancel`}</Button>
                 </Space>
             </Form>
         </Spin>

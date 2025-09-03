@@ -43,13 +43,13 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /api/v1/application/{id}:
+    /api/v1/application/{name}:
         get:
             tags:
                 - ApplicationService
             operationId: ApplicationService_GetApplication
             parameters:
-                - name: id
+                - name: name
                   in: path
                   required: true
                   schema:
@@ -66,7 +66,7 @@ paths:
                 - ApplicationService
             operationId: ApplicationService_UpdateApplication
             parameters:
-                - name: id
+                - name: name
                   in: path
                   required: true
                   schema:
@@ -86,7 +86,7 @@ paths:
                 - ApplicationService
             operationId: ApplicationService_DeleteApplication
             parameters:
-                - name: id
+                - name: name
                   in: path
                   required: true
                   schema:
@@ -238,13 +238,13 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /v1/build/settings/{applicationId}:
+    /v1/app/{name}/build/settings:
         get:
             tags:
                 - BuildSettingsService
             operationId: BuildSettingsService_GetBuildSettings
             parameters:
-                - name: applicationId
+                - name: name
                   in: path
                   required: true
                   schema:
@@ -261,7 +261,7 @@ paths:
                 - BuildSettingsService
             operationId: BuildSettingsService_ApplyBuildSettings
             parameters:
-                - name: applicationId
+                - name: name
                   in: path
                   required: true
                   schema:
@@ -271,6 +271,27 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/app/{name}/build/task:
+        post:
+            tags:
+                - BuildTaskService
+            operationId: BuildTaskService_Create
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.application.IdentityRequest'
                 required: true
             responses:
                 "200":
@@ -297,6 +318,13 @@ components:
                     readOnly: true
                     type: string
                     format: date-time
+        api.v1.application.IdentityRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
         api.v1.application.ListApplicationsResponse:
             type: object
             properties:
@@ -308,13 +336,30 @@ components:
                         $ref: '#/components/schemas/api.v1.application.Application'
         api.v1.build.settings.BuildSettings:
             required:
-                - applicationId
+                - git
+                - image
                 - dockerfile
             type: object
             properties:
-                applicationId:
-                    type: string
+                git:
+                    $ref: '#/components/schemas/api.v1.build.settings.BuildSettings_GitSettings'
+                image:
+                    $ref: '#/components/schemas/api.v1.build.settings.BuildSettings_ImageSettings'
                 dockerfile:
+                    type: string
+        api.v1.build.settings.BuildSettings_GitSettings:
+            required:
+                - url
+            type: object
+            properties:
+                url:
+                    type: string
+        api.v1.build.settings.BuildSettings_ImageSettings:
+            required:
+                - url
+            type: object
+            properties:
+                url:
                     type: string
         api.v1.cluster.Cluster:
             required:
@@ -437,4 +482,5 @@ components:
 tags:
     - name: ApplicationService
     - name: BuildSettingsService
+    - name: BuildTaskService
     - name: ClusterService

@@ -31,7 +31,7 @@ func (a *ApplicationService) Register(gs *grpc.Server, hs *http.Server) {
 func (a *ApplicationService) ListApplications(ctx context.Context, request *application.ListApplicationsRequest) (*application.ListApplicationsResponse, error) {
 	return a.biz.ListApplications(ctx, request)
 }
-func (a *ApplicationService) GetApplication(ctx context.Context, request *application.IdRequest) (*application.Application, error) {
+func (a *ApplicationService) GetApplication(ctx context.Context, request *application.IdentityRequest) (*application.Application, error) {
 	return a.biz.GetApplication(ctx, request)
 }
 func (a *ApplicationService) CreateApplication(ctx context.Context, request *application.Application) (*emptypb.Empty, error) {
@@ -40,6 +40,6 @@ func (a *ApplicationService) CreateApplication(ctx context.Context, request *app
 func (a *ApplicationService) UpdateApplication(ctx context.Context, request *application.Application) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, a.biz.UpdateApplication(ctx, request)
 }
-func (a *ApplicationService) DeleteApplication(ctx context.Context, request *application.IdRequest) (*emptypb.Empty, error) {
+func (a *ApplicationService) DeleteApplication(ctx context.Context, request *application.IdentityRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, a.biz.DeleteApplication(ctx, request)
 }
