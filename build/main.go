@@ -13,7 +13,7 @@ import (
 func main() {
 
 	codePath := "/tmp/foo"
-	imageTag := "build:v1"
+	imageTag := "crpi-mgl4ujhwwhrsi5e3.cn-hangzhou.personal.cr.aliyuncs.com/kubeland/test:v1"
 	cloneCode(codePath)
 	buildImage(imageTag)
 	pushImage(imageTag)
@@ -69,7 +69,7 @@ func buildImage(imageTag string) {
 
 func pushImage(imageTag string) {
 	fmt.Println("###### Step3: Push image")
-	// time.Sleep(5 * time.Minute)
+
 	//cmd := exec.Command("buildah", "push",
 	//	imageTag,
 	//)
