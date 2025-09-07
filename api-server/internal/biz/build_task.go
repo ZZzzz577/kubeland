@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -20,6 +21,12 @@ import (
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
 	"time"
 )
+
+var upGrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 type BuildTaskBiz struct {
 	cm *ClusterManagers
@@ -152,13 +159,15 @@ func (b *BuildTaskBiz) List(ctx context.Context, request *application.IdentityRe
 }
 
 func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Content-Type", "text/event-stream")
-
-	flusher, ok := writer.(http.Flusher)
-	if !ok {
-		http.Error(writer, "streaming unsupported", http.StatusInternalServerError)
+	conn, err := upGrader.Upgrade(writer, request, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("upgrade websocket error")
 		return
 	}
+	defer func() {
+		_ = conn.Close()
+	}()
+
 	ctx := request.Context()
 	vars := mux.Vars(request)
 
@@ -166,7 +175,6 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -179,14 +187,12 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 	})
 	if err != nil {
 		log.Error().Err(err).Str("labelSelector", labelSelector).Msg("list pods error")
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if len(podList.Items) != 1 {
 		err = errors.New("pods num is valid")
 		log.Error().Err(err).Str("labelSelector", labelSelector).Msg("pods num is valid")
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -199,7 +205,6 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 	stream, err := req.Stream(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("get pod logs error")
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
@@ -208,18 +213,14 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 
 	scanner := bufio.NewScanner(stream)
 	for scanner.Scan() {
-		event := "data: " + scanner.Text() + "\n\n"
-		if _, err = writer.Write([]byte(event)); err != nil {
+		if err = conn.WriteMessage(websocket.TextMessage, []byte(scanner.Text()+"\n")); err != nil {
 			log.Error().Err(err).Msg("write to response error")
-			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		flusher.Flush()
 	}
 	if err = scanner.Err(); err != nil {
 		log.Error().Err(err).Msg("scan pod logs error")
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	return
+
 }
