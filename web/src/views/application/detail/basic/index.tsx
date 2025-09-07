@@ -1,16 +1,18 @@
 import { useLingui } from "@lingui/react/macro";
 import type { DescriptionsItemType } from "antd/es/descriptions";
 import { ApplicationCluster } from "@/views/application/list/components/ApplicationListTable.tsx";
-import { Descriptions, Spin } from "antd";
+import { Button, Card, Descriptions, Space } from "antd";
 import { useRequest } from "ahooks";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import useApp from "antd/es/app/useApp";
 import { applicationApi } from "@/api";
+import { EditOutlined } from "@ant-design/icons";
 
 export default function BasicInfo() {
     const { t } = useLingui();
     const { name } = useParams();
     const { notification } = useApp();
+    const navigate = useNavigate();
     const { data, loading } = useRequest(applicationApi.applicationServiceGetApplication.bind(applicationApi), {
         ready: !!name,
         refreshDeps: [name],
@@ -49,14 +51,23 @@ export default function BasicInfo() {
     ];
 
     return (
-        <Spin spinning={loading}>
-            <Descriptions
-                title={t`Basic info`}
-                styles={{ label: { width: 150 } }}
-                column={2}
-                bordered
-                items={items}
-            />
-        </Spin>
+        <Card
+            title={t`Basic info`}
+            className={"!rounded-t-none"}
+            variant="borderless"
+            loading={loading}
+            extra={
+                <Space>
+                    <Button
+                        type={"primary"}
+                        size={"middle"}
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/app/${name}/edit`)}
+                    >{t`Edit`}</Button>
+                </Space>
+            }
+        >
+            <Descriptions styles={{ label: { width: 150 } }} column={2} bordered items={items} />
+        </Card>
     );
 }

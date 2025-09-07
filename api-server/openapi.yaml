@@ -277,6 +277,23 @@ paths:
                     description: OK
                     content: {}
     /v1/app/{name}/build/task:
+        get:
+            tags:
+                - BuildTaskService
+            operationId: BuildTaskService_List
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.build.task.ListBuildTaskResponse'
         post:
             tags:
                 - BuildTaskService
@@ -361,6 +378,23 @@ components:
             properties:
                 url:
                     type: string
+        api.v1.build.task.BuildTask:
+            type: object
+            properties:
+                name:
+                    type: string
+                status:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+        api.v1.build.task.ListBuildTaskResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.build.task.BuildTask'
         api.v1.cluster.Cluster:
             required:
                 - name

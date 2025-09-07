@@ -12,7 +12,9 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,26 +25,214 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type BuildTask struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildTask) Reset() {
+	*x = BuildTask{}
+	mi := &file_v1_build_task_build_task_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildTask) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildTask) ProtoMessage() {}
+
+func (x *BuildTask) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_build_task_build_task_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildTask.ProtoReflect.Descriptor instead.
+func (*BuildTask) Descriptor() ([]byte, []int) {
+	return file_v1_build_task_build_task_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *BuildTask) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *BuildTask) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *BuildTask) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type ListBuildTaskResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*BuildTask           `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListBuildTaskResponse) Reset() {
+	*x = ListBuildTaskResponse{}
+	mi := &file_v1_build_task_build_task_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListBuildTaskResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListBuildTaskResponse) ProtoMessage() {}
+
+func (x *ListBuildTaskResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_build_task_build_task_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListBuildTaskResponse.ProtoReflect.Descriptor instead.
+func (*ListBuildTaskResponse) Descriptor() ([]byte, []int) {
+	return file_v1_build_task_build_task_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ListBuildTaskResponse) GetItems() []*BuildTask {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type IdentityRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppName       string                 `protobuf:"bytes,1,opt,name=appName,proto3" json:"appName,omitempty"`
+	JobName       string                 `protobuf:"bytes,2,opt,name=jobName,proto3" json:"jobName,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdentityRequest) Reset() {
+	*x = IdentityRequest{}
+	mi := &file_v1_build_task_build_task_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityRequest) ProtoMessage() {}
+
+func (x *IdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_build_task_build_task_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityRequest.ProtoReflect.Descriptor instead.
+func (*IdentityRequest) Descriptor() ([]byte, []int) {
+	return file_v1_build_task_build_task_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *IdentityRequest) GetAppName() string {
+	if x != nil {
+		return x.AppName
+	}
+	return ""
+}
+
+func (x *IdentityRequest) GetJobName() string {
+	if x != nil {
+		return x.JobName
+	}
+	return ""
+}
+
 var File_v1_build_task_build_task_proto protoreflect.FileDescriptor
 
 const file_v1_build_task_build_task_proto_rawDesc = "" +
 	"\n" +
-	"\x1ev1/build_task/build_task.proto\x12\x11api.v1.build.task\x1a v1/application/application.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2\x7f\n" +
+	"\x1ev1/build_task/build_task.proto\x12\x11api.v1.build.task\x1a v1/application/application.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1fgoogle/api/field_behavior.proto\"r\n" +
+	"\tBuildTask\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x129\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"K\n" +
+	"\x15ListBuildTaskResponse\x122\n" +
+	"\x05items\x18\x01 \x03(\v2\x1c.api.v1.build.task.BuildTaskR\x05items\"Q\n" +
+	"\x0fIdentityRequest\x12\x1e\n" +
+	"\aappName\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\aappName\x12\x1e\n" +
+	"\ajobName\x18\x02 \x01(\tB\x04\xe2A\x01\x02R\ajobName2\xf9\x01\n" +
 	"\x10BuildTaskService\x12k\n" +
-	"\x06Create\x12#.api.v1.application.IdentityRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/v1/app/{name}/build/taskB#Z!api-server/api/v1/build/task;taskb\x06proto3"
+	"\x06Create\x12#.api.v1.application.IdentityRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/v1/app/{name}/build/task\x12x\n" +
+	"\x04List\x12#.api.v1.application.IdentityRequest\x1a(.api.v1.build.task.ListBuildTaskResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/app/{name}/build/taskB#Z!api-server/api/v1/build/task;taskb\x06proto3"
 
+var (
+	file_v1_build_task_build_task_proto_rawDescOnce sync.Once
+	file_v1_build_task_build_task_proto_rawDescData []byte
+)
+
+func file_v1_build_task_build_task_proto_rawDescGZIP() []byte {
+	file_v1_build_task_build_task_proto_rawDescOnce.Do(func() {
+		file_v1_build_task_build_task_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_v1_build_task_build_task_proto_rawDesc), len(file_v1_build_task_build_task_proto_rawDesc)))
+	})
+	return file_v1_build_task_build_task_proto_rawDescData
+}
+
+var file_v1_build_task_build_task_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_v1_build_task_build_task_proto_goTypes = []any{
-	(*application.IdentityRequest)(nil), // 0: api.v1.application.IdentityRequest
-	(*emptypb.Empty)(nil),               // 1: google.protobuf.Empty
+	(*BuildTask)(nil),                   // 0: api.v1.build.task.BuildTask
+	(*ListBuildTaskResponse)(nil),       // 1: api.v1.build.task.ListBuildTaskResponse
+	(*IdentityRequest)(nil),             // 2: api.v1.build.task.IdentityRequest
+	(*timestamppb.Timestamp)(nil),       // 3: google.protobuf.Timestamp
+	(*application.IdentityRequest)(nil), // 4: api.v1.application.IdentityRequest
+	(*emptypb.Empty)(nil),               // 5: google.protobuf.Empty
 }
 var file_v1_build_task_build_task_proto_depIdxs = []int32{
-	0, // 0: api.v1.build.task.BuildTaskService.Create:input_type -> api.v1.application.IdentityRequest
-	1, // 1: api.v1.build.task.BuildTaskService.Create:output_type -> google.protobuf.Empty
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: api.v1.build.task.BuildTask.created_at:type_name -> google.protobuf.Timestamp
+	0, // 1: api.v1.build.task.ListBuildTaskResponse.items:type_name -> api.v1.build.task.BuildTask
+	4, // 2: api.v1.build.task.BuildTaskService.Create:input_type -> api.v1.application.IdentityRequest
+	4, // 3: api.v1.build.task.BuildTaskService.List:input_type -> api.v1.application.IdentityRequest
+	5, // 4: api.v1.build.task.BuildTaskService.Create:output_type -> google.protobuf.Empty
+	1, // 5: api.v1.build.task.BuildTaskService.List:output_type -> api.v1.build.task.ListBuildTaskResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_v1_build_task_build_task_proto_init() }
@@ -56,12 +246,13 @@ func file_v1_build_task_build_task_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_build_task_build_task_proto_rawDesc), len(file_v1_build_task_build_task_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_v1_build_task_build_task_proto_goTypes,
 		DependencyIndexes: file_v1_build_task_build_task_proto_depIdxs,
+		MessageInfos:      file_v1_build_task_build_task_proto_msgTypes,
 	}.Build()
 	File_v1_build_task_build_task_proto = out.File
 	file_v1_build_task_build_task_proto_goTypes = nil

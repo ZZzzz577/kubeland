@@ -10,6 +10,8 @@ models/ApiV1ApplicationListApplicationsResponse.ts
 models/ApiV1BuildSettingsBuildSettings.ts
 models/ApiV1BuildSettingsBuildSettingsGitSettings.ts
 models/ApiV1BuildSettingsBuildSettingsImageSettings.ts
+models/ApiV1BuildTaskBuildTask.ts
+models/ApiV1BuildTaskListBuildTaskResponse.ts
 models/ApiV1ClusterCluster.ts
 models/ApiV1ClusterConnection.ts
 models/ApiV1ClusterListClustersResponse.ts

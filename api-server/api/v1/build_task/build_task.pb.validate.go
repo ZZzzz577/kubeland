@@ -34,3 +34,375 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 )
+
+// Validate checks the field values on BuildTask with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *BuildTask) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BuildTask with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in BuildTaskMultiError, or nil
+// if none found.
+func (m *BuildTask) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BuildTask) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Status
+
+	if all {
+		switch v := interface{}(m.GetCreatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BuildTaskValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BuildTaskValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BuildTaskValidationError{
+				field:  "CreatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return BuildTaskMultiError(errors)
+	}
+
+	return nil
+}
+
+// BuildTaskMultiError is an error wrapping multiple validation errors returned
+// by BuildTask.ValidateAll() if the designated constraints aren't met.
+type BuildTaskMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BuildTaskMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BuildTaskMultiError) AllErrors() []error { return m }
+
+// BuildTaskValidationError is the validation error returned by
+// BuildTask.Validate if the designated constraints aren't met.
+type BuildTaskValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BuildTaskValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BuildTaskValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BuildTaskValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BuildTaskValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BuildTaskValidationError) ErrorName() string { return "BuildTaskValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BuildTaskValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBuildTask.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BuildTaskValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BuildTaskValidationError{}
+
+// Validate checks the field values on ListBuildTaskResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListBuildTaskResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListBuildTaskResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListBuildTaskResponseMultiError, or nil if none found.
+func (m *ListBuildTaskResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListBuildTaskResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListBuildTaskResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListBuildTaskResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListBuildTaskResponseValidationError{
+					field:  fmt.Sprintf("Items[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListBuildTaskResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListBuildTaskResponseMultiError is an error wrapping multiple validation
+// errors returned by ListBuildTaskResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ListBuildTaskResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListBuildTaskResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListBuildTaskResponseMultiError) AllErrors() []error { return m }
+
+// ListBuildTaskResponseValidationError is the validation error returned by
+// ListBuildTaskResponse.Validate if the designated constraints aren't met.
+type ListBuildTaskResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListBuildTaskResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListBuildTaskResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListBuildTaskResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListBuildTaskResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListBuildTaskResponseValidationError) ErrorName() string {
+	return "ListBuildTaskResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListBuildTaskResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListBuildTaskResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListBuildTaskResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListBuildTaskResponseValidationError{}
+
+// Validate checks the field values on IdentityRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *IdentityRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IdentityRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IdentityRequestMultiError, or nil if none found.
+func (m *IdentityRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IdentityRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AppName
+
+	// no validation rules for JobName
+
+	if len(errors) > 0 {
+		return IdentityRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// IdentityRequestMultiError is an error wrapping multiple validation errors
+// returned by IdentityRequest.ValidateAll() if the designated constraints
+// aren't met.
+type IdentityRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IdentityRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IdentityRequestMultiError) AllErrors() []error { return m }
+
+// IdentityRequestValidationError is the validation error returned by
+// IdentityRequest.Validate if the designated constraints aren't met.
+type IdentityRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdentityRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdentityRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdentityRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdentityRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdentityRequestValidationError) ErrorName() string { return "IdentityRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdentityRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdentityRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdentityRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdentityRequestValidationError{}

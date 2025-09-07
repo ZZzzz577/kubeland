@@ -21,12 +21,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"github.com/samber/lo"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 )
 
 // BuildSettingsReconciler reconciles a BuildSettings object
@@ -41,6 +43,9 @@ func (r *BuildSettingsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&appv1.BuildSettings{}).
 		Owns(&v1.ConfigMap{}).
 		Named("buildsettings").
+		WithOptions(controller.TypedOptions[ctrl.Request]{
+			SkipNameValidation: lo.ToPtr(true),
+		}).
 		Complete(r)
 }
 

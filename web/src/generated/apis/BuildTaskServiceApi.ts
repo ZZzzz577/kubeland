@@ -16,15 +16,22 @@
 import * as runtime from '../runtime';
 import type {
   ApiV1ApplicationIdentityRequest,
+  ApiV1BuildTaskListBuildTaskResponse,
 } from '../models/index';
 import {
     ApiV1ApplicationIdentityRequestFromJSON,
     ApiV1ApplicationIdentityRequestToJSON,
+    ApiV1BuildTaskListBuildTaskResponseFromJSON,
+    ApiV1BuildTaskListBuildTaskResponseToJSON,
 } from '../models/index';
 
 export interface BuildTaskServiceCreateRequest {
     name: string;
     apiV1ApplicationIdentityRequest: ApiV1ApplicationIdentityRequest;
+}
+
+export interface BuildTaskServiceListRequest {
+    name: string;
 }
 
 /**
@@ -74,6 +81,41 @@ export class BuildTaskServiceApi extends runtime.BaseAPI {
      */
     async buildTaskServiceCreate(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.buildTaskServiceCreateRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async buildTaskServiceListRaw(requestParameters: BuildTaskServiceListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1BuildTaskListBuildTaskResponse>> {
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling buildTaskServiceList().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/v1/app/{name}/build/task`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiV1BuildTaskListBuildTaskResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async buildTaskServiceList(requestParameters: BuildTaskServiceListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1BuildTaskListBuildTaskResponse> {
+        const response = await this.buildTaskServiceListRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -10,6 +10,8 @@ import BasicInfo from "@/views/application/detail/basic";
 import BuildSettings from "@/views/application/detail/build";
 import BasicInfoEdit from "@/views/application/modify/basic";
 import BuildSettingsEdit from "@/views/application/modify/build";
+import BuildTask from "@/views/application/detail/task";
+import BuildTaskDetail from "@/views/application/detail/task/detail";
 
 export const Application = (): Route => {
     return {
@@ -46,9 +48,19 @@ export const Application = (): Route => {
                     {
                         path: "build",
                         name: <Trans>Build</Trans>,
-                        element: <BuildSettings />
-                    }
-                ]
+                        element: <BuildSettings />,
+                    },
+                    {
+                        path: "task",
+                        name: <Trans>Task</Trans>,
+                        element: <BuildTask />,
+                    },
+                ],
+            },
+
+            {
+                path: ":name/task/:task",
+                element: <BuildTaskDetail />,
             },
 
             {
@@ -64,11 +76,10 @@ export const Application = (): Route => {
                     {
                         path: "build",
                         name: <Trans>Build</Trans>,
-                        element: <BuildSettingsEdit />
-                    }
-                ]
+                        element: <BuildSettingsEdit />,
+                    },
+                ],
             },
-
         ],
     };
 };

@@ -1,13 +1,13 @@
-import { Card, Space } from "antd";
+import { Card, Menu, type MenuProps, Space } from "antd";
 import { Trans } from "@lingui/react/macro";
-import type { CardTabListType } from "antd/es/card/Card";
 import { useMemo } from "react";
-import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
-import DetailExtra from "@/views/application/detail/components/DetailExtra.tsx";
+import { BuildOutlined, DeleteOutlined, MenuOutlined, SettingOutlined } from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import getActivePath from "@/views/application/detail/utils/tab.ts";
+import DeleteButton from "@/views/application/detail/components/DeleteButton.tsx";
 
-const tabList: CardTabListType[] = [
+type MenuItem = Required<MenuProps>["items"][number];
+const menuItems: MenuItem[] = [
     {
         key: "",
         label: (
@@ -26,15 +26,15 @@ const tabList: CardTabListType[] = [
             </Space>
         ),
     },
-    // {
-    //     key: "buildTasks",
-    //     label: (
-    //         <Space>
-    //             <BuildOutlined />
-    //             <Trans>Build tasks</Trans>
-    //         </Space>
-    //     ),
-    // },
+    {
+        key: "task",
+        label: (
+            <Space>
+                <BuildOutlined />
+                <Trans>Build tasks</Trans>
+            </Space>
+        ),
+    },
 ];
 
 export default function ApplicationDetail() {
@@ -46,20 +46,25 @@ export default function ApplicationDetail() {
         return getActivePath(`/app/${name}`, pathname);
     }, [pathname, name]);
 
-    const onTabChange = (key: string) => {
-        navigate(`/app/${name}/${key}`);
+    const onClick: MenuProps["onClick"] = (e) => {
+        navigate(`/app/${name}/${e.key}`);
     };
 
     return (
-        <Card
-            title={<div className={"text-xl mb-2"}>{name}</div>}
-            defaultActiveTabKey={defaultActiveTab}
-            tabList={tabList}
-            onTabChange={onTabChange}
-            tabProps={{ size: "middle" }}
-            extra={<DetailExtra />}
-        >
+        <>
+            <Card
+                variant="borderless"
+                styles={{ header:{padding:"12px 24px"}, body: { padding: 0 } }}
+                title={<div className={"text-3xl"}>{name}</div>}
+                extra={
+                    <Space>
+                        <DeleteButton icon={<DeleteOutlined />} size={"large"} danger name={name} />
+                    </Space>
+                }
+            >
+                <Menu mode="horizontal" selectedKeys={[defaultActiveTab]} onClick={onClick} items={menuItems} />
+            </Card>
             <Outlet />
-        </Card>
+        </>
     );
 }

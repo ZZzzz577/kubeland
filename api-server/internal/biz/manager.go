@@ -9,6 +9,8 @@ import (
 	"context"
 	"errors"
 	"github.com/rs/zerolog/log"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,7 +32,9 @@ type ClusterManager struct {
 	db        *data.Data
 	clusterID uint64
 	updateAt  time.Time
-	mgr       manager.Manager
+
+	client *kubernetes.Clientset
+	mgr    manager.Manager
 }
 
 func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, error) {
@@ -48,6 +52,11 @@ func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, erro
 		config.BearerToken = conn.Token
 	}
 
+	clientSet, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
 	ctrl.SetLogger(zap.New())
 	mgr, err := manager.New(config, manager.Options{
 		Metrics: metricsserver.Options{
@@ -62,12 +71,15 @@ func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, erro
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
 	return &ClusterManager{
 		ctx:       ctx,
 		cancel:    cancel,
 		clusterID: conn.ClusterID,
 		updateAt:  conn.UpdatedAt,
-		mgr:       mgr,
+
+		client: clientSet,
+		mgr:    mgr,
 	}, nil
 }
 
@@ -184,7 +196,13 @@ func (c *ClusterManagers) Refresh() error {
 	return nil
 }
 
-func (c *ClusterManagers) GetClient(ctx context.Context, appName string) (client.Client, error) {
+type ClientWrapper struct {
+	*kubernetes.Clientset
+	client.Client
+	Scheme *runtime.Scheme
+}
+
+func (c *ClusterManagers) GetClient(ctx context.Context, appName string) (*ClientWrapper, error) {
 	app, err := c.db.Application.Query().
 		Select(application.FieldClusterID).
 		Where(
@@ -197,9 +215,15 @@ func (c *ClusterManagers) GetClient(ctx context.Context, appName string) (client
 	clusterId := app.ClusterID
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if mgr := c.managers[clusterId]; mgr == nil || mgr.mgr == nil {
+
+	mgr := c.managers[clusterId]
+	if mgr == nil || mgr.mgr == nil {
 		return nil, ErrClientNotFound
-	} else {
-		return mgr.mgr.GetClient(), nil
 	}
+	return &ClientWrapper{
+		Clientset: mgr.client,
+		Client:    mgr.mgr.GetClient(),
+		Scheme:    mgr.mgr.GetScheme(),
+	}, nil
+
 }
