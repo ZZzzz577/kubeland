@@ -165,6 +165,8 @@ func (m *Pagination) validate(all bool) error {
 
 	// no validation rules for Total
 
+	// no validation rules for TotalPage
+
 	if len(errors) > 0 {
 		return PaginationMultiError(errors)
 	}

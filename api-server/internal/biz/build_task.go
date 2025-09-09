@@ -4,6 +4,7 @@ import (
 	"api-server/api/v1/application"
 	task "api-server/api/v1/build_task"
 	appv1 "api-server/internal/kube/api/v1"
+	"api-server/internal/kube/commons/job"
 	"bufio"
 	"context"
 	"errors"
@@ -19,6 +20,7 @@ import (
 	"net/http"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
+	"slices"
 	"time"
 )
 
@@ -136,22 +138,26 @@ func (b *BuildTaskBiz) List(ctx context.Context, request *application.IdentityRe
 		return nil, err
 	}
 
-	var tasks batchv1.JobList
-	err = client.List(ctx, &tasks,
-		cr.InNamespace("default"),
-		// todo change matching labels to matching fields
-		// cr.MatchingLabels(map[string]string{"app": appName}),
-	)
+	tasks, err := client.BatchV1().Jobs("default").
+		List(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Error().Err(err).Str("app", appName).Msg("list build tasks error")
 		return nil, err
 	}
 
+	slices.SortFunc(tasks.Items, func(a, b batchv1.Job) int {
+		if a.CreationTimestamp.Before(&b.CreationTimestamp) {
+			return 1
+		} else {
+			return -1
+		}
+	})
+
 	return &task.ListBuildTaskResponse{
 		Items: lo.Map(tasks.Items, func(item batchv1.Job, index int) *task.BuildTask {
 			return &task.BuildTask{
 				Name:      item.Name,
-				Status:    item.Status.String(),
+				Status:    task.Status(job.GetJobStatus(item)),
 				CreatedAt: timestamppb.New(item.CreationTimestamp.Time),
 			}
 		}),

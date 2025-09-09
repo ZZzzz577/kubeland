@@ -78,6 +78,7 @@ type Pagination struct {
 	Current       uint32                 `protobuf:"varint,1,opt,name=current,proto3" json:"current,omitempty"`
 	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Total         uint32                 `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	TotalPage     uint32                 `protobuf:"varint,4,opt,name=total_page,json=totalPage,proto3" json:"total_page,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *Pagination) GetTotal() uint32 {
 	return 0
 }
 
+func (x *Pagination) GetTotalPage() uint32 {
+	if x != nil {
+		return x.TotalPage
+	}
+	return 0
+}
+
 var File_v1_common_page_proto protoreflect.FileDescriptor
 
 const file_v1_common_page_proto_rawDesc = "" +
@@ -140,12 +148,14 @@ const file_v1_common_page_proto_rawDesc = "" +
 	"\x14v1/common/page.proto\x12\rapi.v1.common\"4\n" +
 	"\x04Page\x12\x18\n" +
 	"\acurrent\x18\x01 \x01(\rR\acurrent\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\rR\x04size\"P\n" +
+	"\x04size\x18\x02 \x01(\rR\x04size\"o\n" +
 	"\n" +
 	"Pagination\x12\x18\n" +
 	"\acurrent\x18\x01 \x01(\rR\acurrent\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\rR\x04size\x12\x14\n" +
-	"\x05total\x18\x03 \x01(\rR\x05totalB!Z\x1fapi-server/api/v1/common;commonb\x06proto3"
+	"\x05total\x18\x03 \x01(\rR\x05total\x12\x1d\n" +
+	"\n" +
+	"total_page\x18\x04 \x01(\rR\ttotalPageB!Z\x1fapi-server/api/v1/common;commonb\x06proto3"
 
 var (
 	file_v1_common_page_proto_rawDescOnce sync.Once

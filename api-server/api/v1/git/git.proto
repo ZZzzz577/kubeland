@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package api.v1.git;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "v1/application/application.proto";
+import "v1/common/page.proto";
+
+
+option go_package = "api-server/api/v1/git;git";
+
+service GitService {
+  rpc ApplyGitSettings(ApplyGitSettingsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/app/{name}/git"
+      body: "git_settings"
+    };
+  }
+
+  rpc GetGitSettings(application.IdentityRequest) returns (GitSettings) {
+    option (google.api.http) = {
+      get: "/api/v1/app/{name}/git"
+    };
+  }
+
+  rpc ListBranches(application.IdentityRequest) returns (ListBranchesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/app/{name}/git/branch"
+    };
+  }
+
+  rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/app/{name}/git/branch/{branch_name}/commit"
+    };
+  }
+}
+
+message GitSettings {
+  string url = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string token = 2;
+}
+
+message ApplyGitSettingsRequest {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  GitSettings git_settings = 2[
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ListBranchesResponse {
+  repeated string items = 1;
+}
+
+message ListCommitsRequest {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string branch_name = 2[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  common.Page page = 3;
+}
+
+message ListCommitsResponse {
+  message Commit {
+    string sha = 1;
+    string message = 2;
+    google.protobuf.Timestamp created_at = 3;
+  }
+
+  common.Pagination pagination = 1;
+  repeated Commit items = 2;
+}

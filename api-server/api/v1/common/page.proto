@@ -13,4 +13,5 @@ message Pagination {
   uint32 current = 1;
   uint32 size = 2;
   uint32 total = 3;
+  uint32 total_page = 4;
 }

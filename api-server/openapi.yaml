@@ -6,6 +6,95 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/app/{name}/git:
+        get:
+            tags:
+                - GitService
+            operationId: GitService_GetGitSettings
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.git.GitSettings'
+        put:
+            tags:
+                - GitService
+            operationId: GitService_ApplyGitSettings
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.git.GitSettings'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/app/{name}/git/branch:
+        get:
+            tags:
+                - GitService
+            operationId: GitService_ListBranches
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.git.ListBranchesResponse'
+    /api/v1/app/{name}/git/branch/{branchName}/commit:
+        get:
+            tags:
+                - GitService
+            operationId: GitService_ListCommits
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: branchName
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page.current
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: page.size
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.git.ListCommitsResponse'
     /api/v1/application:
         get:
             tags:
@@ -384,7 +473,16 @@ components:
                 name:
                     type: string
                 status:
+                    enum:
+                        - STATUS_UNSPECIFIED
+                        - STATUS_RUNNING
+                        - STATUS_COMPLETE
+                        - STATUS_FAILED
+                        - STATUS_SUSPENDED
+                        - STATUS_FAILURE_TARGET
+                        - STATUS_SUCCESS_CRITERIA_MET
                     type: string
+                    format: enum
                 createdAt:
                     type: string
                     format: date-time
@@ -513,8 +611,47 @@ components:
                 total:
                     type: integer
                     format: uint32
+                totalPage:
+                    type: integer
+                    format: uint32
+        api.v1.git.GitSettings:
+            required:
+                - url
+            type: object
+            properties:
+                url:
+                    type: string
+                token:
+                    type: string
+        api.v1.git.ListBranchesResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        type: string
+        api.v1.git.ListCommitsResponse:
+            type: object
+            properties:
+                pagination:
+                    $ref: '#/components/schemas/api.v1.common.Pagination'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.git.ListCommitsResponse_Commit'
+        api.v1.git.ListCommitsResponse_Commit:
+            type: object
+            properties:
+                sha:
+                    type: string
+                message:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
 tags:
     - name: ApplicationService
     - name: BuildSettingsService
     - name: BuildTaskService
     - name: ClusterService
+    - name: GitService
