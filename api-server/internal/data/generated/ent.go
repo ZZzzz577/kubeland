@@ -6,6 +6,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/imagerepo"
 	"context"
 	"errors"
 	"fmt"
@@ -78,6 +79,7 @@ func checkColumn(t, c string) error {
 			application.Table:       application.ValidColumn,
 			cluster.Table:           cluster.ValidColumn,
 			clusterconnection.Table: clusterconnection.ValidColumn,
+			imagerepo.Table:         imagerepo.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

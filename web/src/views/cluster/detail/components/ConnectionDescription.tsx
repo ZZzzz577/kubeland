@@ -1,14 +1,13 @@
-import {type ApiV1ClusterConnection, ApiV1ClusterConnectionTypeEnum} from "@/generated";
-import {useLingui} from "@lingui/react/macro";
-import {Descriptions, type DescriptionsProps, Space} from "antd";
-import {useMemo} from "react";
-import {getAuthType} from "@/views/cluster/commons/components/AuthType.tsx";
+import { type ApiV1ClusterConnection, ApiV1ClusterConnectionTypeEnum } from "@/generated";
+import { useLingui } from "@lingui/react/macro";
+import { Descriptions, type DescriptionsProps, Space } from "antd";
+import { useMemo } from "react";
+import { getAuthType } from "@/views/cluster/commons/components/AuthType.tsx";
 import TestConnection from "@/views/cluster/detail/components/TestConnection.tsx";
 
-
 export default function ConnectionDescription(props: { connection?: ApiV1ClusterConnection }) {
-    const {connection} = props;
-    const {t} = useLingui();
+    const { connection } = props;
+    const { t } = useLingui();
 
     const items = useMemo(() => {
         const items: DescriptionsProps["items"] = [
@@ -58,11 +57,11 @@ export default function ConnectionDescription(props: { connection?: ApiV1Cluster
                 bordered
                 items={items}
                 styles={{
-                    label: {width: 120, padding: 10},
-                    root: {border: "none", borderRadius: 0},
+                    label: { width: 120, padding: 10 },
+                    root: { border: "none", borderRadius: 0 },
                 }}
             />
-            <TestConnection connection={connection}/>
+            <TestConnection connection={connection} />
         </Space>
     );
 }

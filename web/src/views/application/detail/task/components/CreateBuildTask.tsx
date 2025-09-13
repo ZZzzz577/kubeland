@@ -15,7 +15,7 @@ export default function CreateBuildTask(props: { refresh: () => void }) {
         manual: true,
         onSuccess: () => {
             notification.success({ message: t`Create build task success` });
-            refresh()
+            refresh();
         },
         onError: (e) =>
             notification.error({

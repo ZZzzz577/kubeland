@@ -6,6 +6,82 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/app/{name}/build/settings:
+        get:
+            tags:
+                - BuildSettingsService
+            operationId: BuildSettingsService_GetBuildSettings
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+        post:
+            tags:
+                - BuildSettingsService
+            operationId: BuildSettingsService_ApplyBuildSettings
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/app/{name}/build/task:
+        get:
+            tags:
+                - BuildTaskService
+            operationId: BuildTaskService_List
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.build.task.ListBuildTaskResponse'
+        post:
+            tags:
+                - BuildTaskService
+            operationId: BuildTaskService_Create
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.application.IdentityRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/app/{name}/git:
         get:
             tags:
@@ -327,49 +403,48 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /v1/app/{name}/build/settings:
+    /api/v1/image/repo:
         get:
             tags:
-                - BuildSettingsService
-            operationId: BuildSettingsService_GetBuildSettings
+                - ImageService
+            operationId: ImageService_ListImageRepos
             parameters:
-                - name: name
-                  in: path
-                  required: true
+                - name: page.current
+                  in: query
                   schema:
-                    type: string
+                    type: integer
+                    format: uint32
+                - name: page.size
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+                                $ref: '#/components/schemas/api.v1.image.ListImageReposResponse'
         post:
             tags:
-                - BuildSettingsService
-            operationId: BuildSettingsService_ApplyBuildSettings
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - ImageService
+            operationId: ImageService_CreateImageRepo
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.build.settings.BuildSettings'
+                            $ref: '#/components/schemas/api.v1.image.ImageRepo'
                 required: true
             responses:
                 "200":
                     description: OK
                     content: {}
-    /v1/app/{name}/build/task:
+    /api/v1/image/repo/{name}:
         get:
             tags:
-                - BuildTaskService
-            operationId: BuildTaskService_List
+                - ImageService
+            operationId: ImageService_GetImageRepo
             parameters:
                 - name: name
                   in: path
@@ -382,11 +457,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.build.task.ListBuildTaskResponse'
-        post:
+                                $ref: '#/components/schemas/api.v1.image.ImageRepo'
+        put:
             tags:
-                - BuildTaskService
-            operationId: BuildTaskService_Create
+                - ImageService
+            operationId: ImageService_UpdateImageRepo
             parameters:
                 - name: name
                   in: path
@@ -397,8 +472,22 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.application.IdentityRequest'
+                            $ref: '#/components/schemas/api.v1.image.ImageRepo'
                 required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        delete:
+            tags:
+                - ImageService
+            operationId: ImageService_DeleteImageRepo
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -649,9 +738,43 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        api.v1.image.ImageRepo:
+            required:
+                - name
+                - url
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                url:
+                    type: string
+                username:
+                    type: string
+                password:
+                    type: string
+                createdAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                updatedAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
+        api.v1.image.ListImageReposResponse:
+            type: object
+            properties:
+                pagination:
+                    $ref: '#/components/schemas/api.v1.common.Pagination'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.image.ImageRepo'
 tags:
     - name: ApplicationService
     - name: BuildSettingsService
     - name: BuildTaskService
     - name: ClusterService
     - name: GitService
+    - name: ImageService

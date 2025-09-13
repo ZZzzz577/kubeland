@@ -1,7 +1,14 @@
 import { Card, Menu, type MenuProps, Space } from "antd";
 import { Trans } from "@lingui/react/macro";
 import { useMemo } from "react";
-import { BuildOutlined, DeleteOutlined, MenuOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+    BuildOutlined,
+    DeleteOutlined,
+    DockerOutlined,
+    GitlabOutlined,
+    MenuOutlined,
+    SettingOutlined,
+} from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import getActivePath from "@/views/application/detail/utils/tab.ts";
 import DeleteButton from "@/views/application/detail/components/DeleteButton.tsx";
@@ -27,11 +34,29 @@ const menuItems: MenuItem[] = [
         ),
     },
     {
+        key: "git",
+        label: (
+            <Space>
+                <GitlabOutlined />
+                <Trans>Git repo</Trans>
+            </Space>
+        ),
+    },
+    {
         key: "task",
         label: (
             <Space>
                 <BuildOutlined />
                 <Trans>Build tasks</Trans>
+            </Space>
+        ),
+    },
+    {
+        key: "image",
+        label: (
+            <Space>
+                <DockerOutlined />
+                <Trans>Image repo</Trans>
             </Space>
         ),
     },
@@ -54,7 +79,7 @@ export default function ApplicationDetail() {
         <>
             <Card
                 variant="borderless"
-                styles={{ header:{padding:"12px 24px"}, body: { padding: 0 } }}
+                styles={{ header: { padding: "12px 24px" }, body: { padding: 0 } }}
                 title={<div className={"text-3xl"}>{name}</div>}
                 extra={
                     <Space>

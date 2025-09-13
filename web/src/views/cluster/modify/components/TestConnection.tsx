@@ -35,7 +35,12 @@ export default function TestConnection() {
     };
     return (
         <>
-            <Button type={"primary"} ghost loading={loading} onClick={handleTestConnection}>{t`test connection`}</Button>
+            <Button
+                type={"primary"}
+                ghost
+                loading={loading}
+                onClick={handleTestConnection}
+            >{t`test connection`}</Button>
         </>
     );
 }

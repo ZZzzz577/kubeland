@@ -44,6 +44,18 @@ func (f ClusterConnectionFunc) Mutate(ctx context.Context, m generated.Mutation)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ClusterConnectionMutation", m)
 }
 
+// The ImageRepoFunc type is an adapter to allow the use of ordinary
+// function as ImageRepo mutator.
+type ImageRepoFunc func(context.Context, *generated.ImageRepoMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ImageRepoFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	if mv, ok := m.(*generated.ImageRepoMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ImageRepoMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, generated.Mutation) bool
 

@@ -2,6 +2,7 @@ apis/ApplicationServiceApi.ts
 apis/BuildSettingsServiceApi.ts
 apis/BuildTaskServiceApi.ts
 apis/ClusterServiceApi.ts
+apis/GitServiceApi.ts
 apis/index.ts
 index.ts
 models/ApiV1ApplicationApplication.ts
@@ -22,5 +23,9 @@ models/ApiV1ClusterResolveKubeConfigResponseContext.ts
 models/ApiV1ClusterResolveKubeConfigResponseUser.ts
 models/ApiV1ClusterTestConnectionResponse.ts
 models/ApiV1CommonPagination.ts
+models/ApiV1GitGitSettings.ts
+models/ApiV1GitListBranchesResponse.ts
+models/ApiV1GitListCommitsResponse.ts
+models/ApiV1GitListCommitsResponseCommit.ts
 models/index.ts
 runtime.ts

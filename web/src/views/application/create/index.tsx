@@ -7,7 +7,7 @@ export default function ApplicationCreate() {
     const { t } = useLingui();
     return (
         <Card title={t`Create a new application`} extra={<BackButton />}>
-            <ApplicationCreateForm/>
+            <ApplicationCreateForm />
         </Card>
     );
 }

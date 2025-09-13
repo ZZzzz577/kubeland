@@ -31,8 +31,8 @@ type BuildTaskServiceHTTPServer interface {
 
 func RegisterBuildTaskServiceHTTPServer(s *http.Server, srv BuildTaskServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/app/{name}/build/task", _BuildTaskService_Create0_HTTP_Handler(srv))
-	r.GET("/v1/app/{name}/build/task", _BuildTaskService_List0_HTTP_Handler(srv))
+	r.POST("/api/v1/app/{name}/build/task", _BuildTaskService_Create0_HTTP_Handler(srv))
+	r.GET("/api/v1/app/{name}/build/task", _BuildTaskService_List0_HTTP_Handler(srv))
 }
 
 func _BuildTaskService_Create0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func(ctx http.Context) error {
@@ -97,7 +97,7 @@ func NewBuildTaskServiceHTTPClient(client *http.Client) BuildTaskServiceHTTPClie
 
 func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *application.IdentityRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/v1/app/{name}/build/task"
+	pattern := "/api/v1/app/{name}/build/task"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBuildTaskServiceCreate))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -110,7 +110,7 @@ func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *applica
 
 func (c *BuildTaskServiceHTTPClientImpl) List(ctx context.Context, in *application.IdentityRequest, opts ...http.CallOption) (*ListBuildTaskResponse, error) {
 	var out ListBuildTaskResponse
-	pattern := "/v1/app/{name}/build/task"
+	pattern := "/api/v1/app/{name}/build/task"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationBuildTaskServiceList))
 	opts = append(opts, http.PathTemplate(pattern))

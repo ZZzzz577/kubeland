@@ -31,7 +31,7 @@ export default function ApplicationTableColumns(): ColumnsType<ApiV1ApplicationA
             render: (_, record) => {
                 return (
                     <Space>
-                        <EditButton name={record.name}  type={"link"} />
+                        <EditButton name={record.name} type={"link"} />
                         <DeleteButton name={record.name} type={"link"} />
                     </Space>
                 );

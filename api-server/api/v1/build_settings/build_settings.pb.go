@@ -242,10 +242,10 @@ const file_v1_build_settings_build_settings_proto_rawDesc = "" +
 	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url\"\x82\x01\n" +
 	"\x19ApplyBuildSettingsRequest\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\x12K\n" +
-	"\x0ebuild_settings\x18\x02 \x01(\v2$.api.v1.build.settings.BuildSettingsR\rbuildSettings2\xb5\x02\n" +
-	"\x14BuildSettingsService\x12\x84\x01\n" +
-	"\x10GetBuildSettings\x12#.api.v1.application.IdentityRequest\x1a$.api.v1.build.settings.BuildSettings\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/app/{name}/build/settings\x12\x95\x01\n" +
-	"\x12ApplyBuildSettings\x120.api.v1.build.settings.ApplyBuildSettingsRequest\x1a\x16.google.protobuf.Empty\"5\x82\xd3\xe4\x93\x02/:\x0ebuild_settings\"\x1d/v1/app/{name}/build/settingsB+Z)api-server/api/v1/build/settings;settingsb\x06proto3"
+	"\x0ebuild_settings\x18\x02 \x01(\v2$.api.v1.build.settings.BuildSettingsR\rbuildSettings2\xbd\x02\n" +
+	"\x14BuildSettingsService\x12\x88\x01\n" +
+	"\x10GetBuildSettings\x12#.api.v1.application.IdentityRequest\x1a$.api.v1.build.settings.BuildSettings\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/app/{name}/build/settings\x12\x99\x01\n" +
+	"\x12ApplyBuildSettings\x120.api.v1.build.settings.ApplyBuildSettingsRequest\x1a\x16.google.protobuf.Empty\"9\x82\xd3\xe4\x93\x023:\x0ebuild_settings\"!/api/v1/app/{name}/build/settingsB+Z)api-server/api/v1/build/settings;settingsb\x06proto3"
 
 var (
 	file_v1_build_settings_build_settings_proto_rawDescOnce sync.Once

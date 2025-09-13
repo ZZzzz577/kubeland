@@ -18,6 +18,8 @@ type Tx struct {
 	Cluster *ClusterClient
 	// ClusterConnection is the client for interacting with the ClusterConnection builders.
 	ClusterConnection *ClusterConnectionClient
+	// ImageRepo is the client for interacting with the ImageRepo builders.
+	ImageRepo *ImageRepoClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,6 +154,7 @@ func (tx *Tx) init() {
 	tx.Application = NewApplicationClient(tx.config)
 	tx.Cluster = NewClusterClient(tx.config)
 	tx.ClusterConnection = NewClusterConnectionClient(tx.config)
+	tx.ImageRepo = NewImageRepoClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

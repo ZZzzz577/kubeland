@@ -16,6 +16,7 @@ func NewServices(
 	buildSettings *BuildSettingsService,
 	buildTask *BuildTaskService,
 	git *GitService,
+	image *ImageService,
 ) []Service {
 	return []Service{
 		cluster,
@@ -23,6 +24,7 @@ func NewServices(
 		buildSettings,
 		buildTask,
 		git,
+		image,
 	}
 }
 
@@ -34,4 +36,5 @@ var ProviderSet = wire.NewSet(
 	NewBuildSettingsService,
 	NewBuildTaskService,
 	NewGitService,
+	NewImageService,
 )

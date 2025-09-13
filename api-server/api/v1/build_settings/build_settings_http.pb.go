@@ -31,8 +31,8 @@ type BuildSettingsServiceHTTPServer interface {
 
 func RegisterBuildSettingsServiceHTTPServer(s *http.Server, srv BuildSettingsServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/app/{name}/build/settings", _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv))
-	r.POST("/v1/app/{name}/build/settings", _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv))
+	r.GET("/api/v1/app/{name}/build/settings", _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv))
+	r.POST("/api/v1/app/{name}/build/settings", _BuildSettingsService_ApplyBuildSettings0_HTTP_Handler(srv))
 }
 
 func _BuildSettingsService_GetBuildSettings0_HTTP_Handler(srv BuildSettingsServiceHTTPServer) func(ctx http.Context) error {
@@ -97,7 +97,7 @@ func NewBuildSettingsServiceHTTPClient(client *http.Client) BuildSettingsService
 
 func (c *BuildSettingsServiceHTTPClientImpl) ApplyBuildSettings(ctx context.Context, in *ApplyBuildSettingsRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/v1/app/{name}/build/settings"
+	pattern := "/api/v1/app/{name}/build/settings"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBuildSettingsServiceApplyBuildSettings))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -110,7 +110,7 @@ func (c *BuildSettingsServiceHTTPClientImpl) ApplyBuildSettings(ctx context.Cont
 
 func (c *BuildSettingsServiceHTTPClientImpl) GetBuildSettings(ctx context.Context, in *application.IdentityRequest, opts ...http.CallOption) (*BuildSettings, error) {
 	var out BuildSettings
-	pattern := "/v1/app/{name}/build/settings"
+	pattern := "/api/v1/app/{name}/build/settings"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationBuildSettingsServiceGetBuildSettings))
 	opts = append(opts, http.PathTemplate(pattern))

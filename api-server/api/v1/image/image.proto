@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package api.v1.image;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "v1/common/page.proto";
+import "validate/validate.proto";
+
+
+option go_package = "api-server/api/v1/image;image";
+
+service ImageService {
+
+  rpc GetImageRepo(IdentityRequest) returns (ImageRepo) {
+    option (google.api.http) = {
+      get: "/api/v1/image/repo/{name}"
+    };
+  }
+
+  rpc ListImageRepos(ListImageReposRequest) returns (ListImageReposResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/image/repo"
+    };
+  }
+
+  rpc CreateImageRepo(ImageRepo) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/image/repo",
+      body: "*"
+    };
+  }
+
+  rpc UpdateImageRepo(ImageRepo) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/image/repo/{name}",
+      body: "*"
+    };
+  }
+
+  rpc DeleteImageRepo(IdentityRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/image/repo/{name}"
+    };
+  }
+}
+
+message IdentityRequest {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {min_len: 1, max_len: 64}
+  ];
+}
+
+message ImageRepo {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {min_len: 1, max_len: 64}
+  ];
+  string description = 2;
+  string url = 3[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string username = 4;
+  string password = 5;
+  google.protobuf.Timestamp created_at = 6 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+  google.protobuf.Timestamp updated_at = 7[
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];;
+}
+
+message ListImageReposRequest{
+  common.Page page = 1;
+}
+
+message ListImageReposResponse {
+  common.Pagination pagination = 1;
+  repeated ImageRepo items = 2;
+}

@@ -14,13 +14,13 @@ service BuildSettingsService {
 
   rpc GetBuildSettings(application.IdentityRequest) returns (BuildSettings) {
     option (google.api.http) = {
-      get: "/v1/app/{name}/build/settings";
+      get: "/api/v1/app/{name}/build/settings";
     };
   }
 
   rpc ApplyBuildSettings(ApplyBuildSettingsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/app/{name}/build/settings";
+      post: "/api/v1/app/{name}/build/settings";
       body: "build_settings";
     };
   }

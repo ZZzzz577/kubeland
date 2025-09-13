@@ -264,10 +264,10 @@ const file_v1_build_task_build_task_proto_rawDesc = "" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_SUSPENDED\x10\x04\x12\x19\n" +
 	"\x15STATUS_FAILURE_TARGET\x10\x05\x12\x1f\n" +
-	"\x1bSTATUS_SUCCESS_CRITERIA_MET\x10\x062\xf9\x01\n" +
-	"\x10BuildTaskService\x12k\n" +
-	"\x06Create\x12#.api.v1.application.IdentityRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/v1/app/{name}/build/task\x12x\n" +
-	"\x04List\x12#.api.v1.application.IdentityRequest\x1a(.api.v1.build.task.ListBuildTaskResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/app/{name}/build/taskB#Z!api-server/api/v1/build/task;taskb\x06proto3"
+	"\x1bSTATUS_SUCCESS_CRITERIA_MET\x10\x062\x81\x02\n" +
+	"\x10BuildTaskService\x12o\n" +
+	"\x06Create\x12#.api.v1.application.IdentityRequest\x1a\x16.google.protobuf.Empty\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/app/{name}/build/task\x12|\n" +
+	"\x04List\x12#.api.v1.application.IdentityRequest\x1a(.api.v1.build.task.ListBuildTaskResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/app/{name}/build/taskB#Z!api-server/api/v1/build/task;taskb\x06proto3"
 
 var (
 	file_v1_build_task_build_task_proto_rawDescOnce sync.Once

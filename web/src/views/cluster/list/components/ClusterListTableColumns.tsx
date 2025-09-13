@@ -1,10 +1,9 @@
-import type {ColumnsType} from "antd/es/table";
-import type {ApiV1ClusterCluster} from "@/generated";
-import {Trans} from "@lingui/react/macro";
-import {Space} from "antd";
-import {Link} from "react-router";
-import {ClusterStatus, OperatorStatus} from "@/views/cluster/list/components/ClusterListTable.tsx";
-
+import type { ColumnsType } from "antd/es/table";
+import type { ApiV1ClusterCluster } from "@/generated";
+import { Trans } from "@lingui/react/macro";
+import { Space } from "antd";
+import { Link } from "react-router";
+import { ClusterStatus, OperatorStatus } from "@/views/cluster/list/components/ClusterListTable.tsx";
 
 export default function ClusterListTableColumns(): ColumnsType<ApiV1ClusterCluster> {
     return [
@@ -27,11 +26,11 @@ export default function ClusterListTableColumns(): ColumnsType<ApiV1ClusterClust
         },
         {
             title: <Trans>Connection status</Trans>,
-            render: (_: string, record) => <ClusterStatus conn={record.connection}/>
+            render: (_: string, record) => <ClusterStatus conn={record.connection} />,
         },
         {
             title: <Trans>Operator status</Trans>,
-            render: (_: string, record) => <OperatorStatus conn={record.connection}/>
+            render: (_: string, record) => <OperatorStatus conn={record.connection} />,
         },
         {
             title: <Trans>Create time</Trans>,

@@ -101,11 +101,37 @@ var (
 			},
 		},
 	}
+	// ImageReposColumns holds the columns for the "image_repos" table.
+	ImageReposColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "description", Type: field.TypeString, Size: 1024, Default: ""},
+		{Name: "url", Type: field.TypeString, Size: 512},
+		{Name: "username", Type: field.TypeString, Size: 256, Default: ""},
+		{Name: "password", Type: field.TypeString, Size: 256, Default: ""},
+	}
+	// ImageReposTable holds the schema information for the "image_repos" table.
+	ImageReposTable = &schema.Table{
+		Name:       "image_repos",
+		Columns:    ImageReposColumns,
+		PrimaryKey: []*schema.Column{ImageReposColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "imagerepo_name",
+				Unique:  true,
+				Columns: []*schema.Column{ImageReposColumns[4]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ApplicationsTable,
 		ClustersTable,
 		ClusterConnectionsTable,
+		ImageReposTable,
 	}
 )
 

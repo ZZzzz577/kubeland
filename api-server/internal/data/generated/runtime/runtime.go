@@ -6,6 +6,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/imagerepo"
 	"api-server/internal/data/schema"
 	"time"
 )
@@ -154,6 +155,66 @@ func init() {
 	clusterconnectionDescToken := clusterconnectionFields[6].Descriptor()
 	// clusterconnection.DefaultToken holds the default value on creation for the token field.
 	clusterconnection.DefaultToken = clusterconnectionDescToken.Default.(string)
+	imagerepoMixin := schema.ImageRepo{}.Mixin()
+	imagerepoMixinHooks1 := imagerepoMixin[1].Hooks()
+	imagerepo.Hooks[0] = imagerepoMixinHooks1[0]
+	imagerepoMixinInters1 := imagerepoMixin[1].Interceptors()
+	imagerepo.Interceptors[0] = imagerepoMixinInters1[0]
+	imagerepoMixinFields0 := imagerepoMixin[0].Fields()
+	_ = imagerepoMixinFields0
+	imagerepoFields := schema.ImageRepo{}.Fields()
+	_ = imagerepoFields
+	// imagerepoDescCreatedAt is the schema descriptor for created_at field.
+	imagerepoDescCreatedAt := imagerepoMixinFields0[0].Descriptor()
+	// imagerepo.DefaultCreatedAt holds the default value on creation for the created_at field.
+	imagerepo.DefaultCreatedAt = imagerepoDescCreatedAt.Default.(func() time.Time)
+	// imagerepoDescUpdatedAt is the schema descriptor for updated_at field.
+	imagerepoDescUpdatedAt := imagerepoMixinFields0[1].Descriptor()
+	// imagerepo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	imagerepo.DefaultUpdatedAt = imagerepoDescUpdatedAt.Default.(func() time.Time)
+	// imagerepo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	imagerepo.UpdateDefaultUpdatedAt = imagerepoDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// imagerepoDescName is the schema descriptor for name field.
+	imagerepoDescName := imagerepoFields[0].Descriptor()
+	// imagerepo.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	imagerepo.NameValidator = func() func(string) error {
+		validators := imagerepoDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// imagerepoDescDescription is the schema descriptor for description field.
+	imagerepoDescDescription := imagerepoFields[1].Descriptor()
+	// imagerepo.DefaultDescription holds the default value on creation for the description field.
+	imagerepo.DefaultDescription = imagerepoDescDescription.Default.(string)
+	// imagerepo.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	imagerepo.DescriptionValidator = imagerepoDescDescription.Validators[0].(func(string) error)
+	// imagerepoDescURL is the schema descriptor for url field.
+	imagerepoDescURL := imagerepoFields[2].Descriptor()
+	// imagerepo.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	imagerepo.URLValidator = imagerepoDescURL.Validators[0].(func(string) error)
+	// imagerepoDescUsername is the schema descriptor for username field.
+	imagerepoDescUsername := imagerepoFields[3].Descriptor()
+	// imagerepo.DefaultUsername holds the default value on creation for the username field.
+	imagerepo.DefaultUsername = imagerepoDescUsername.Default.(string)
+	// imagerepo.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
+	imagerepo.UsernameValidator = imagerepoDescUsername.Validators[0].(func(string) error)
+	// imagerepoDescPassword is the schema descriptor for password field.
+	imagerepoDescPassword := imagerepoFields[4].Descriptor()
+	// imagerepo.DefaultPassword holds the default value on creation for the password field.
+	imagerepo.DefaultPassword = imagerepoDescPassword.Default.(string)
+	// imagerepo.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	imagerepo.PasswordValidator = imagerepoDescPassword.Validators[0].(func(string) error)
 }
 
 const (

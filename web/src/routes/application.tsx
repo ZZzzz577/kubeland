@@ -12,6 +12,8 @@ import BasicInfoEdit from "@/views/application/modify/basic";
 import BuildSettingsEdit from "@/views/application/modify/build";
 import BuildTask from "@/views/application/detail/task";
 import BuildTaskDetail from "@/views/application/detail/task/detail";
+import GitRepo from "@/views/application/detail/git";
+// import ImageRepo from "@/views/application/detail/image";
 
 export const Application = (): Route => {
     return {
@@ -51,10 +53,20 @@ export const Application = (): Route => {
                         element: <BuildSettings />,
                     },
                     {
+                        path: "git",
+                        name: <Trans>Git</Trans>,
+                        element: <GitRepo />,
+                    },
+                    {
                         path: "task",
                         name: <Trans>Task</Trans>,
                         element: <BuildTask />,
                     },
+                    // {
+                    //     path: "image",
+                    //     name: <Trans>Image</Trans>,
+                    //     element: <ImageRepo />,
+                    // },
                 ],
             },
 

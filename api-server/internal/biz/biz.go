@@ -10,4 +10,5 @@ var ProviderSet = wire.NewSet(
 	NewBuildSettingsBiz,
 	NewBuildTaskBiz,
 	NewGitBiz,
+	NewImageBiz,
 )
