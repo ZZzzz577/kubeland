@@ -3,6 +3,7 @@ apis/BuildSettingsServiceApi.ts
 apis/BuildTaskServiceApi.ts
 apis/ClusterServiceApi.ts
 apis/GitServiceApi.ts
+apis/ImageServiceApi.ts
 apis/index.ts
 index.ts
 models/ApiV1ApplicationApplication.ts
@@ -27,5 +28,7 @@ models/ApiV1GitGitSettings.ts
 models/ApiV1GitListBranchesResponse.ts
 models/ApiV1GitListCommitsResponse.ts
 models/ApiV1GitListCommitsResponseCommit.ts
+models/ApiV1ImageImageRepo.ts
+models/ApiV1ImageListImageReposResponse.ts
 models/index.ts
 runtime.ts

@@ -6,32 +6,30 @@ import ClusterModify from "@/views/cluster/modify";
 import ClusterList from "@/views/cluster/list";
 import ClusterDetail from "@/views/cluster/detail";
 
-export const Cluster = (): Route => {
-    return {
-        path: "/cluster",
-        element: <AppLayout />,
-        name: <Trans>Cluster</Trans>,
-        menu: {
-            icon: <KubernetesOutlined />,
+export const Cluster: Route = {
+    path: "/cluster",
+    element: <AppLayout />,
+    name: <Trans>Cluster</Trans>,
+    menu: {
+        icon: <KubernetesOutlined />,
+    },
+    children: [
+        {
+            path: "",
+            element: <ClusterList />,
         },
-        children: [
-            {
-                path: "",
-                element: <ClusterList />,
-            },
-            {
-                path: ":id/detail",
-                element: <ClusterDetail />,
-            },
-            {
-                path: "create",
-                name: <Trans>Create</Trans>,
-                element: <ClusterModify />,
-            },
-            {
-                path: ":id/edit",
-                element: <ClusterModify />,
-            },
-        ],
-    };
+        {
+            path: ":id/detail",
+            element: <ClusterDetail />,
+        },
+        {
+            path: "create",
+            name: <Trans>Create</Trans>,
+            element: <ClusterModify />,
+        },
+        {
+            path: ":id/edit",
+            element: <ClusterModify />,
+        },
+    ],
 };

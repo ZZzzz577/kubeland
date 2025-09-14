@@ -13,85 +13,77 @@ import BuildSettingsEdit from "@/views/application/modify/build";
 import BuildTask from "@/views/application/detail/task";
 import BuildTaskDetail from "@/views/application/detail/task/detail";
 import GitRepo from "@/views/application/detail/git";
-// import ImageRepo from "@/views/application/detail/image";
 
-export const Application = (): Route => {
-    return {
-        path: "/app",
-        element: <AppLayout />,
-        name: <Trans>Application</Trans>,
-        menu: {
-            icon: <AppstoreOutlined />,
+export const Application: Route = {
+    path: "/app",
+    element: <AppLayout />,
+    name: <Trans>Application</Trans>,
+    menu: {
+        icon: <AppstoreOutlined />,
+    },
+    children: [
+        {
+            path: "",
+            name: <Trans>Application</Trans>,
+            menu: {},
+            element: <ApplicationList />,
         },
-        children: [
-            {
-                path: "",
-                name: <Trans>Application</Trans>,
-                menu: {},
-                element: <ApplicationList />,
-            },
 
-            {
-                path: "create",
-                name: <Trans>Create</Trans>,
-                element: <ApplicationCreate />,
-            },
+        {
+            path: "create",
+            name: <Trans>Create</Trans>,
+            element: <ApplicationCreate />,
+        },
 
-            {
-                path: ":name",
-                name: <Trans>Detail</Trans>,
-                element: <ApplicationDetail />,
-                children: [
-                    {
-                        path: "",
-                        name: <Trans>Basic</Trans>,
-                        element: <BasicInfo />,
-                    },
-                    {
-                        path: "build",
-                        name: <Trans>Build</Trans>,
-                        element: <BuildSettings />,
-                    },
-                    {
-                        path: "git",
-                        name: <Trans>Git</Trans>,
-                        element: <GitRepo />,
-                    },
-                    {
-                        path: "task",
-                        name: <Trans>Task</Trans>,
-                        element: <BuildTask />,
-                    },
-                    // {
-                    //     path: "image",
-                    //     name: <Trans>Image</Trans>,
-                    //     element: <ImageRepo />,
-                    // },
-                ],
-            },
+        {
+            path: ":name",
+            name: <Trans>Detail</Trans>,
+            element: <ApplicationDetail />,
+            children: [
+                {
+                    path: "",
+                    name: <Trans>Basic</Trans>,
+                    element: <BasicInfo />,
+                },
+                {
+                    path: "build",
+                    name: <Trans>Build</Trans>,
+                    element: <BuildSettings />,
+                },
+                {
+                    path: "git",
+                    name: <Trans>Git</Trans>,
+                    element: <GitRepo />,
+                },
+                {
+                    path: "task",
+                    name: <Trans>Task</Trans>,
+                    element: <BuildTask />,
+                },
+            ],
+        },
 
-            {
-                path: ":name/task/:task",
-                element: <BuildTaskDetail />,
-            },
+        {
+            path: ":name/task/:task",
+            element: <BuildTaskDetail />,
+        },
 
-            {
-                path: ":name/edit",
-                name: <Trans>Edit</Trans>,
-                element: <ApplicationModify />,
-                children: [
-                    {
-                        path: "",
-                        name: <Trans>Basic</Trans>,
-                        element: <BasicInfoEdit />,
-                    },
-                    {
-                        path: "build",
-                        name: <Trans>Build</Trans>,
-                        element: <BuildSettingsEdit />,
-                    },
-                ],
-            },
-        ],
-    };
+        {
+            path: ":name/edit",
+            name: <Trans>Edit</Trans>,
+            element: <ApplicationModify />,
+            children: [
+                {
+                    path: "",
+                    name: <Trans>Basic</Trans>,
+                    element: <BasicInfoEdit />,
+                },
+                {
+                    path: "build",
+                    name: <Trans>Build</Trans>,
+                    element: <BuildSettingsEdit />,
+                },
+            ],
+        },
+    ],
 };

@@ -5,6 +5,7 @@ import {
     ClusterServiceApi,
     Configuration,
     GitServiceApi,
+    ImageServiceApi,
 } from "@/generated";
 import { StatusMiddleware } from "@/api/middleware/status.ts";
 
@@ -18,3 +19,4 @@ export const applicationApi = new ApplicationServiceApi(config);
 export const buildSettingsApi = new BuildSettingsServiceApi(config);
 export const buildTaskApi = new BuildTaskServiceApi(config);
 export const gitApi = new GitServiceApi(config);
+export const imageApi = new ImageServiceApi(config);
