@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
-	"github.com/go-git/go-git/v6/plumbing/transport/http"
 	"io"
 	"os"
 	"os/exec"
 	"sync"
-	"time"
 )
 
 func main() {
@@ -20,7 +18,7 @@ func main() {
 	cloneCode(codePath)
 	buildImage(imageTag)
 	//pushImage(imageTag)
-	time.Sleep(time.Hour)
+	//time.Sleep(time.Hour)
 }
 func cloneCode(codePath string) {
 	fmt.Println("###### Step1: Clone code")
@@ -51,10 +49,10 @@ func cloneCode(codePath string) {
 	fmt.Printf("clone code from %s\n", gitUrl)
 	repository, err := git.PlainClone(codePath, &git.CloneOptions{
 		URL: gitUrl,
-		Auth: &http.BasicAuth{
-			Username: "token",
-			Password: gitToken,
-		},
+		//Auth: &http.BasicAuth{
+		//	Username: "token",
+		//	Password: gitToken,
+		//},
 		Progress: os.Stdout,
 	})
 	if err != nil {
