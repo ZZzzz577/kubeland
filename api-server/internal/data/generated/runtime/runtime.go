@@ -6,6 +6,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/gitrepo"
 	"api-server/internal/data/generated/imagerepo"
 	"api-server/internal/data/schema"
 	"time"
@@ -155,6 +156,60 @@ func init() {
 	clusterconnectionDescToken := clusterconnectionFields[6].Descriptor()
 	// clusterconnection.DefaultToken holds the default value on creation for the token field.
 	clusterconnection.DefaultToken = clusterconnectionDescToken.Default.(string)
+	gitrepoMixin := schema.GitRepo{}.Mixin()
+	gitrepoMixinHooks1 := gitrepoMixin[1].Hooks()
+	gitrepo.Hooks[0] = gitrepoMixinHooks1[0]
+	gitrepoMixinInters1 := gitrepoMixin[1].Interceptors()
+	gitrepo.Interceptors[0] = gitrepoMixinInters1[0]
+	gitrepoMixinFields0 := gitrepoMixin[0].Fields()
+	_ = gitrepoMixinFields0
+	gitrepoFields := schema.GitRepo{}.Fields()
+	_ = gitrepoFields
+	// gitrepoDescCreatedAt is the schema descriptor for created_at field.
+	gitrepoDescCreatedAt := gitrepoMixinFields0[0].Descriptor()
+	// gitrepo.DefaultCreatedAt holds the default value on creation for the created_at field.
+	gitrepo.DefaultCreatedAt = gitrepoDescCreatedAt.Default.(func() time.Time)
+	// gitrepoDescUpdatedAt is the schema descriptor for updated_at field.
+	gitrepoDescUpdatedAt := gitrepoMixinFields0[1].Descriptor()
+	// gitrepo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	gitrepo.DefaultUpdatedAt = gitrepoDescUpdatedAt.Default.(func() time.Time)
+	// gitrepo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	gitrepo.UpdateDefaultUpdatedAt = gitrepoDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// gitrepoDescName is the schema descriptor for name field.
+	gitrepoDescName := gitrepoFields[0].Descriptor()
+	// gitrepo.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	gitrepo.NameValidator = func() func(string) error {
+		validators := gitrepoDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// gitrepoDescDescription is the schema descriptor for description field.
+	gitrepoDescDescription := gitrepoFields[1].Descriptor()
+	// gitrepo.DefaultDescription holds the default value on creation for the description field.
+	gitrepo.DefaultDescription = gitrepoDescDescription.Default.(string)
+	// gitrepo.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	gitrepo.DescriptionValidator = gitrepoDescDescription.Validators[0].(func(string) error)
+	// gitrepoDescURL is the schema descriptor for url field.
+	gitrepoDescURL := gitrepoFields[2].Descriptor()
+	// gitrepo.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	gitrepo.URLValidator = gitrepoDescURL.Validators[0].(func(string) error)
+	// gitrepoDescToken is the schema descriptor for token field.
+	gitrepoDescToken := gitrepoFields[3].Descriptor()
+	// gitrepo.DefaultToken holds the default value on creation for the token field.
+	gitrepo.DefaultToken = gitrepoDescToken.Default.(string)
+	// gitrepo.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	gitrepo.TokenValidator = gitrepoDescToken.Validators[0].(func(string) error)
 	imagerepoMixin := schema.ImageRepo{}.Mixin()
 	imagerepoMixinHooks1 := imagerepoMixin[1].Hooks()
 	imagerepo.Hooks[0] = imagerepoMixinHooks1[0]

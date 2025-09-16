@@ -11,9 +11,9 @@ import "google/api/field_behavior.proto";
 option go_package = "api-server/api/v1/build/task;task";
 
 service BuildTaskService {
-  rpc Create(application.IdentityRequest) returns (google.protobuf.Empty) {
+  rpc Create(CreateBuildTaskRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/app/{name}/build/task"
+      post: "/api/v1/app/{appName}/build/task"
       body: "*"
     };
   }
@@ -37,11 +37,14 @@ enum Status {
 }
 
 message BuildTask {
-
-
   string name = 1;
   Status status = 2;
   google.protobuf.Timestamp created_at = 3;
+}
+
+message CreateBuildTaskRequest {
+  string appName = 1 [(google.api.field_behavior) = REQUIRED];
+  string commit = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message ListBuildTaskResponse {

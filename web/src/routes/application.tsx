@@ -3,12 +3,10 @@ import AppLayout from "@/layout";
 import { Trans } from "@lingui/react/macro";
 import { AppstoreOutlined } from "@ant-design/icons";
 import ApplicationList from "@/views/application/list";
-import ApplicationModify from "@/views/application/modify";
 import ApplicationDetail from "@/views/application/detail";
 import ApplicationCreate from "@/views/application/create";
 import BasicInfo from "@/views/application/detail/basic";
 import BuildSettings from "@/views/application/detail/build";
-import BasicInfoEdit from "@/views/application/modify/basic";
 import BuildSettingsEdit from "@/views/application/modify/build";
 import BuildTask from "@/views/application/detail/task";
 import BuildTaskDetail from "@/views/application/detail/task/detail";
@@ -69,21 +67,9 @@ export const Application: Route = {
         },
 
         {
-            path: ":name/edit",
+            path: ":name/edit/build",
             name: <Trans>Edit</Trans>,
-            element: <ApplicationModify />,
-            children: [
-                {
-                    path: "",
-                    name: <Trans>Basic</Trans>,
-                    element: <BasicInfoEdit />,
-                },
-                {
-                    path: "build",
-                    name: <Trans>Build</Trans>,
-                    element: <BuildSettingsEdit />,
-                },
-            ],
+            element: <BuildSettingsEdit />,
         },
     ],
 };

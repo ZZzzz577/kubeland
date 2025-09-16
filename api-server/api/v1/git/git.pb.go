@@ -9,6 +9,7 @@ package git
 import (
 	application "api-server/api/v1/application"
 	common "api-server/api/v1/common"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -26,6 +27,230 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type IdentityRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdentityRequest) Reset() {
+	*x = IdentityRequest{}
+	mi := &file_v1_git_git_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityRequest) ProtoMessage() {}
+
+func (x *IdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_git_git_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityRequest.ProtoReflect.Descriptor instead.
+func (*IdentityRequest) Descriptor() ([]byte, []int) {
+	return file_v1_git_git_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *IdentityRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type GitRepo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GitRepo) Reset() {
+	*x = GitRepo{}
+	mi := &file_v1_git_git_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GitRepo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GitRepo) ProtoMessage() {}
+
+func (x *GitRepo) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_git_git_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GitRepo.ProtoReflect.Descriptor instead.
+func (*GitRepo) Descriptor() ([]byte, []int) {
+	return file_v1_git_git_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GitRepo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GitRepo) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GitRepo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *GitRepo) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *GitRepo) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *GitRepo) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type ListGitReposRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.Page           `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGitReposRequest) Reset() {
+	*x = ListGitReposRequest{}
+	mi := &file_v1_git_git_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGitReposRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGitReposRequest) ProtoMessage() {}
+
+func (x *ListGitReposRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_git_git_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGitReposRequest.ProtoReflect.Descriptor instead.
+func (*ListGitReposRequest) Descriptor() ([]byte, []int) {
+	return file_v1_git_git_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ListGitReposRequest) GetPage() *common.Page {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+type ListGitReposResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pagination    *common.Pagination     `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Items         []*GitRepo             `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGitReposResponse) Reset() {
+	*x = ListGitReposResponse{}
+	mi := &file_v1_git_git_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGitReposResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGitReposResponse) ProtoMessage() {}
+
+func (x *ListGitReposResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_git_git_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGitReposResponse.ProtoReflect.Descriptor instead.
+func (*ListGitReposResponse) Descriptor() ([]byte, []int) {
+	return file_v1_git_git_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ListGitReposResponse) GetPagination() *common.Pagination {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *ListGitReposResponse) GetItems() []*GitRepo {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 type GitSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
@@ -36,7 +261,7 @@ type GitSettings struct {
 
 func (x *GitSettings) Reset() {
 	*x = GitSettings{}
-	mi := &file_v1_git_git_proto_msgTypes[0]
+	mi := &file_v1_git_git_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +273,7 @@ func (x *GitSettings) String() string {
 func (*GitSettings) ProtoMessage() {}
 
 func (x *GitSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[0]
+	mi := &file_v1_git_git_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +286,7 @@ func (x *GitSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GitSettings.ProtoReflect.Descriptor instead.
 func (*GitSettings) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{0}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GitSettings) GetUrl() string {
@@ -88,7 +313,7 @@ type ApplyGitSettingsRequest struct {
 
 func (x *ApplyGitSettingsRequest) Reset() {
 	*x = ApplyGitSettingsRequest{}
-	mi := &file_v1_git_git_proto_msgTypes[1]
+	mi := &file_v1_git_git_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -100,7 +325,7 @@ func (x *ApplyGitSettingsRequest) String() string {
 func (*ApplyGitSettingsRequest) ProtoMessage() {}
 
 func (x *ApplyGitSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[1]
+	mi := &file_v1_git_git_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -113,7 +338,7 @@ func (x *ApplyGitSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplyGitSettingsRequest.ProtoReflect.Descriptor instead.
 func (*ApplyGitSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{1}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ApplyGitSettingsRequest) GetName() string {
@@ -139,7 +364,7 @@ type ListBranchesResponse struct {
 
 func (x *ListBranchesResponse) Reset() {
 	*x = ListBranchesResponse{}
-	mi := &file_v1_git_git_proto_msgTypes[2]
+	mi := &file_v1_git_git_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -151,7 +376,7 @@ func (x *ListBranchesResponse) String() string {
 func (*ListBranchesResponse) ProtoMessage() {}
 
 func (x *ListBranchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[2]
+	mi := &file_v1_git_git_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -164,7 +389,7 @@ func (x *ListBranchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBranchesResponse.ProtoReflect.Descriptor instead.
 func (*ListBranchesResponse) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{2}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListBranchesResponse) GetItems() []string {
@@ -185,7 +410,7 @@ type ListCommitsRequest struct {
 
 func (x *ListCommitsRequest) Reset() {
 	*x = ListCommitsRequest{}
-	mi := &file_v1_git_git_proto_msgTypes[3]
+	mi := &file_v1_git_git_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -197,7 +422,7 @@ func (x *ListCommitsRequest) String() string {
 func (*ListCommitsRequest) ProtoMessage() {}
 
 func (x *ListCommitsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[3]
+	mi := &file_v1_git_git_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -210,7 +435,7 @@ func (x *ListCommitsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCommitsRequest.ProtoReflect.Descriptor instead.
 func (*ListCommitsRequest) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{3}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListCommitsRequest) GetName() string {
@@ -244,7 +469,7 @@ type ListCommitsResponse struct {
 
 func (x *ListCommitsResponse) Reset() {
 	*x = ListCommitsResponse{}
-	mi := &file_v1_git_git_proto_msgTypes[4]
+	mi := &file_v1_git_git_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -256,7 +481,7 @@ func (x *ListCommitsResponse) String() string {
 func (*ListCommitsResponse) ProtoMessage() {}
 
 func (x *ListCommitsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[4]
+	mi := &file_v1_git_git_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -269,7 +494,7 @@ func (x *ListCommitsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCommitsResponse.ProtoReflect.Descriptor instead.
 func (*ListCommitsResponse) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{4}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListCommitsResponse) GetPagination() *common.Pagination {
@@ -297,7 +522,7 @@ type ListCommitsResponse_Commit struct {
 
 func (x *ListCommitsResponse_Commit) Reset() {
 	*x = ListCommitsResponse_Commit{}
-	mi := &file_v1_git_git_proto_msgTypes[5]
+	mi := &file_v1_git_git_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -309,7 +534,7 @@ func (x *ListCommitsResponse_Commit) String() string {
 func (*ListCommitsResponse_Commit) ProtoMessage() {}
 
 func (x *ListCommitsResponse_Commit) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_git_git_proto_msgTypes[5]
+	mi := &file_v1_git_git_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,7 +547,7 @@ func (x *ListCommitsResponse_Commit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCommitsResponse_Commit.ProtoReflect.Descriptor instead.
 func (*ListCommitsResponse_Commit) Descriptor() ([]byte, []int) {
-	return file_v1_git_git_proto_rawDescGZIP(), []int{4, 0}
+	return file_v1_git_git_proto_rawDescGZIP(), []int{8, 0}
 }
 
 func (x *ListCommitsResponse_Commit) GetSha() string {
@@ -351,7 +576,25 @@ var File_v1_git_git_proto protoreflect.FileDescriptor
 const file_v1_git_git_proto_rawDesc = "" +
 	"\n" +
 	"\x10v1/git/git.proto\x12\n" +
-	"api.v1.git\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a v1/application/application.proto\x1a\x14v1/common/page.proto\";\n" +
+	"api.v1.git\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a v1/application/application.proto\x1a\x14v1/common/page.proto\x1a\x17validate/validate.proto\"4\n" +
+	"\x0fIdentityRequest\x12!\n" +
+	"\x04name\x18\x01 \x01(\tB\r\xe2A\x01\x02\xfaB\x06r\x04\x10\x01\x18@R\x04name\"\xfe\x01\n" +
+	"\aGitRepo\x12!\n" +
+	"\x04name\x18\x01 \x01(\tB\r\xe2A\x01\x02\xfaB\x06r\x04\x10\x01\x18@R\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
+	"\x03url\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\x03url\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\x12?\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tcreatedAt\x12?\n" +
+	"\n" +
+	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tupdatedAt\">\n" +
+	"\x13ListGitReposRequest\x12'\n" +
+	"\x04page\x18\x01 \x01(\v2\x13.api.v1.common.PageR\x04page\"|\n" +
+	"\x14ListGitReposResponse\x129\n" +
+	"\n" +
+	"pagination\x18\x01 \x01(\v2\x19.api.v1.common.PaginationR\n" +
+	"pagination\x12)\n" +
+	"\x05items\x18\x02 \x03(\v2\x13.api.v1.git.GitRepoR\x05items\";\n" +
 	"\vGitSettings\x12\x16\n" +
 	"\x03url\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x03url\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\"u\n" +
@@ -374,10 +617,15 @@ const file_v1_git_git_proto_rawDesc = "" +
 	"\x03sha\x18\x01 \x01(\tR\x03sha\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x129\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\x86\x04\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xf9\x06\n" +
 	"\n" +
-	"GitService\x12}\n" +
-	"\x10ApplyGitSettings\x12#.api.v1.git.ApplyGitSettingsRequest\x1a\x16.google.protobuf.Empty\",\x82\xd3\xe4\x93\x02&:\fgit_settings\x1a\x16/api/v1/app/{name}/git\x12n\n" +
+	"GitService\x12_\n" +
+	"\n" +
+	"GetGitRepo\x12\x1b.api.v1.git.IdentityRequest\x1a\x13.api.v1.git.GitRepo\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/git/repo/{name}\x12k\n" +
+	"\fListGitRepos\x12\x1f.api.v1.git.ListGitReposRequest\x1a .api.v1.git.ListGitReposResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/git/repo\x12Y\n" +
+	"\rCreateGitRepo\x12\x13.api.v1.git.GitRepo\x1a\x16.google.protobuf.Empty\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/api/v1/git/repo\x12`\n" +
+	"\rUpdateGitRepo\x12\x13.api.v1.git.GitRepo\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/git/repo/{name}\x12e\n" +
+	"\rDeleteGitRepo\x12\x1b.api.v1.git.IdentityRequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/git/repo/{name}\x12n\n" +
 	"\x0eGetGitSettings\x12#.api.v1.application.IdentityRequest\x1a\x17.api.v1.git.GitSettings\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/app/{name}/git\x12|\n" +
 	"\fListBranches\x12#.api.v1.application.IdentityRequest\x1a .api.v1.git.ListBranchesResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/app/{name}/git/branch\x12\x8a\x01\n" +
 	"\vListCommits\x12\x1e.api.v1.git.ListCommitsRequest\x1a\x1f.api.v1.git.ListCommitsResponse\":\x82\xd3\xe4\x93\x024\x122/api/v1/app/{name}/git/branch/{branch_name}/commitB\x1bZ\x19api-server/api/v1/git;gitb\x06proto3"
@@ -394,39 +642,56 @@ func file_v1_git_git_proto_rawDescGZIP() []byte {
 	return file_v1_git_git_proto_rawDescData
 }
 
-var file_v1_git_git_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_v1_git_git_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_v1_git_git_proto_goTypes = []any{
-	(*GitSettings)(nil),                 // 0: api.v1.git.GitSettings
-	(*ApplyGitSettingsRequest)(nil),     // 1: api.v1.git.ApplyGitSettingsRequest
-	(*ListBranchesResponse)(nil),        // 2: api.v1.git.ListBranchesResponse
-	(*ListCommitsRequest)(nil),          // 3: api.v1.git.ListCommitsRequest
-	(*ListCommitsResponse)(nil),         // 4: api.v1.git.ListCommitsResponse
-	(*ListCommitsResponse_Commit)(nil),  // 5: api.v1.git.ListCommitsResponse.Commit
-	(*common.Page)(nil),                 // 6: api.v1.common.Page
-	(*common.Pagination)(nil),           // 7: api.v1.common.Pagination
-	(*timestamppb.Timestamp)(nil),       // 8: google.protobuf.Timestamp
-	(*application.IdentityRequest)(nil), // 9: api.v1.application.IdentityRequest
-	(*emptypb.Empty)(nil),               // 10: google.protobuf.Empty
+	(*IdentityRequest)(nil),             // 0: api.v1.git.IdentityRequest
+	(*GitRepo)(nil),                     // 1: api.v1.git.GitRepo
+	(*ListGitReposRequest)(nil),         // 2: api.v1.git.ListGitReposRequest
+	(*ListGitReposResponse)(nil),        // 3: api.v1.git.ListGitReposResponse
+	(*GitSettings)(nil),                 // 4: api.v1.git.GitSettings
+	(*ApplyGitSettingsRequest)(nil),     // 5: api.v1.git.ApplyGitSettingsRequest
+	(*ListBranchesResponse)(nil),        // 6: api.v1.git.ListBranchesResponse
+	(*ListCommitsRequest)(nil),          // 7: api.v1.git.ListCommitsRequest
+	(*ListCommitsResponse)(nil),         // 8: api.v1.git.ListCommitsResponse
+	(*ListCommitsResponse_Commit)(nil),  // 9: api.v1.git.ListCommitsResponse.Commit
+	(*timestamppb.Timestamp)(nil),       // 10: google.protobuf.Timestamp
+	(*common.Page)(nil),                 // 11: api.v1.common.Page
+	(*common.Pagination)(nil),           // 12: api.v1.common.Pagination
+	(*application.IdentityRequest)(nil), // 13: api.v1.application.IdentityRequest
+	(*emptypb.Empty)(nil),               // 14: google.protobuf.Empty
 }
 var file_v1_git_git_proto_depIdxs = []int32{
-	0,  // 0: api.v1.git.ApplyGitSettingsRequest.git_settings:type_name -> api.v1.git.GitSettings
-	6,  // 1: api.v1.git.ListCommitsRequest.page:type_name -> api.v1.common.Page
-	7,  // 2: api.v1.git.ListCommitsResponse.pagination:type_name -> api.v1.common.Pagination
-	5,  // 3: api.v1.git.ListCommitsResponse.items:type_name -> api.v1.git.ListCommitsResponse.Commit
-	8,  // 4: api.v1.git.ListCommitsResponse.Commit.created_at:type_name -> google.protobuf.Timestamp
-	1,  // 5: api.v1.git.GitService.ApplyGitSettings:input_type -> api.v1.git.ApplyGitSettingsRequest
-	9,  // 6: api.v1.git.GitService.GetGitSettings:input_type -> api.v1.application.IdentityRequest
-	9,  // 7: api.v1.git.GitService.ListBranches:input_type -> api.v1.application.IdentityRequest
-	3,  // 8: api.v1.git.GitService.ListCommits:input_type -> api.v1.git.ListCommitsRequest
-	10, // 9: api.v1.git.GitService.ApplyGitSettings:output_type -> google.protobuf.Empty
-	0,  // 10: api.v1.git.GitService.GetGitSettings:output_type -> api.v1.git.GitSettings
-	2,  // 11: api.v1.git.GitService.ListBranches:output_type -> api.v1.git.ListBranchesResponse
-	4,  // 12: api.v1.git.GitService.ListCommits:output_type -> api.v1.git.ListCommitsResponse
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	10, // 0: api.v1.git.GitRepo.created_at:type_name -> google.protobuf.Timestamp
+	10, // 1: api.v1.git.GitRepo.updated_at:type_name -> google.protobuf.Timestamp
+	11, // 2: api.v1.git.ListGitReposRequest.page:type_name -> api.v1.common.Page
+	12, // 3: api.v1.git.ListGitReposResponse.pagination:type_name -> api.v1.common.Pagination
+	1,  // 4: api.v1.git.ListGitReposResponse.items:type_name -> api.v1.git.GitRepo
+	4,  // 5: api.v1.git.ApplyGitSettingsRequest.git_settings:type_name -> api.v1.git.GitSettings
+	11, // 6: api.v1.git.ListCommitsRequest.page:type_name -> api.v1.common.Page
+	12, // 7: api.v1.git.ListCommitsResponse.pagination:type_name -> api.v1.common.Pagination
+	9,  // 8: api.v1.git.ListCommitsResponse.items:type_name -> api.v1.git.ListCommitsResponse.Commit
+	10, // 9: api.v1.git.ListCommitsResponse.Commit.created_at:type_name -> google.protobuf.Timestamp
+	0,  // 10: api.v1.git.GitService.GetGitRepo:input_type -> api.v1.git.IdentityRequest
+	2,  // 11: api.v1.git.GitService.ListGitRepos:input_type -> api.v1.git.ListGitReposRequest
+	1,  // 12: api.v1.git.GitService.CreateGitRepo:input_type -> api.v1.git.GitRepo
+	1,  // 13: api.v1.git.GitService.UpdateGitRepo:input_type -> api.v1.git.GitRepo
+	0,  // 14: api.v1.git.GitService.DeleteGitRepo:input_type -> api.v1.git.IdentityRequest
+	13, // 15: api.v1.git.GitService.GetGitSettings:input_type -> api.v1.application.IdentityRequest
+	13, // 16: api.v1.git.GitService.ListBranches:input_type -> api.v1.application.IdentityRequest
+	7,  // 17: api.v1.git.GitService.ListCommits:input_type -> api.v1.git.ListCommitsRequest
+	1,  // 18: api.v1.git.GitService.GetGitRepo:output_type -> api.v1.git.GitRepo
+	3,  // 19: api.v1.git.GitService.ListGitRepos:output_type -> api.v1.git.ListGitReposResponse
+	14, // 20: api.v1.git.GitService.CreateGitRepo:output_type -> google.protobuf.Empty
+	14, // 21: api.v1.git.GitService.UpdateGitRepo:output_type -> google.protobuf.Empty
+	14, // 22: api.v1.git.GitService.DeleteGitRepo:output_type -> google.protobuf.Empty
+	4,  // 23: api.v1.git.GitService.GetGitSettings:output_type -> api.v1.git.GitSettings
+	6,  // 24: api.v1.git.GitService.ListBranches:output_type -> api.v1.git.ListBranchesResponse
+	8,  // 25: api.v1.git.GitService.ListCommits:output_type -> api.v1.git.ListCommitsResponse
+	18, // [18:26] is the sub-list for method output_type
+	10, // [10:18] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_v1_git_git_proto_init() }
@@ -440,7 +705,7 @@ func file_v1_git_git_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_git_git_proto_rawDesc), len(file_v1_git_git_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

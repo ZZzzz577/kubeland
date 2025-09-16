@@ -43,17 +43,20 @@ spec:
                 type: string
               gitUrl:
                 properties:
-                  url:
+                  repo_name:
+                    type: string
+                  repo_path:
                     type: string
                 required:
-                - url
+                - repo_name
+                - repo_path
                 type: object
               imageUrl:
                 properties:
-                  url:
+                  repo_name:
                     type: string
                 required:
-                - url
+                - repo_name
                 type: object
             required:
             - dockerfile

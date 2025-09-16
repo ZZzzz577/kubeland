@@ -37,11 +37,11 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	buildSettingsBiz := biz.NewBuildSettingsBiz(clusterManagers)
+	buildSettingsBiz := biz.NewBuildSettingsBiz(clusterManagers, dataData)
 	buildSettingsService := service.NewBuildSettingsService(buildSettingsBiz)
-	buildTaskBiz := biz.NewBuildTaskBiz(clusterManagers)
+	buildTaskBiz := biz.NewBuildTaskBiz(clusterManagers, dataData)
 	buildTaskService := service.NewBuildTaskService(buildTaskBiz)
-	gitBiz := biz.NewGitBiz(clusterManagers)
+	gitBiz := biz.NewGitBiz(clusterManagers, dataData)
 	gitService := service.NewGitService(gitBiz)
 	imageBiz := biz.NewImageBiz(dataData)
 	imageService := service.NewImageService(imageBiz)

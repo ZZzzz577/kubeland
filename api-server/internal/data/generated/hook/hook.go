@@ -44,6 +44,18 @@ func (f ClusterConnectionFunc) Mutate(ctx context.Context, m generated.Mutation)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ClusterConnectionMutation", m)
 }
 
+// The GitRepoFunc type is an adapter to allow the use of ordinary
+// function as GitRepo mutator.
+type GitRepoFunc func(context.Context, *generated.GitRepoMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GitRepoFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	if mv, ok := m.(*generated.GitRepoMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.GitRepoMutation", m)
+}
+
 // The ImageRepoFunc type is an adapter to allow the use of ordinary
 // function as ImageRepo mutator.
 type ImageRepoFunc func(context.Context, *generated.ImageRepoMutation) (generated.Value, error)

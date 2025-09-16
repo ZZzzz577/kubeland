@@ -18,6 +18,8 @@ type Tx struct {
 	Cluster *ClusterClient
 	// ClusterConnection is the client for interacting with the ClusterConnection builders.
 	ClusterConnection *ClusterConnectionClient
+	// GitRepo is the client for interacting with the GitRepo builders.
+	GitRepo *GitRepoClient
 	// ImageRepo is the client for interacting with the ImageRepo builders.
 	ImageRepo *ImageRepoClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) init() {
 	tx.Application = NewApplicationClient(tx.config)
 	tx.Cluster = NewClusterClient(tx.config)
 	tx.ClusterConnection = NewClusterConnectionClient(tx.config)
+	tx.GitRepo = NewGitRepoClient(tx.config)
 	tx.ImageRepo = NewImageRepoClient(tx.config)
 }
 

@@ -10,6 +10,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/gitrepo"
 	"api-server/internal/data/generated/imagerepo"
 	"api-server/internal/data/generated/predicate"
 
@@ -153,6 +154,33 @@ func (f TraverseClusterConnection) Traverse(ctx context.Context, q generated.Que
 	return fmt.Errorf("unexpected query type %T. expect *generated.ClusterConnectionQuery", q)
 }
 
+// The GitRepoFunc type is an adapter to allow the use of ordinary function as a Querier.
+type GitRepoFunc func(context.Context, *generated.GitRepoQuery) (generated.Value, error)
+
+// Query calls f(ctx, q).
+func (f GitRepoFunc) Query(ctx context.Context, q generated.Query) (generated.Value, error) {
+	if q, ok := q.(*generated.GitRepoQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *generated.GitRepoQuery", q)
+}
+
+// The TraverseGitRepo type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseGitRepo func(context.Context, *generated.GitRepoQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseGitRepo) Intercept(next generated.Querier) generated.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseGitRepo) Traverse(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.GitRepoQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *generated.GitRepoQuery", q)
+}
+
 // The ImageRepoFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ImageRepoFunc func(context.Context, *generated.ImageRepoQuery) (generated.Value, error)
 
@@ -189,6 +217,8 @@ func NewQuery(q generated.Query) (Query, error) {
 		return &query[*generated.ClusterQuery, predicate.Cluster, cluster.OrderOption]{typ: generated.TypeCluster, tq: q}, nil
 	case *generated.ClusterConnectionQuery:
 		return &query[*generated.ClusterConnectionQuery, predicate.ClusterConnection, clusterconnection.OrderOption]{typ: generated.TypeClusterConnection, tq: q}, nil
+	case *generated.GitRepoQuery:
+		return &query[*generated.GitRepoQuery, predicate.GitRepo, gitrepo.OrderOption]{typ: generated.TypeGitRepo, tq: q}, nil
 	case *generated.ImageRepoQuery:
 		return &query[*generated.ImageRepoQuery, predicate.ImageRepo, imagerepo.OrderOption]{typ: generated.TypeImageRepo, tq: q}, nil
 	default:

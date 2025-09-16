@@ -15,5 +15,8 @@ type Cluster func(*sql.Selector)
 // ClusterConnection is the predicate function for clusterconnection builders.
 type ClusterConnection func(*sql.Selector)
 
+// GitRepo is the predicate function for gitrepo builders.
+type GitRepo func(*sql.Selector)
+
 // ImageRepo is the predicate function for imagerepo builders.
 type ImageRepo func(*sql.Selector)

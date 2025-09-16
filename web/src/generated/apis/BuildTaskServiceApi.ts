@@ -15,19 +15,19 @@
 
 import * as runtime from '../runtime';
 import type {
-  ApiV1ApplicationIdentityRequest,
+  ApiV1BuildTaskCreateBuildTaskRequest,
   ApiV1BuildTaskListBuildTaskResponse,
 } from '../models/index';
 import {
-    ApiV1ApplicationIdentityRequestFromJSON,
-    ApiV1ApplicationIdentityRequestToJSON,
+    ApiV1BuildTaskCreateBuildTaskRequestFromJSON,
+    ApiV1BuildTaskCreateBuildTaskRequestToJSON,
     ApiV1BuildTaskListBuildTaskResponseFromJSON,
     ApiV1BuildTaskListBuildTaskResponseToJSON,
 } from '../models/index';
 
 export interface BuildTaskServiceCreateRequest {
-    name: string;
-    apiV1ApplicationIdentityRequest: ApiV1ApplicationIdentityRequest;
+    appName: string;
+    apiV1BuildTaskCreateBuildTaskRequest: ApiV1BuildTaskCreateBuildTaskRequest;
 }
 
 export interface BuildTaskServiceListRequest {
@@ -42,17 +42,17 @@ export class BuildTaskServiceApi extends runtime.BaseAPI {
     /**
      */
     async buildTaskServiceCreateRaw(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['name'] == null) {
+        if (requestParameters['appName'] == null) {
             throw new runtime.RequiredError(
-                'name',
-                'Required parameter "name" was null or undefined when calling buildTaskServiceCreate().'
+                'appName',
+                'Required parameter "appName" was null or undefined when calling buildTaskServiceCreate().'
             );
         }
 
-        if (requestParameters['apiV1ApplicationIdentityRequest'] == null) {
+        if (requestParameters['apiV1BuildTaskCreateBuildTaskRequest'] == null) {
             throw new runtime.RequiredError(
-                'apiV1ApplicationIdentityRequest',
-                'Required parameter "apiV1ApplicationIdentityRequest" was null or undefined when calling buildTaskServiceCreate().'
+                'apiV1BuildTaskCreateBuildTaskRequest',
+                'Required parameter "apiV1BuildTaskCreateBuildTaskRequest" was null or undefined when calling buildTaskServiceCreate().'
             );
         }
 
@@ -63,15 +63,15 @@ export class BuildTaskServiceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/app/{name}/build/task`;
-        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+        let urlPath = `/api/v1/app/{appName}/build/task`;
+        urlPath = urlPath.replace(`{${"appName"}}`, encodeURIComponent(String(requestParameters['appName'])));
 
         const response = await this.request({
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ApiV1ApplicationIdentityRequestToJSON(requestParameters['apiV1ApplicationIdentityRequest']),
+            body: ApiV1BuildTaskCreateBuildTaskRequestToJSON(requestParameters['apiV1BuildTaskCreateBuildTaskRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

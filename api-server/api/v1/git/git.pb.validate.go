@@ -35,6 +35,586 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on IdentityRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *IdentityRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IdentityRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IdentityRequestMultiError, or nil if none found.
+func (m *IdentityRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IdentityRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 64 {
+		err := IdentityRequestValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 64 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return IdentityRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// IdentityRequestMultiError is an error wrapping multiple validation errors
+// returned by IdentityRequest.ValidateAll() if the designated constraints
+// aren't met.
+type IdentityRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IdentityRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IdentityRequestMultiError) AllErrors() []error { return m }
+
+// IdentityRequestValidationError is the validation error returned by
+// IdentityRequest.Validate if the designated constraints aren't met.
+type IdentityRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdentityRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdentityRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdentityRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdentityRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdentityRequestValidationError) ErrorName() string { return "IdentityRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdentityRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdentityRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdentityRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdentityRequestValidationError{}
+
+// Validate checks the field values on GitRepo with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GitRepo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GitRepo with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in GitRepoMultiError, or nil if none found.
+func (m *GitRepo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GitRepo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 64 {
+		err := GitRepoValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 64 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Description
+
+	// no validation rules for Url
+
+	// no validation rules for Token
+
+	if all {
+		switch v := interface{}(m.GetCreatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GitRepoValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GitRepoValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GitRepoValidationError{
+				field:  "CreatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUpdatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GitRepoValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GitRepoValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpdatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GitRepoValidationError{
+				field:  "UpdatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GitRepoMultiError(errors)
+	}
+
+	return nil
+}
+
+// GitRepoMultiError is an error wrapping multiple validation errors returned
+// by GitRepo.ValidateAll() if the designated constraints aren't met.
+type GitRepoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GitRepoMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GitRepoMultiError) AllErrors() []error { return m }
+
+// GitRepoValidationError is the validation error returned by GitRepo.Validate
+// if the designated constraints aren't met.
+type GitRepoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GitRepoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GitRepoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GitRepoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GitRepoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GitRepoValidationError) ErrorName() string { return "GitRepoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GitRepoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGitRepo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GitRepoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GitRepoValidationError{}
+
+// Validate checks the field values on ListGitReposRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListGitReposRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListGitReposRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListGitReposRequestMultiError, or nil if none found.
+func (m *ListGitReposRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListGitReposRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListGitReposRequestValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListGitReposRequestValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListGitReposRequestValidationError{
+				field:  "Page",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ListGitReposRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListGitReposRequestMultiError is an error wrapping multiple validation
+// errors returned by ListGitReposRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ListGitReposRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListGitReposRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListGitReposRequestMultiError) AllErrors() []error { return m }
+
+// ListGitReposRequestValidationError is the validation error returned by
+// ListGitReposRequest.Validate if the designated constraints aren't met.
+type ListGitReposRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListGitReposRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListGitReposRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListGitReposRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListGitReposRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListGitReposRequestValidationError) ErrorName() string {
+	return "ListGitReposRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListGitReposRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListGitReposRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListGitReposRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListGitReposRequestValidationError{}
+
+// Validate checks the field values on ListGitReposResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListGitReposResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListGitReposResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListGitReposResponseMultiError, or nil if none found.
+func (m *ListGitReposResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListGitReposResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPagination()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListGitReposResponseValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListGitReposResponseValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListGitReposResponseValidationError{
+				field:  "Pagination",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListGitReposResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListGitReposResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListGitReposResponseValidationError{
+					field:  fmt.Sprintf("Items[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListGitReposResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListGitReposResponseMultiError is an error wrapping multiple validation
+// errors returned by ListGitReposResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ListGitReposResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListGitReposResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListGitReposResponseMultiError) AllErrors() []error { return m }
+
+// ListGitReposResponseValidationError is the validation error returned by
+// ListGitReposResponse.Validate if the designated constraints aren't met.
+type ListGitReposResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListGitReposResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListGitReposResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListGitReposResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListGitReposResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListGitReposResponseValidationError) ErrorName() string {
+	return "ListGitReposResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListGitReposResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListGitReposResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListGitReposResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListGitReposResponseValidationError{}
+
 // Validate checks the field values on GitSettings with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

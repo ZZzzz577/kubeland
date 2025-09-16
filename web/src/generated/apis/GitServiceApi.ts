@@ -15,22 +15,35 @@
 
 import * as runtime from '../runtime';
 import type {
+  ApiV1GitGitRepo,
   ApiV1GitGitSettings,
   ApiV1GitListBranchesResponse,
   ApiV1GitListCommitsResponse,
+  ApiV1GitListGitReposResponse,
 } from '../models/index';
 import {
+    ApiV1GitGitRepoFromJSON,
+    ApiV1GitGitRepoToJSON,
     ApiV1GitGitSettingsFromJSON,
     ApiV1GitGitSettingsToJSON,
     ApiV1GitListBranchesResponseFromJSON,
     ApiV1GitListBranchesResponseToJSON,
     ApiV1GitListCommitsResponseFromJSON,
     ApiV1GitListCommitsResponseToJSON,
+    ApiV1GitListGitReposResponseFromJSON,
+    ApiV1GitListGitReposResponseToJSON,
 } from '../models/index';
 
-export interface GitServiceApplyGitSettingsRequest {
+export interface GitServiceCreateGitRepoRequest {
+    apiV1GitGitRepo: Omit<ApiV1GitGitRepo, 'createdAt'|'updatedAt'>;
+}
+
+export interface GitServiceDeleteGitRepoRequest {
     name: string;
-    apiV1GitGitSettings: ApiV1GitGitSettings;
+}
+
+export interface GitServiceGetGitRepoRequest {
+    name: string;
 }
 
 export interface GitServiceGetGitSettingsRequest {
@@ -48,6 +61,16 @@ export interface GitServiceListCommitsRequest {
     pageSize?: number;
 }
 
+export interface GitServiceListGitReposRequest {
+    pageCurrent?: number;
+    pageSize?: number;
+}
+
+export interface GitServiceUpdateGitRepoRequest {
+    name: string;
+    apiV1GitGitRepo: Omit<ApiV1GitGitRepo, 'createdAt'|'updatedAt'>;
+}
+
 /**
  * 
  */
@@ -55,18 +78,11 @@ export class GitServiceApi extends runtime.BaseAPI {
 
     /**
      */
-    async gitServiceApplyGitSettingsRaw(requestParameters: GitServiceApplyGitSettingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['name'] == null) {
+    async gitServiceCreateGitRepoRaw(requestParameters: GitServiceCreateGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['apiV1GitGitRepo'] == null) {
             throw new runtime.RequiredError(
-                'name',
-                'Required parameter "name" was null or undefined when calling gitServiceApplyGitSettings().'
-            );
-        }
-
-        if (requestParameters['apiV1GitGitSettings'] == null) {
-            throw new runtime.RequiredError(
-                'apiV1GitGitSettings',
-                'Required parameter "apiV1GitGitSettings" was null or undefined when calling gitServiceApplyGitSettings().'
+                'apiV1GitGitRepo',
+                'Required parameter "apiV1GitGitRepo" was null or undefined when calling gitServiceCreateGitRepo().'
             );
         }
 
@@ -77,15 +93,14 @@ export class GitServiceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/app/{name}/git`;
-        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+        let urlPath = `/api/v1/git/repo`;
 
         const response = await this.request({
             path: urlPath,
-            method: 'PUT',
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ApiV1GitGitSettingsToJSON(requestParameters['apiV1GitGitSettings']),
+            body: ApiV1GitGitRepoToJSON(requestParameters['apiV1GitGitRepo']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -93,8 +108,77 @@ export class GitServiceApi extends runtime.BaseAPI {
 
     /**
      */
-    async gitServiceApplyGitSettings(requestParameters: GitServiceApplyGitSettingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.gitServiceApplyGitSettingsRaw(requestParameters, initOverrides);
+    async gitServiceCreateGitRepo(requestParameters: GitServiceCreateGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.gitServiceCreateGitRepoRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async gitServiceDeleteGitRepoRaw(requestParameters: GitServiceDeleteGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling gitServiceDeleteGitRepo().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/v1/git/repo/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async gitServiceDeleteGitRepo(requestParameters: GitServiceDeleteGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.gitServiceDeleteGitRepoRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async gitServiceGetGitRepoRaw(requestParameters: GitServiceGetGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1GitGitRepo>> {
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling gitServiceGetGitRepo().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/v1/git/repo/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiV1GitGitRepoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async gitServiceGetGitRepo(requestParameters: GitServiceGetGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1GitGitRepo> {
+        const response = await this.gitServiceGetGitRepoRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -216,6 +300,85 @@ export class GitServiceApi extends runtime.BaseAPI {
     async gitServiceListCommits(requestParameters: GitServiceListCommitsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1GitListCommitsResponse> {
         const response = await this.gitServiceListCommitsRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async gitServiceListGitReposRaw(requestParameters: GitServiceListGitReposRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1GitListGitReposResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['pageCurrent'] != null) {
+            queryParameters['page.current'] = requestParameters['pageCurrent'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['page.size'] = requestParameters['pageSize'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/v1/git/repo`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiV1GitListGitReposResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async gitServiceListGitRepos(requestParameters: GitServiceListGitReposRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1GitListGitReposResponse> {
+        const response = await this.gitServiceListGitReposRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async gitServiceUpdateGitRepoRaw(requestParameters: GitServiceUpdateGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling gitServiceUpdateGitRepo().'
+            );
+        }
+
+        if (requestParameters['apiV1GitGitRepo'] == null) {
+            throw new runtime.RequiredError(
+                'apiV1GitGitRepo',
+                'Required parameter "apiV1GitGitRepo" was null or undefined when calling gitServiceUpdateGitRepo().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/v1/git/repo/{name}`;
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApiV1GitGitRepoToJSON(requestParameters['apiV1GitGitRepo']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async gitServiceUpdateGitRepo(requestParameters: GitServiceUpdateGitRepoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.gitServiceUpdateGitRepoRaw(requestParameters, initOverrides);
     }
 
 }

@@ -56,7 +56,7 @@ export default function BuildTask() {
             loading={loading}
             extra={
                 <Space>
-                    <CreateBuildTask refresh={refresh} />
+                    <CreateBuildTask />
                     <Button icon={<SyncOutlined />} loading={loading} onClick={refresh}>{t`Refresh`}</Button>
                 </Space>
             }

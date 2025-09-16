@@ -6,6 +6,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/gitrepo"
 	"api-server/internal/data/generated/imagerepo"
 	"api-server/internal/data/generated/predicate"
 	"context"
@@ -30,6 +31,7 @@ const (
 	TypeApplication       = "Application"
 	TypeCluster           = "Cluster"
 	TypeClusterConnection = "ClusterConnection"
+	TypeGitRepo           = "GitRepo"
 	TypeImageRepo         = "ImageRepo"
 )
 
@@ -2346,6 +2348,678 @@ func (m *ClusterConnectionMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown ClusterConnection edge %s", name)
+}
+
+// GitRepoMutation represents an operation that mutates the GitRepo nodes in the graph.
+type GitRepoMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint64
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_at     *time.Time
+	name          *string
+	description   *string
+	url           *string
+	token         *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*GitRepo, error)
+	predicates    []predicate.GitRepo
+}
+
+var _ ent.Mutation = (*GitRepoMutation)(nil)
+
+// gitrepoOption allows management of the mutation configuration using functional options.
+type gitrepoOption func(*GitRepoMutation)
+
+// newGitRepoMutation creates new mutation for the GitRepo entity.
+func newGitRepoMutation(c config, op Op, opts ...gitrepoOption) *GitRepoMutation {
+	m := &GitRepoMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeGitRepo,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withGitRepoID sets the ID field of the mutation.
+func withGitRepoID(id uint64) gitrepoOption {
+	return func(m *GitRepoMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *GitRepo
+		)
+		m.oldValue = func(ctx context.Context) (*GitRepo, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().GitRepo.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withGitRepo sets the old GitRepo of the mutation.
+func withGitRepo(node *GitRepo) gitrepoOption {
+	return func(m *GitRepoMutation) {
+		m.oldValue = func(context.Context) (*GitRepo, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m GitRepoMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m GitRepoMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *GitRepoMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *GitRepoMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().GitRepo.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *GitRepoMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *GitRepoMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *GitRepoMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *GitRepoMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *GitRepoMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *GitRepoMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (m *GitRepoMutation) SetDeleteAt(t time.Time) {
+	m.delete_at = &t
+}
+
+// DeleteAt returns the value of the "delete_at" field in the mutation.
+func (m *GitRepoMutation) DeleteAt() (r time.Time, exists bool) {
+	v := m.delete_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteAt returns the old "delete_at" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldDeleteAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteAt: %w", err)
+	}
+	return oldValue.DeleteAt, nil
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (m *GitRepoMutation) ClearDeleteAt() {
+	m.delete_at = nil
+	m.clearedFields[gitrepo.FieldDeleteAt] = struct{}{}
+}
+
+// DeleteAtCleared returns if the "delete_at" field was cleared in this mutation.
+func (m *GitRepoMutation) DeleteAtCleared() bool {
+	_, ok := m.clearedFields[gitrepo.FieldDeleteAt]
+	return ok
+}
+
+// ResetDeleteAt resets all changes to the "delete_at" field.
+func (m *GitRepoMutation) ResetDeleteAt() {
+	m.delete_at = nil
+	delete(m.clearedFields, gitrepo.FieldDeleteAt)
+}
+
+// SetName sets the "name" field.
+func (m *GitRepoMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *GitRepoMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *GitRepoMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *GitRepoMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *GitRepoMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *GitRepoMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetURL sets the "url" field.
+func (m *GitRepoMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *GitRepoMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *GitRepoMutation) ResetURL() {
+	m.url = nil
+}
+
+// SetToken sets the "token" field.
+func (m *GitRepoMutation) SetToken(s string) {
+	m.token = &s
+}
+
+// Token returns the value of the "token" field in the mutation.
+func (m *GitRepoMutation) Token() (r string, exists bool) {
+	v := m.token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldToken returns the old "token" field's value of the GitRepo entity.
+// If the GitRepo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GitRepoMutation) OldToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldToken: %w", err)
+	}
+	return oldValue.Token, nil
+}
+
+// ResetToken resets all changes to the "token" field.
+func (m *GitRepoMutation) ResetToken() {
+	m.token = nil
+}
+
+// Where appends a list predicates to the GitRepoMutation builder.
+func (m *GitRepoMutation) Where(ps ...predicate.GitRepo) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the GitRepoMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *GitRepoMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.GitRepo, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *GitRepoMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *GitRepoMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (GitRepo).
+func (m *GitRepoMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *GitRepoMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, gitrepo.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, gitrepo.FieldUpdatedAt)
+	}
+	if m.delete_at != nil {
+		fields = append(fields, gitrepo.FieldDeleteAt)
+	}
+	if m.name != nil {
+		fields = append(fields, gitrepo.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, gitrepo.FieldDescription)
+	}
+	if m.url != nil {
+		fields = append(fields, gitrepo.FieldURL)
+	}
+	if m.token != nil {
+		fields = append(fields, gitrepo.FieldToken)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *GitRepoMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case gitrepo.FieldCreatedAt:
+		return m.CreatedAt()
+	case gitrepo.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case gitrepo.FieldDeleteAt:
+		return m.DeleteAt()
+	case gitrepo.FieldName:
+		return m.Name()
+	case gitrepo.FieldDescription:
+		return m.Description()
+	case gitrepo.FieldURL:
+		return m.URL()
+	case gitrepo.FieldToken:
+		return m.Token()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *GitRepoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case gitrepo.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case gitrepo.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case gitrepo.FieldDeleteAt:
+		return m.OldDeleteAt(ctx)
+	case gitrepo.FieldName:
+		return m.OldName(ctx)
+	case gitrepo.FieldDescription:
+		return m.OldDescription(ctx)
+	case gitrepo.FieldURL:
+		return m.OldURL(ctx)
+	case gitrepo.FieldToken:
+		return m.OldToken(ctx)
+	}
+	return nil, fmt.Errorf("unknown GitRepo field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GitRepoMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case gitrepo.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case gitrepo.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case gitrepo.FieldDeleteAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteAt(v)
+		return nil
+	case gitrepo.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case gitrepo.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case gitrepo.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case gitrepo.FieldToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetToken(v)
+		return nil
+	}
+	return fmt.Errorf("unknown GitRepo field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *GitRepoMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *GitRepoMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GitRepoMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown GitRepo numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *GitRepoMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(gitrepo.FieldDeleteAt) {
+		fields = append(fields, gitrepo.FieldDeleteAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *GitRepoMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *GitRepoMutation) ClearField(name string) error {
+	switch name {
+	case gitrepo.FieldDeleteAt:
+		m.ClearDeleteAt()
+		return nil
+	}
+	return fmt.Errorf("unknown GitRepo nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *GitRepoMutation) ResetField(name string) error {
+	switch name {
+	case gitrepo.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case gitrepo.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case gitrepo.FieldDeleteAt:
+		m.ResetDeleteAt()
+		return nil
+	case gitrepo.FieldName:
+		m.ResetName()
+		return nil
+	case gitrepo.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case gitrepo.FieldURL:
+		m.ResetURL()
+		return nil
+	case gitrepo.FieldToken:
+		m.ResetToken()
+		return nil
+	}
+	return fmt.Errorf("unknown GitRepo field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *GitRepoMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *GitRepoMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *GitRepoMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *GitRepoMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *GitRepoMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *GitRepoMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *GitRepoMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown GitRepo unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *GitRepoMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown GitRepo edge %s", name)
 }
 
 // ImageRepoMutation represents an operation that mutates the ImageRepo nodes in the graph.

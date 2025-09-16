@@ -14,6 +14,11 @@ export default function ImageDescription(props: {
             children: image?.url
         }
     ];
-    return <Descriptions title={"Image repository settings"} bordered styles={{ label: { width: 150 } }}
-                         items={items} />;
+    return (
+        <Descriptions
+            title={"Image repository settings"}
+            bordered
+            styles={{ label: { width: 150 } }}
+            items={items} />
+    );
 }

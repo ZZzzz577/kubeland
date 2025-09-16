@@ -21,17 +21,25 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GitService_ApplyGitSettings_FullMethodName = "/api.v1.git.GitService/ApplyGitSettings"
-	GitService_GetGitSettings_FullMethodName   = "/api.v1.git.GitService/GetGitSettings"
-	GitService_ListBranches_FullMethodName     = "/api.v1.git.GitService/ListBranches"
-	GitService_ListCommits_FullMethodName      = "/api.v1.git.GitService/ListCommits"
+	GitService_GetGitRepo_FullMethodName     = "/api.v1.git.GitService/GetGitRepo"
+	GitService_ListGitRepos_FullMethodName   = "/api.v1.git.GitService/ListGitRepos"
+	GitService_CreateGitRepo_FullMethodName  = "/api.v1.git.GitService/CreateGitRepo"
+	GitService_UpdateGitRepo_FullMethodName  = "/api.v1.git.GitService/UpdateGitRepo"
+	GitService_DeleteGitRepo_FullMethodName  = "/api.v1.git.GitService/DeleteGitRepo"
+	GitService_GetGitSettings_FullMethodName = "/api.v1.git.GitService/GetGitSettings"
+	GitService_ListBranches_FullMethodName   = "/api.v1.git.GitService/ListBranches"
+	GitService_ListCommits_FullMethodName    = "/api.v1.git.GitService/ListCommits"
 )
 
 // GitServiceClient is the client API for GitService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GitServiceClient interface {
-	ApplyGitSettings(ctx context.Context, in *ApplyGitSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetGitRepo(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*GitRepo, error)
+	ListGitRepos(ctx context.Context, in *ListGitReposRequest, opts ...grpc.CallOption) (*ListGitReposResponse, error)
+	CreateGitRepo(ctx context.Context, in *GitRepo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateGitRepo(ctx context.Context, in *GitRepo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteGitRepo(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetGitSettings(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*GitSettings, error)
 	ListBranches(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*ListBranchesResponse, error)
 	ListCommits(ctx context.Context, in *ListCommitsRequest, opts ...grpc.CallOption) (*ListCommitsResponse, error)
@@ -45,10 +53,50 @@ func NewGitServiceClient(cc grpc.ClientConnInterface) GitServiceClient {
 	return &gitServiceClient{cc}
 }
 
-func (c *gitServiceClient) ApplyGitSettings(ctx context.Context, in *ApplyGitSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *gitServiceClient) GetGitRepo(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*GitRepo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GitRepo)
+	err := c.cc.Invoke(ctx, GitService_GetGitRepo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gitServiceClient) ListGitRepos(ctx context.Context, in *ListGitReposRequest, opts ...grpc.CallOption) (*ListGitReposResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListGitReposResponse)
+	err := c.cc.Invoke(ctx, GitService_ListGitRepos_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gitServiceClient) CreateGitRepo(ctx context.Context, in *GitRepo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, GitService_ApplyGitSettings_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GitService_CreateGitRepo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gitServiceClient) UpdateGitRepo(ctx context.Context, in *GitRepo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GitService_UpdateGitRepo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gitServiceClient) DeleteGitRepo(ctx context.Context, in *IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GitService_DeleteGitRepo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +137,11 @@ func (c *gitServiceClient) ListCommits(ctx context.Context, in *ListCommitsReque
 // All implementations must embed UnimplementedGitServiceServer
 // for forward compatibility.
 type GitServiceServer interface {
-	ApplyGitSettings(context.Context, *ApplyGitSettingsRequest) (*emptypb.Empty, error)
+	GetGitRepo(context.Context, *IdentityRequest) (*GitRepo, error)
+	ListGitRepos(context.Context, *ListGitReposRequest) (*ListGitReposResponse, error)
+	CreateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error)
+	UpdateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error)
+	DeleteGitRepo(context.Context, *IdentityRequest) (*emptypb.Empty, error)
 	GetGitSettings(context.Context, *application.IdentityRequest) (*GitSettings, error)
 	ListBranches(context.Context, *application.IdentityRequest) (*ListBranchesResponse, error)
 	ListCommits(context.Context, *ListCommitsRequest) (*ListCommitsResponse, error)
@@ -103,8 +155,20 @@ type GitServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGitServiceServer struct{}
 
-func (UnimplementedGitServiceServer) ApplyGitSettings(context.Context, *ApplyGitSettingsRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ApplyGitSettings not implemented")
+func (UnimplementedGitServiceServer) GetGitRepo(context.Context, *IdentityRequest) (*GitRepo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGitRepo not implemented")
+}
+func (UnimplementedGitServiceServer) ListGitRepos(context.Context, *ListGitReposRequest) (*ListGitReposResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListGitRepos not implemented")
+}
+func (UnimplementedGitServiceServer) CreateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGitRepo not implemented")
+}
+func (UnimplementedGitServiceServer) UpdateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateGitRepo not implemented")
+}
+func (UnimplementedGitServiceServer) DeleteGitRepo(context.Context, *IdentityRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteGitRepo not implemented")
 }
 func (UnimplementedGitServiceServer) GetGitSettings(context.Context, *application.IdentityRequest) (*GitSettings, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGitSettings not implemented")
@@ -136,20 +200,92 @@ func RegisterGitServiceServer(s grpc.ServiceRegistrar, srv GitServiceServer) {
 	s.RegisterService(&GitService_ServiceDesc, srv)
 }
 
-func _GitService_ApplyGitSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplyGitSettingsRequest)
+func _GitService_GetGitRepo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdentityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GitServiceServer).ApplyGitSettings(ctx, in)
+		return srv.(GitServiceServer).GetGitRepo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GitService_ApplyGitSettings_FullMethodName,
+		FullMethod: GitService_GetGitRepo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GitServiceServer).ApplyGitSettings(ctx, req.(*ApplyGitSettingsRequest))
+		return srv.(GitServiceServer).GetGitRepo(ctx, req.(*IdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GitService_ListGitRepos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGitReposRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GitServiceServer).ListGitRepos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GitService_ListGitRepos_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GitServiceServer).ListGitRepos(ctx, req.(*ListGitReposRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GitService_CreateGitRepo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GitRepo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GitServiceServer).CreateGitRepo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GitService_CreateGitRepo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GitServiceServer).CreateGitRepo(ctx, req.(*GitRepo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GitService_UpdateGitRepo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GitRepo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GitServiceServer).UpdateGitRepo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GitService_UpdateGitRepo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GitServiceServer).UpdateGitRepo(ctx, req.(*GitRepo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GitService_DeleteGitRepo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GitServiceServer).DeleteGitRepo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GitService_DeleteGitRepo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GitServiceServer).DeleteGitRepo(ctx, req.(*IdentityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -216,8 +352,24 @@ var GitService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GitServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ApplyGitSettings",
-			Handler:    _GitService_ApplyGitSettings_Handler,
+			MethodName: "GetGitRepo",
+			Handler:    _GitService_GetGitRepo_Handler,
+		},
+		{
+			MethodName: "ListGitRepos",
+			Handler:    _GitService_ListGitRepos_Handler,
+		},
+		{
+			MethodName: "CreateGitRepo",
+			Handler:    _GitService_CreateGitRepo_Handler,
+		},
+		{
+			MethodName: "UpdateGitRepo",
+			Handler:    _GitService_UpdateGitRepo_Handler,
+		},
+		{
+			MethodName: "DeleteGitRepo",
+			Handler:    _GitService_DeleteGitRepo_Handler,
 		},
 		{
 			MethodName: "GetGitSettings",

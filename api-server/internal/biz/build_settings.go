@@ -3,6 +3,10 @@ package biz
 import (
 	"api-server/api/v1/application"
 	settings "api-server/api/v1/build_settings"
+	"api-server/internal/data"
+	"api-server/internal/data/generated"
+	"api-server/internal/data/generated/gitrepo"
+	"api-server/internal/data/generated/imagerepo"
 	appv1 "api-server/internal/kube/api/v1"
 	"context"
 	"fmt"
@@ -13,14 +17,17 @@ import (
 )
 
 type BuildSettingsBiz struct {
-	cm *ClusterManagers
+	cm   *ClusterManagers
+	data *data.Data
 }
 
 func NewBuildSettingsBiz(
 	cm *ClusterManagers,
+	data *data.Data,
 ) *BuildSettingsBiz {
 	return &BuildSettingsBiz{
-		cm: cm,
+		cm:   cm,
+		data: data,
 	}
 }
 
@@ -33,6 +40,7 @@ func (b *BuildSettingsBiz) GetBuildSettings(ctx context.Context, request *applic
 	}
 
 	namespace := "default"
+	resp := &settings.BuildSettings{}
 	var buildSettings appv1.BuildSettings
 	err = client.Get(ctx, cr.ObjectKey{
 		Namespace: namespace,
@@ -40,24 +48,48 @@ func (b *BuildSettingsBiz) GetBuildSettings(ctx context.Context, request *applic
 	}, &buildSettings)
 
 	if errors.IsNotFound(err) {
-		return &settings.BuildSettings{
-			Dockerfile: "",
-		}, nil
+		return resp, nil
 	}
 	if err != nil {
 		log.Error().Err(err).Msg("get build settings error")
 		return nil, err
 	}
+	resp.Dockerfile = buildSettings.Spec.Dockerfile
 
-	return &settings.BuildSettings{
-		Git: &settings.BuildSettings_GitSettings{
-			Url: buildSettings.Spec.Git.Url,
-		},
-		Image: &settings.BuildSettings_ImageSettings{
-			Url: buildSettings.Spec.Image.Url,
-		},
-		Dockerfile: buildSettings.Spec.Dockerfile,
-	}, nil
+	gitSettings := buildSettings.Spec.Git
+	gitRepo, err := b.data.GitRepo.Query().
+		Where(gitrepo.Name(gitSettings.RepoName)).
+		Only(ctx)
+	if generated.IsNotFound(err) {
+		return resp, nil
+	}
+	if err != nil {
+		log.Error().Err(err).Msg("get git repo error")
+		return nil, err
+	}
+	resp.Git = &settings.BuildSettings_GitSettings{
+		RepoName: gitSettings.RepoName,
+		RepoPath: gitSettings.RepoPath,
+		Url:      fmt.Sprintf("%s/%s", gitRepo.URL, gitSettings.RepoPath),
+	}
+
+	imageSettings := buildSettings.Spec.Image
+	imageRepo, err := b.data.ImageRepo.Query().
+		Where(imagerepo.Name(imageSettings.RepoName)).
+		Only(ctx)
+	if generated.IsNotFound(err) {
+		return resp, nil
+	}
+	if err != nil {
+		log.Error().Err(err).Msg("get image repo error")
+		return nil, err
+	}
+	resp.Image = &settings.BuildSettings_ImageSettings{
+		RepoName: imageSettings.RepoName,
+		Url:      imageRepo.URL,
+	}
+
+	return resp, nil
 }
 
 func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *settings.ApplyBuildSettingsRequest) error {
@@ -93,10 +125,11 @@ func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *sett
 			},
 			Spec: appv1.BuildSettingsSpec{
 				Git: appv1.GitSettings{
-					Url: gitSettings.GetUrl(),
+					RepoName: gitSettings.GetRepoName(),
+					RepoPath: gitSettings.GetRepoPath(),
 				},
 				Image: appv1.ImageSettings{
-					Url: imageSettings.GetUrl(),
+					RepoName: imageSettings.GetRepoName(),
 				},
 				Dockerfile: dockerfile,
 			},
@@ -106,8 +139,9 @@ func (b *BuildSettingsBiz) ApplyBuildSettings(ctx context.Context, request *sett
 			return err
 		}
 	} else {
-		kubeBuildSettings.Spec.Git.Url = gitSettings.GetUrl()
-		kubeBuildSettings.Spec.Image.Url = imageSettings.GetUrl()
+		kubeBuildSettings.Spec.Git.RepoName = gitSettings.GetRepoName()
+		kubeBuildSettings.Spec.Git.RepoPath = gitSettings.GetRepoPath()
+		kubeBuildSettings.Spec.Image.RepoName = imageSettings.GetRepoName()
 		kubeBuildSettings.Spec.Dockerfile = dockerfile
 		err = client.Update(ctx, &kubeBuildSettings)
 		if err != nil {

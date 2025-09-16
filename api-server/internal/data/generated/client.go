@@ -14,6 +14,7 @@ import (
 	"api-server/internal/data/generated/application"
 	"api-server/internal/data/generated/cluster"
 	"api-server/internal/data/generated/clusterconnection"
+	"api-server/internal/data/generated/gitrepo"
 	"api-server/internal/data/generated/imagerepo"
 
 	"entgo.io/ent"
@@ -33,6 +34,8 @@ type Client struct {
 	Cluster *ClusterClient
 	// ClusterConnection is the client for interacting with the ClusterConnection builders.
 	ClusterConnection *ClusterConnectionClient
+	// GitRepo is the client for interacting with the GitRepo builders.
+	GitRepo *GitRepoClient
 	// ImageRepo is the client for interacting with the ImageRepo builders.
 	ImageRepo *ImageRepoClient
 }
@@ -49,6 +52,7 @@ func (c *Client) init() {
 	c.Application = NewApplicationClient(c.config)
 	c.Cluster = NewClusterClient(c.config)
 	c.ClusterConnection = NewClusterConnectionClient(c.config)
+	c.GitRepo = NewGitRepoClient(c.config)
 	c.ImageRepo = NewImageRepoClient(c.config)
 }
 
@@ -145,6 +149,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Application:       NewApplicationClient(cfg),
 		Cluster:           NewClusterClient(cfg),
 		ClusterConnection: NewClusterConnectionClient(cfg),
+		GitRepo:           NewGitRepoClient(cfg),
 		ImageRepo:         NewImageRepoClient(cfg),
 	}, nil
 }
@@ -168,6 +173,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Application:       NewApplicationClient(cfg),
 		Cluster:           NewClusterClient(cfg),
 		ClusterConnection: NewClusterConnectionClient(cfg),
+		GitRepo:           NewGitRepoClient(cfg),
 		ImageRepo:         NewImageRepoClient(cfg),
 	}, nil
 }
@@ -200,6 +206,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Application.Use(hooks...)
 	c.Cluster.Use(hooks...)
 	c.ClusterConnection.Use(hooks...)
+	c.GitRepo.Use(hooks...)
 	c.ImageRepo.Use(hooks...)
 }
 
@@ -209,6 +216,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Application.Intercept(interceptors...)
 	c.Cluster.Intercept(interceptors...)
 	c.ClusterConnection.Intercept(interceptors...)
+	c.GitRepo.Intercept(interceptors...)
 	c.ImageRepo.Intercept(interceptors...)
 }
 
@@ -221,6 +229,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Cluster.mutate(ctx, m)
 	case *ClusterConnectionMutation:
 		return c.ClusterConnection.mutate(ctx, m)
+	case *GitRepoMutation:
+		return c.GitRepo.mutate(ctx, m)
 	case *ImageRepoMutation:
 		return c.ImageRepo.mutate(ctx, m)
 	default:
@@ -697,6 +707,141 @@ func (c *ClusterConnectionClient) mutate(ctx context.Context, m *ClusterConnecti
 	}
 }
 
+// GitRepoClient is a client for the GitRepo schema.
+type GitRepoClient struct {
+	config
+}
+
+// NewGitRepoClient returns a client for the GitRepo from the given config.
+func NewGitRepoClient(c config) *GitRepoClient {
+	return &GitRepoClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `gitrepo.Hooks(f(g(h())))`.
+func (c *GitRepoClient) Use(hooks ...Hook) {
+	c.hooks.GitRepo = append(c.hooks.GitRepo, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `gitrepo.Intercept(f(g(h())))`.
+func (c *GitRepoClient) Intercept(interceptors ...Interceptor) {
+	c.inters.GitRepo = append(c.inters.GitRepo, interceptors...)
+}
+
+// Create returns a builder for creating a GitRepo entity.
+func (c *GitRepoClient) Create() *GitRepoCreate {
+	mutation := newGitRepoMutation(c.config, OpCreate)
+	return &GitRepoCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of GitRepo entities.
+func (c *GitRepoClient) CreateBulk(builders ...*GitRepoCreate) *GitRepoCreateBulk {
+	return &GitRepoCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *GitRepoClient) MapCreateBulk(slice any, setFunc func(*GitRepoCreate, int)) *GitRepoCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &GitRepoCreateBulk{err: fmt.Errorf("calling to GitRepoClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*GitRepoCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &GitRepoCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for GitRepo.
+func (c *GitRepoClient) Update() *GitRepoUpdate {
+	mutation := newGitRepoMutation(c.config, OpUpdate)
+	return &GitRepoUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GitRepoClient) UpdateOne(_m *GitRepo) *GitRepoUpdateOne {
+	mutation := newGitRepoMutation(c.config, OpUpdateOne, withGitRepo(_m))
+	return &GitRepoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GitRepoClient) UpdateOneID(id uint64) *GitRepoUpdateOne {
+	mutation := newGitRepoMutation(c.config, OpUpdateOne, withGitRepoID(id))
+	return &GitRepoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for GitRepo.
+func (c *GitRepoClient) Delete() *GitRepoDelete {
+	mutation := newGitRepoMutation(c.config, OpDelete)
+	return &GitRepoDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GitRepoClient) DeleteOne(_m *GitRepo) *GitRepoDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GitRepoClient) DeleteOneID(id uint64) *GitRepoDeleteOne {
+	builder := c.Delete().Where(gitrepo.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GitRepoDeleteOne{builder}
+}
+
+// Query returns a query builder for GitRepo.
+func (c *GitRepoClient) Query() *GitRepoQuery {
+	return &GitRepoQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeGitRepo},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a GitRepo entity by its id.
+func (c *GitRepoClient) Get(ctx context.Context, id uint64) (*GitRepo, error) {
+	return c.Query().Where(gitrepo.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GitRepoClient) GetX(ctx context.Context, id uint64) *GitRepo {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *GitRepoClient) Hooks() []Hook {
+	hooks := c.hooks.GitRepo
+	return append(hooks[:len(hooks):len(hooks)], gitrepo.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *GitRepoClient) Interceptors() []Interceptor {
+	inters := c.inters.GitRepo
+	return append(inters[:len(inters):len(inters)], gitrepo.Interceptors[:]...)
+}
+
+func (c *GitRepoClient) mutate(ctx context.Context, m *GitRepoMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GitRepoCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GitRepoUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GitRepoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GitRepoDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("generated: unknown GitRepo mutation op: %q", m.Op())
+	}
+}
+
 // ImageRepoClient is a client for the ImageRepo schema.
 type ImageRepoClient struct {
 	config
@@ -835,9 +980,9 @@ func (c *ImageRepoClient) mutate(ctx context.Context, m *ImageRepoMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Application, Cluster, ClusterConnection, ImageRepo []ent.Hook
+		Application, Cluster, ClusterConnection, GitRepo, ImageRepo []ent.Hook
 	}
 	inters struct {
-		Application, Cluster, ClusterConnection, ImageRepo []ent.Interceptor
+		Application, Cluster, ClusterConnection, GitRepo, ImageRepo []ent.Interceptor
 	}
 )

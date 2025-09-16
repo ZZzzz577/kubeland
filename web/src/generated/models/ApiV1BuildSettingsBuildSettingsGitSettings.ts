@@ -24,14 +24,27 @@ export interface ApiV1BuildSettingsBuildSettingsGitSettings {
      * @type {string}
      * @memberof ApiV1BuildSettingsBuildSettingsGitSettings
      */
-    url: string;
+    repoName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiV1BuildSettingsBuildSettingsGitSettings
+     */
+    repoPath: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiV1BuildSettingsBuildSettingsGitSettings
+     */
+    readonly url?: string;
 }
 
 /**
  * Check if a given object implements the ApiV1BuildSettingsBuildSettingsGitSettings interface.
  */
 export function instanceOfApiV1BuildSettingsBuildSettingsGitSettings(value: object): value is ApiV1BuildSettingsBuildSettingsGitSettings {
-    if (!('url' in value) || value['url'] === undefined) return false;
+    if (!('repoName' in value) || value['repoName'] === undefined) return false;
+    if (!('repoPath' in value) || value['repoPath'] === undefined) return false;
     return true;
 }
 
@@ -45,7 +58,9 @@ export function ApiV1BuildSettingsBuildSettingsGitSettingsFromJSONTyped(json: an
     }
     return {
         
-        'url': json['url'],
+        'repoName': json['repoName'],
+        'repoPath': json['repoPath'],
+        'url': json['url'] == null ? undefined : json['url'],
     };
 }
 
@@ -53,14 +68,15 @@ export function ApiV1BuildSettingsBuildSettingsGitSettingsToJSON(json: any): Api
     return ApiV1BuildSettingsBuildSettingsGitSettingsToJSONTyped(json, false);
 }
 
-export function ApiV1BuildSettingsBuildSettingsGitSettingsToJSONTyped(value?: ApiV1BuildSettingsBuildSettingsGitSettings | null, ignoreDiscriminator: boolean = false): any {
+export function ApiV1BuildSettingsBuildSettingsGitSettingsToJSONTyped(value?: Omit<ApiV1BuildSettingsBuildSettingsGitSettings, 'url'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'url': value['url'],
+        'repoName': value['repoName'],
+        'repoPath': value['repoPath'],
     };
 }
 

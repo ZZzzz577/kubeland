@@ -8,15 +8,41 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "v1/application/application.proto";
 import "v1/common/page.proto";
+import "validate/validate.proto";
 
 
 option go_package = "api-server/api/v1/git;git";
 
 service GitService {
-  rpc ApplyGitSettings(ApplyGitSettingsRequest) returns (google.protobuf.Empty) {
+  rpc GetGitRepo(IdentityRequest) returns (GitRepo) {
     option (google.api.http) = {
-      put: "/api/v1/app/{name}/git"
-      body: "git_settings"
+      get: "/api/v1/git/repo/{name}"
+    };
+  }
+
+  rpc ListGitRepos(ListGitReposRequest) returns (ListGitReposResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/git/repo"
+    };
+  }
+
+  rpc CreateGitRepo(GitRepo) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/git/repo",
+      body: "*"
+    };
+  }
+
+  rpc UpdateGitRepo(GitRepo) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/git/repo/{name}",
+      body: "*"
+    };
+  }
+
+  rpc DeleteGitRepo(IdentityRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/git/repo/{name}"
     };
   }
 
@@ -37,6 +63,40 @@ service GitService {
       get: "/api/v1/app/{name}/git/branch/{branch_name}/commit"
     };
   }
+}
+
+message IdentityRequest {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {min_len: 1, max_len: 64}
+  ];
+}
+
+message GitRepo {
+  string name = 1[
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {min_len: 1, max_len: 64}
+  ];
+  string description = 2;
+  string url = 3[
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string token = 4;
+  google.protobuf.Timestamp created_at = 6 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+  google.protobuf.Timestamp updated_at = 7[
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+message ListGitReposRequest{
+  common.Page page = 1;
+}
+
+message ListGitReposResponse {
+  common.Pagination pagination = 1;
+  repeated GitRepo items = 2;
 }
 
 message GitSettings {

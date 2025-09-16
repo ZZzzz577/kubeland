@@ -7,12 +7,12 @@ apis/ImageServiceApi.ts
 apis/index.ts
 index.ts
 models/ApiV1ApplicationApplication.ts
-models/ApiV1ApplicationIdentityRequest.ts
 models/ApiV1ApplicationListApplicationsResponse.ts
 models/ApiV1BuildSettingsBuildSettings.ts
 models/ApiV1BuildSettingsBuildSettingsGitSettings.ts
 models/ApiV1BuildSettingsBuildSettingsImageSettings.ts
 models/ApiV1BuildTaskBuildTask.ts
+models/ApiV1BuildTaskCreateBuildTaskRequest.ts
 models/ApiV1BuildTaskListBuildTaskResponse.ts
 models/ApiV1ClusterCluster.ts
 models/ApiV1ClusterConnection.ts
@@ -24,10 +24,12 @@ models/ApiV1ClusterResolveKubeConfigResponseContext.ts
 models/ApiV1ClusterResolveKubeConfigResponseUser.ts
 models/ApiV1ClusterTestConnectionResponse.ts
 models/ApiV1CommonPagination.ts
+models/ApiV1GitGitRepo.ts
 models/ApiV1GitGitSettings.ts
 models/ApiV1GitListBranchesResponse.ts
 models/ApiV1GitListCommitsResponse.ts
 models/ApiV1GitListCommitsResponseCommit.ts
+models/ApiV1GitListGitReposResponse.ts
 models/ApiV1ImageImageRepo.ts
 models/ApiV1ImageListImageReposResponse.ts
 models/index.ts

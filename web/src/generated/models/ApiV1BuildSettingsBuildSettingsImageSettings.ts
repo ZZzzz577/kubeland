@@ -24,14 +24,20 @@ export interface ApiV1BuildSettingsBuildSettingsImageSettings {
      * @type {string}
      * @memberof ApiV1BuildSettingsBuildSettingsImageSettings
      */
-    url: string;
+    repoName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiV1BuildSettingsBuildSettingsImageSettings
+     */
+    readonly url?: string;
 }
 
 /**
  * Check if a given object implements the ApiV1BuildSettingsBuildSettingsImageSettings interface.
  */
 export function instanceOfApiV1BuildSettingsBuildSettingsImageSettings(value: object): value is ApiV1BuildSettingsBuildSettingsImageSettings {
-    if (!('url' in value) || value['url'] === undefined) return false;
+    if (!('repoName' in value) || value['repoName'] === undefined) return false;
     return true;
 }
 
@@ -45,7 +51,8 @@ export function ApiV1BuildSettingsBuildSettingsImageSettingsFromJSONTyped(json: 
     }
     return {
         
-        'url': json['url'],
+        'repoName': json['repoName'],
+        'url': json['url'] == null ? undefined : json['url'],
     };
 }
 
@@ -53,14 +60,14 @@ export function ApiV1BuildSettingsBuildSettingsImageSettingsToJSON(json: any): A
     return ApiV1BuildSettingsBuildSettingsImageSettingsToJSONTyped(json, false);
 }
 
-export function ApiV1BuildSettingsBuildSettingsImageSettingsToJSONTyped(value?: ApiV1BuildSettingsBuildSettingsImageSettings | null, ignoreDiscriminator: boolean = false): any {
+export function ApiV1BuildSettingsBuildSettingsImageSettingsToJSONTyped(value?: Omit<ApiV1BuildSettingsBuildSettingsImageSettings, 'url'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'url': value['url'],
+        'repoName': value['repoName'],
     };
 }
 

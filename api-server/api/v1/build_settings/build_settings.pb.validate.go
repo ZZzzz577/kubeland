@@ -350,9 +350,20 @@ func (m *BuildSettings_GitSettings) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetUrl()); l < 1 || l > 512 {
+	if l := utf8.RuneCountInString(m.GetRepoName()); l < 1 || l > 64 {
 		err := BuildSettings_GitSettingsValidationError{
-			field:  "Url",
+			field:  "RepoName",
+			reason: "value length must be between 1 and 64 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if l := utf8.RuneCountInString(m.GetRepoPath()); l < 1 || l > 512 {
+		err := BuildSettings_GitSettingsValidationError{
+			field:  "RepoPath",
 			reason: "value length must be between 1 and 512 runes, inclusive",
 		}
 		if !all {
@@ -360,6 +371,8 @@ func (m *BuildSettings_GitSettings) validate(all bool) error {
 		}
 		errors = append(errors, err)
 	}
+
+	// no validation rules for Url
 
 	if len(errors) > 0 {
 		return BuildSettings_GitSettingsMultiError(errors)
@@ -463,16 +476,18 @@ func (m *BuildSettings_ImageSettings) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetUrl()); l < 1 || l > 512 {
+	if l := utf8.RuneCountInString(m.GetRepoName()); l < 1 || l > 64 {
 		err := BuildSettings_ImageSettingsValidationError{
-			field:  "Url",
-			reason: "value length must be between 1 and 512 runes, inclusive",
+			field:  "RepoName",
+			reason: "value length must be between 1 and 64 runes, inclusive",
 		}
 		if !all {
 			return err
 		}
 		errors = append(errors, err)
 	}
+
+	// no validation rules for Url
 
 	if len(errors) > 0 {
 		return BuildSettings_ImageSettingsMultiError(errors)

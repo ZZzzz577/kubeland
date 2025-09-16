@@ -4,118 +4,178 @@ import (
 	"api-server/api/v1/application"
 	"api-server/api/v1/common"
 	"api-server/api/v1/git"
+	"api-server/internal/data"
+	"api-server/internal/data/generated"
+	"api-server/internal/data/generated/gitrepo"
 	appv1 "api-server/internal/kube/api/v1"
 	"context"
 	"fmt"
 	"github.com/google/go-github/v74/github"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"net/url"
-	controllerruntime "sigs.k8s.io/controller-runtime"
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
-)
-
-const (
-	GitUrlKey   = "GIT_URL"
-	GitTokenKey = "GIT_TOKEN"
 )
 
 type GitBiz struct {
 	cm     *ClusterManagers
 	client *github.Client
+	data   *data.Data
 }
 
 func NewGitBiz(
 	cm *ClusterManagers,
+	data *data.Data,
 ) *GitBiz {
 	client := github.NewClient(nil)
 	return &GitBiz{
 		cm:     cm,
 		client: client,
+		data:   data,
 	}
 }
 
-func (g *GitBiz) ApplyGitSettings(ctx context.Context, request *git.ApplyGitSettingsRequest) error {
+func (g *GitBiz) GetGitRepo(ctx context.Context, request *git.IdentityRequest) (*git.GitRepo, error) {
+	gitRepo, err := g.data.GitRepo.Query().
+		Where(gitrepo.Name(request.GetName())).
+		Only(ctx)
+	if generated.IsNotFound(err) {
+		return nil, status.Error(codes.NotFound, "git repo not found")
+	}
+	if err != nil {
+		log.Error().Err(err).Msg("get git repo error")
+		return nil, err
+	}
+	return g.toProto(gitRepo, true), nil
+}
+
+func (g *GitBiz) ListGitRepos(ctx context.Context, request *git.ListGitReposRequest) (*git.ListGitReposResponse, error) {
+	page, repos, err := data.Page[*generated.GitRepoQuery](ctx, g.data.GitRepo.Query(), request.Page)
+	if err != nil {
+		log.Error().Err(err).Msg("list git repos error")
+		return nil, err
+	}
+	return &git.ListGitReposResponse{
+		Pagination: page,
+		Items: lo.Map(repos, func(item *generated.GitRepo, index int) *git.GitRepo {
+			return g.toProto(item, false)
+		}),
+	}, nil
+}
+
+func (g *GitBiz) CreateGitRepo(ctx context.Context, request *git.GitRepo) error {
+	return g.data.WithTx(ctx, func(tx *generated.Tx) error {
+		exist, err := tx.GitRepo.Query().
+			Where(gitrepo.Name(request.GetName())).
+			Exist(ctx)
+		if err != nil {
+			log.Error().Err(err).Msg("check git repo exist error")
+			return err
+		}
+		if exist {
+			return status.Error(codes.AlreadyExists, "git repo already exists")
+		}
+		err = tx.GitRepo.Create().
+			SetName(request.GetName()).
+			SetDescription(request.GetDescription()).
+			SetURL(request.GetUrl()).
+			SetToken(request.GetToken()).
+			Exec(ctx)
+		if err != nil {
+			log.Error().Err(err).Msg("create git repo error")
+			return err
+		}
+		return nil
+	})
+}
+
+func (g *GitBiz) UpdateGitRepo(ctx context.Context, request *git.GitRepo) error {
+	err := g.data.GitRepo.Update().
+		SetDescription(request.GetDescription()).
+		SetURL(request.GetUrl()).
+		SetToken(request.GetToken()).
+		Where(gitrepo.Name(request.GetName())).
+		Exec(ctx)
+	if generated.IsNotFound(err) {
+		return status.Error(codes.NotFound, "git repo not found")
+	}
+	if err != nil {
+		log.Error().Err(err).Msg("update git repo error")
+		return err
+	}
+	return nil
+}
+
+func (g *GitBiz) DeleteGitRepo(ctx context.Context, request *git.IdentityRequest) error {
+	_, err := g.data.GitRepo.Delete().
+		Where(gitrepo.Name(request.GetName())).
+		Exec(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("delete git repo error")
+		return err
+	}
+	return nil
+}
+
+func (g *GitBiz) toProto(source *generated.GitRepo, showSecret bool) *git.GitRepo {
+	target := &git.GitRepo{
+		Name:        source.Name,
+		Description: source.Description,
+		Url:         source.URL,
+		CreatedAt:   timestamppb.New(source.CreatedAt),
+		UpdatedAt:   timestamppb.New(source.UpdatedAt),
+	}
+	if showSecret {
+		target.Token = source.Token
+	}
+	return target
+}
+
+func (g *GitBiz) GetGitSettings(ctx context.Context, request *application.IdentityRequest) (*git.GitSettings, error) {
 	appName := request.GetName()
-	namespace := "default"
 
 	client, err := g.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
-		return err
+		return nil, err
 	}
 
+	namespace := "default"
 	var buildSettings appv1.BuildSettings
 	err = client.Get(ctx, cr.ObjectKey{
 		Namespace: namespace,
 		Name:      appName,
 	}, &buildSettings)
 
-	gitSettingsName := fmt.Sprintf("%s-git", appName)
-	gitSettings, err := client.CoreV1().Secrets(namespace).Get(ctx, gitSettingsName, metav1.GetOptions{})
-	if err != nil && !errors.IsNotFound(err) {
-		log.Error().Err(err).Msg("get git settings error")
-		return err
-	}
-
 	if errors.IsNotFound(err) {
-		gitSettings, err = client.CoreV1().Secrets(namespace).Create(ctx, &corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      gitSettingsName,
-				Namespace: namespace,
-			},
-			StringData: map[string]string{
-				GitUrlKey:   request.GetGitSettings().GetUrl(),
-				GitTokenKey: request.GetGitSettings().GetToken(),
-			},
-		}, metav1.CreateOptions{})
-		if err != nil {
-			log.Error().Err(err).Msg("create git secret error")
-			return err
-		}
-	} else {
-		gitSettings.Data[GitUrlKey] = []byte(request.GetGitSettings().GetUrl())
-		gitSettings.Data[GitTokenKey] = []byte(request.GetGitSettings().GetToken())
-		gitSettings, err = client.CoreV1().Secrets(namespace).Update(ctx, gitSettings, metav1.UpdateOptions{})
-		if err != nil {
-			log.Error().Err(err).Msg("update git secret error")
-			return err
-		}
+		return nil, nil
 	}
-
-	if err = controllerruntime.SetControllerReference(&buildSettings, gitSettings, client.Scheme); err != nil {
-		log.Error().Err(err).Msg("set controller reference error")
-		return err
-	}
-
-	return nil
-
-}
-
-func (g *GitBiz) GetGitSettings(ctx context.Context, request *application.IdentityRequest) (*git.GitSettings, error) {
-	appName := request.GetName()
-	namespace := "default"
-
-	client, err := g.cm.GetClient(ctx, appName)
 	if err != nil {
-		log.Error().Err(err).Msg("get cluster client error")
+		log.Error().Err(err).Msg("get build settings error")
 		return nil, err
 	}
 
-	gitSettings, err := client.CoreV1().Secrets(namespace).
-		Get(ctx, fmt.Sprintf("%s-git", appName), metav1.GetOptions{})
+	gitSettings := buildSettings.Spec.Git
+	gitRepoName := gitSettings.RepoName
+	gitRepo, err := g.data.GitRepo.Query().
+		Where(gitrepo.Name(gitRepoName)).
+		Only(ctx)
+	if generated.IsNotFound(err) {
+		return nil, nil
+	}
 	if err != nil {
-		log.Error().Err(err).Msg("get git settings error")
+		log.Error().Err(err).Msg("get git repo error")
 		return nil, err
 	}
+
 	return &git.GitSettings{
-		Url:   string(gitSettings.Data[GitUrlKey]),
-		Token: string(gitSettings.Data[GitTokenKey]),
+		Url:   fmt.Sprintf("%s/%s", gitRepo.URL, gitSettings.RepoPath),
+		Token: gitRepo.Token,
 	}, nil
 
 }

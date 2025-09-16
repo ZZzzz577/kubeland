@@ -3,7 +3,9 @@ import AppLayout from "@/layout";
 import { Trans } from "@lingui/react/macro";
 import { DockerOutlined } from "@ant-design/icons";
 import ImageRepoList from "@/views/image/list";
-import ImageRepositoryCreate from "@/views/image/create";
+import ImageRepoCreate from "@/views/image/create";
+import ImageRepoDetail from "@/views/image/detail";
+import ImageRepoUpdate from "@/views/image/update";
 
 export const Image: Route = {
     path: "/image",
@@ -20,7 +22,17 @@ export const Image: Route = {
         {
             path: "create",
             name: <Trans>Create</Trans>,
-            element: <ImageRepositoryCreate />,
+            element: <ImageRepoCreate />,
+        },
+        {
+            path: ":name",
+            name: <Trans>Detail</Trans>,
+            element: <ImageRepoDetail />,
+        },
+        {
+            path: ":name/edit",
+            name: <Trans>Edit</Trans>,
+            element: <ImageRepoUpdate />,
         },
     ],
 };

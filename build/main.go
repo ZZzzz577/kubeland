@@ -4,10 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
+	"github.com/go-git/go-git/v6/plumbing/transport/http"
 	"io"
 	"os"
 	"os/exec"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -16,7 +19,8 @@ func main() {
 	imageTag := "crpi-mgl4ujhwwhrsi5e3.cn-hangzhou.personal.cr.aliyuncs.com/kubeland/test:v1"
 	cloneCode(codePath)
 	buildImage(imageTag)
-	pushImage(imageTag)
+	//pushImage(imageTag)
+	time.Sleep(time.Hour)
 }
 func cloneCode(codePath string) {
 	fmt.Println("###### Step1: Clone code")
@@ -24,21 +28,62 @@ func cloneCode(codePath string) {
 	if gitUrl == "" {
 		panic("GIT_URL is empty")
 	}
+
+	// todo: consider no git token
+	gitTokenFile := "/app/config/git/GIT_TOKEN"
+	file, err := os.Open(gitTokenFile)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+	gitToken := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		gitToken += scanner.Text() + "\n"
+	}
+	if err = scanner.Err(); err != nil {
+		panic(err)
+	}
+	fmt.Println("GIT_TOKEN:", gitToken)
+
 	fmt.Printf("clone code from %s\n", gitUrl)
-	_, err := git.PlainClone(codePath, &git.CloneOptions{
-		URL:      gitUrl,
+	repository, err := git.PlainClone(codePath, &git.CloneOptions{
+		URL: gitUrl,
+		Auth: &http.BasicAuth{
+			Username: "token",
+			Password: gitToken,
+		},
 		Progress: os.Stdout,
 	})
 	if err != nil {
 		panic(err)
 	}
+	gitCommit := os.Getenv("GIT_COMMIT")
+	if gitCommit == "" {
+		panic("GIT_COMMIT is empty")
+	}
+
+	worktree, err := repository.Worktree()
+	if err != nil {
+		panic(err)
+	}
+	hash, ok := plumbing.FromHex(gitCommit)
+	if !ok {
+		panic("invalid git commit")
+	}
+	if err = worktree.Checkout(&git.CheckoutOptions{Hash: hash}); err != nil {
+		panic(err)
+	}
+
 }
 
 func buildImage(imageTag string) {
 	fmt.Println("###### Step2: Build image")
 	cmd := exec.Command("buildah", "build",
 		"--tag", imageTag,
-		"/app/config",
+		"/app/config/dockerfile",
 	)
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {

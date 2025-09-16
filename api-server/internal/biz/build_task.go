@@ -3,6 +3,8 @@ package biz
 import (
 	"api-server/api/v1/application"
 	task "api-server/api/v1/build_task"
+	"api-server/internal/data"
+	"api-server/internal/data/generated/gitrepo"
 	appv1 "api-server/internal/kube/api/v1"
 	"api-server/internal/kube/commons/job"
 	"bufio"
@@ -31,19 +33,22 @@ var upGrader = websocket.Upgrader{
 }
 
 type BuildTaskBiz struct {
-	cm *ClusterManagers
+	cm   *ClusterManagers
+	data *data.Data
 }
 
 func NewBuildTaskBiz(
 	cm *ClusterManagers,
+	data *data.Data,
 ) *BuildTaskBiz {
 	return &BuildTaskBiz{
-		cm: cm,
+		cm:   cm,
+		data: data,
 	}
 }
 
-func (b *BuildTaskBiz) Create(ctx context.Context, request *application.IdentityRequest) error {
-	appName := request.GetName()
+func (b *BuildTaskBiz) Create(ctx context.Context, request *task.CreateBuildTaskRequest) error {
+	appName := request.GetAppName()
 	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
@@ -61,7 +66,7 @@ func (b *BuildTaskBiz) Create(ctx context.Context, request *application.Identity
 		return err
 	}
 
-	buildTask := b.createBuildTask(&buildSettings)
+	buildTask := b.createBuildTask(ctx, request, &buildSettings)
 	if err = controllerruntime.SetControllerReference(&buildSettings, buildTask, client.Scheme); err != nil {
 		log.Error().Err(err).Msg("set controller reference error")
 		return err
@@ -76,21 +81,27 @@ func (b *BuildTaskBiz) Create(ctx context.Context, request *application.Identity
 	return nil
 }
 
-func (b *BuildTaskBiz) createBuildTask(buildSettings *appv1.BuildSettings) *batchv1.Job {
+func (b *BuildTaskBiz) createBuildTask(ctx context.Context, request *task.CreateBuildTaskRequest, buildSettings *appv1.BuildSettings) *batchv1.Job {
 	namespace := "default"
 	taskName := fmt.Sprintf("%s-%s", buildSettings.Name, time.Now().Format("20060102150405"))
+	gitSettings := buildSettings.Spec.Git
+	gitRepo, err := b.data.GitRepo.Query().
+		Where(gitrepo.Name(gitSettings.RepoName)).
+		Only(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("get git repo error")
+		return nil
+	}
+	gitUrl := fmt.Sprintf("%s/%s", gitRepo.URL, gitSettings.RepoPath)
+
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      taskName,
 			Namespace: namespace,
-			// Labels:    labels,
 		},
 		Spec: batchv1.JobSpec{
 			BackoffLimit: lo.ToPtr(int32(0)),
 			Template: corev1.PodTemplateSpec{
-				//ObjectMeta: metav1.ObjectMeta{
-				//	Labels: labels,
-				//},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
@@ -100,13 +111,25 @@ func (b *BuildTaskBiz) createBuildTask(buildSettings *appv1.BuildSettings) *batc
 							Env: []corev1.EnvVar{
 								{
 									Name:  "GIT_URL",
-									Value: buildSettings.Spec.Git.Url,
+									Value: gitUrl,
+								},
+								{
+									Name:  "GIT_COMMIT",
+									Value: request.GetCommit(),
 								},
 							},
 							VolumeMounts: []corev1.VolumeMount{
 								{
-									Name:      "dockerfile-config",
-									MountPath: "/app/config",
+									Name:      "git",
+									MountPath: "/app/config/git",
+								},
+								{
+									Name:      "image",
+									MountPath: "/app/config/image",
+								},
+								{
+									Name:      "dockerfile",
+									MountPath: "/app/config/dockerfile",
 								},
 							},
 						},
@@ -114,11 +137,27 @@ func (b *BuildTaskBiz) createBuildTask(buildSettings *appv1.BuildSettings) *batc
 					RestartPolicy: corev1.RestartPolicyNever,
 					Volumes: []corev1.Volume{
 						{
-							Name: "dockerfile-config",
+							Name: "git",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: fmt.Sprintf("%s-git", buildSettings.Name),
+								},
+							},
+						},
+						{
+							Name: "image",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: fmt.Sprintf("%s-image", buildSettings.Name),
+								},
+							},
+						},
+						{
+							Name: "dockerfile",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: fmt.Sprintf("%s-dockerfile-cm", buildSettings.Name),
+										Name: fmt.Sprintf("%s-dockerfile", buildSettings.Name),
 									},
 								},
 							},

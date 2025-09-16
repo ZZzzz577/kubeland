@@ -30,16 +30,26 @@ service BuildSettingsService {
 
 message BuildSettings {
   message GitSettings {
-    string url = 1[
+    string repo_name = 1[
+      (google.api.field_behavior) = REQUIRED,
+      (validate.rules).string = {min_len: 1,max_len: 64}
+    ];
+    string repo_path = 2[
       (google.api.field_behavior) = REQUIRED,
       (validate.rules).string = {min_len: 1,max_len: 512}
+    ];
+    string url = 3[
+      (google.api.field_behavior) = OUTPUT_ONLY
     ];
   }
 
   message ImageSettings {
-    string url = 1[
+    string repo_name = 1[
       (google.api.field_behavior) = REQUIRED,
-      (validate.rules).string = {min_len: 1,max_len: 512}
+      (validate.rules).string = {min_len: 1,max_len: 64}
+    ];
+    string url = 2[
+      (google.api.field_behavior) = OUTPUT_ONLY
     ];
   }
 

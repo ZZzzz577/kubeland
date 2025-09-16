@@ -6,6 +6,27 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/app/{appName}/build/task:
+        post:
+            tags:
+                - BuildTaskService
+            operationId: BuildTaskService_Create
+            parameters:
+                - name: appName
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.build.task.CreateBuildTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/app/{name}/build/settings:
         get:
             tags:
@@ -62,26 +83,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.build.task.ListBuildTaskResponse'
-        post:
-            tags:
-                - BuildTaskService
-            operationId: BuildTaskService_Create
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.v1.application.IdentityRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content: {}
     /api/v1/app/{name}/git:
         get:
             tags:
@@ -100,26 +101,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.git.GitSettings'
-        put:
-            tags:
-                - GitService
-            operationId: GitService_ApplyGitSettings
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.v1.git.GitSettings'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content: {}
     /api/v1/app/{name}/git/branch:
         get:
             tags:
@@ -403,6 +384,95 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/git/repo:
+        get:
+            tags:
+                - GitService
+            operationId: GitService_ListGitRepos
+            parameters:
+                - name: page.current
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: page.size
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.git.ListGitReposResponse'
+        post:
+            tags:
+                - GitService
+            operationId: GitService_CreateGitRepo
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.git.GitRepo'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/git/repo/{name}:
+        get:
+            tags:
+                - GitService
+            operationId: GitService_GetGitRepo
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.git.GitRepo'
+        put:
+            tags:
+                - GitService
+            operationId: GitService_UpdateGitRepo
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.git.GitRepo'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        delete:
+            tags:
+                - GitService
+            operationId: GitService_DeleteGitRepo
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/image/repo:
         get:
             tags:
@@ -513,13 +583,6 @@ components:
                     readOnly: true
                     type: string
                     format: date-time
-        api.v1.application.IdentityRequest:
-            required:
-                - name
-            type: object
-            properties:
-                name:
-                    type: string
         api.v1.application.ListApplicationsResponse:
             type: object
             properties:
@@ -544,17 +607,26 @@ components:
                     type: string
         api.v1.build.settings.BuildSettings_GitSettings:
             required:
-                - url
+                - repoName
+                - repoPath
             type: object
             properties:
+                repoName:
+                    type: string
+                repoPath:
+                    type: string
                 url:
+                    readOnly: true
                     type: string
         api.v1.build.settings.BuildSettings_ImageSettings:
             required:
-                - url
+                - repoName
             type: object
             properties:
+                repoName:
+                    type: string
                 url:
+                    readOnly: true
                     type: string
         api.v1.build.task.BuildTask:
             type: object
@@ -575,6 +647,16 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        api.v1.build.task.CreateBuildTaskRequest:
+            required:
+                - appName
+                - commit
+            type: object
+            properties:
+                appName:
+                    type: string
+                commit:
+                    type: string
         api.v1.build.task.ListBuildTaskResponse:
             type: object
             properties:
@@ -703,6 +785,28 @@ components:
                 totalPage:
                     type: integer
                     format: uint32
+        api.v1.git.GitRepo:
+            required:
+                - name
+                - url
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                url:
+                    type: string
+                token:
+                    type: string
+                createdAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                updatedAt:
+                    readOnly: true
+                    type: string
+                    format: date-time
         api.v1.git.GitSettings:
             required:
                 - url
@@ -738,6 +842,15 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        api.v1.git.ListGitReposResponse:
+            type: object
+            properties:
+                pagination:
+                    $ref: '#/components/schemas/api.v1.common.Pagination'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.git.GitRepo'
         api.v1.image.ImageRepo:
             required:
                 - name

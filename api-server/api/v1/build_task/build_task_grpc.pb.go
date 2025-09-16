@@ -29,7 +29,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BuildTaskServiceClient interface {
-	Create(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	List(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*ListBuildTaskResponse, error)
 }
 
@@ -41,7 +41,7 @@ func NewBuildTaskServiceClient(cc grpc.ClientConnInterface) BuildTaskServiceClie
 	return &buildTaskServiceClient{cc}
 }
 
-func (c *buildTaskServiceClient) Create(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *buildTaskServiceClient) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BuildTaskService_Create_FullMethodName, in, out, cOpts...)
@@ -65,7 +65,7 @@ func (c *buildTaskServiceClient) List(ctx context.Context, in *application.Ident
 // All implementations must embed UnimplementedBuildTaskServiceServer
 // for forward compatibility.
 type BuildTaskServiceServer interface {
-	Create(context.Context, *application.IdentityRequest) (*emptypb.Empty, error)
+	Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error)
 	List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error)
 	mustEmbedUnimplementedBuildTaskServiceServer()
 }
@@ -77,7 +77,7 @@ type BuildTaskServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBuildTaskServiceServer struct{}
 
-func (UnimplementedBuildTaskServiceServer) Create(context.Context, *application.IdentityRequest) (*emptypb.Empty, error) {
+func (UnimplementedBuildTaskServiceServer) Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedBuildTaskServiceServer) List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error) {
@@ -105,7 +105,7 @@ func RegisterBuildTaskServiceServer(s grpc.ServiceRegistrar, srv BuildTaskServic
 }
 
 func _BuildTaskService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(application.IdentityRequest)
+	in := new(CreateBuildTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func _BuildTaskService_Create_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: BuildTaskService_Create_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BuildTaskServiceServer).Create(ctx, req.(*application.IdentityRequest))
+		return srv.(BuildTaskServiceServer).Create(ctx, req.(*CreateBuildTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

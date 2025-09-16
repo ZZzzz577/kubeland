@@ -8,7 +8,7 @@ import { useForm } from "antd/es/form/Form";
 import type { ApiV1ImageImageRepo } from "@/generated";
 import { SaveOutlined } from "@ant-design/icons";
 
-export default function ImageRepositoryCreate() {
+export default function ImageRepoCreate() {
     const { t } = useLingui();
     const { notification } = useApp();
     const navigate = useNavigate();

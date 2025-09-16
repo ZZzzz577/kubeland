@@ -29,7 +29,7 @@ func (b *BuildTaskService) Register(gs *kgrpc.Server, hs *http.Server) {
 	task.RegisterBuildTaskServiceHTTPServer(hs, b)
 }
 
-func (b *BuildTaskService) Create(ctx context.Context, request *application.IdentityRequest) (*emptypb.Empty, error) {
+func (b *BuildTaskService) Create(ctx context.Context, request *task.CreateBuildTaskRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, b.biz.Create(ctx, request)
 }
 

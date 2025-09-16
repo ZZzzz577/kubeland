@@ -139,7 +139,9 @@ func (x *ApplyBuildSettingsRequest) GetBuildSettings() *BuildSettings {
 
 type BuildSettings_GitSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	RepoName      string                 `protobuf:"bytes,1,opt,name=repo_name,json=repoName,proto3" json:"repo_name,omitempty"`
+	RepoPath      string                 `protobuf:"bytes,2,opt,name=repo_path,json=repoPath,proto3" json:"repo_path,omitempty"`
+	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -174,6 +176,20 @@ func (*BuildSettings_GitSettings) Descriptor() ([]byte, []int) {
 	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0, 0}
 }
 
+func (x *BuildSettings_GitSettings) GetRepoName() string {
+	if x != nil {
+		return x.RepoName
+	}
+	return ""
+}
+
+func (x *BuildSettings_GitSettings) GetRepoPath() string {
+	if x != nil {
+		return x.RepoPath
+	}
+	return ""
+}
+
 func (x *BuildSettings_GitSettings) GetUrl() string {
 	if x != nil {
 		return x.Url
@@ -183,7 +199,8 @@ func (x *BuildSettings_GitSettings) GetUrl() string {
 
 type BuildSettings_ImageSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	RepoName      string                 `protobuf:"bytes,1,opt,name=repo_name,json=repoName,proto3" json:"repo_name,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -218,6 +235,13 @@ func (*BuildSettings_ImageSettings) Descriptor() ([]byte, []int) {
 	return file_v1_build_settings_build_settings_proto_rawDescGZIP(), []int{0, 1}
 }
 
+func (x *BuildSettings_ImageSettings) GetRepoName() string {
+	if x != nil {
+		return x.RepoName
+	}
+	return ""
+}
+
 func (x *BuildSettings_ImageSettings) GetUrl() string {
 	if x != nil {
 		return x.Url
@@ -229,17 +253,20 @@ var File_v1_build_settings_build_settings_proto protoreflect.FileDescriptor
 
 const file_v1_build_settings_build_settings_proto_rawDesc = "" +
 	"\n" +
-	"&v1/build_settings/build_settings.proto\x12\x15api.v1.build.settings\x1a v1/application/application.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"\xb3\x02\n" +
+	"&v1/build_settings/build_settings.proto\x12\x15api.v1.build.settings\x1a v1/application/application.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"\xa4\x03\n" +
 	"\rBuildSettings\x12H\n" +
 	"\x03git\x18\x01 \x01(\v20.api.v1.build.settings.BuildSettings.GitSettingsB\x04\xe2A\x01\x02R\x03git\x12N\n" +
 	"\x05image\x18\x02 \x01(\v22.api.v1.build.settings.BuildSettings.ImageSettingsB\x04\xe2A\x01\x02R\x05image\x12$\n" +
 	"\n" +
 	"dockerfile\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\n" +
-	"dockerfile\x1a/\n" +
-	"\vGitSettings\x12 \n" +
-	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url\x1a1\n" +
-	"\rImageSettings\x12 \n" +
-	"\x03url\x18\x01 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\x03url\"\x82\x01\n" +
+	"dockerfile\x1a~\n" +
+	"\vGitSettings\x12*\n" +
+	"\trepo_name\x18\x01 \x01(\tB\r\xe2A\x01\x02\xfaB\x06r\x04\x10\x01\x18@R\brepoName\x12+\n" +
+	"\trepo_path\x18\x02 \x01(\tB\x0e\xe2A\x01\x02\xfaB\ar\x05\x10\x01\x18\x80\x04R\brepoPath\x12\x16\n" +
+	"\x03url\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x03url\x1aS\n" +
+	"\rImageSettings\x12*\n" +
+	"\trepo_name\x18\x01 \x01(\tB\r\xe2A\x01\x02\xfaB\x06r\x04\x10\x01\x18@R\brepoName\x12\x16\n" +
+	"\x03url\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03url\"\x82\x01\n" +
 	"\x19ApplyBuildSettingsRequest\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\x12K\n" +
 	"\x0ebuild_settings\x18\x02 \x01(\v2$.api.v1.build.settings.BuildSettingsR\rbuildSettings2\xbd\x02\n" +

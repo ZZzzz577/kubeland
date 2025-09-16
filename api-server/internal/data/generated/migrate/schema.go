@@ -101,6 +101,30 @@ var (
 			},
 		},
 	}
+	// GitReposColumns holds the columns for the "git_repos" table.
+	GitReposColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "delete_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "description", Type: field.TypeString, Size: 1024, Default: ""},
+		{Name: "url", Type: field.TypeString, Size: 512},
+		{Name: "token", Type: field.TypeString, Size: 1024, Default: ""},
+	}
+	// GitReposTable holds the schema information for the "git_repos" table.
+	GitReposTable = &schema.Table{
+		Name:       "git_repos",
+		Columns:    GitReposColumns,
+		PrimaryKey: []*schema.Column{GitReposColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "gitrepo_name",
+				Unique:  true,
+				Columns: []*schema.Column{GitReposColumns[4]},
+			},
+		},
+	}
 	// ImageReposColumns holds the columns for the "image_repos" table.
 	ImageReposColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
@@ -131,6 +155,7 @@ var (
 		ApplicationsTable,
 		ClustersTable,
 		ClusterConnectionsTable,
+		GitReposTable,
 		ImageReposTable,
 	}
 )

@@ -21,30 +21,105 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationGitServiceApplyGitSettings = "/api.v1.git.GitService/ApplyGitSettings"
+const OperationGitServiceCreateGitRepo = "/api.v1.git.GitService/CreateGitRepo"
+const OperationGitServiceDeleteGitRepo = "/api.v1.git.GitService/DeleteGitRepo"
+const OperationGitServiceGetGitRepo = "/api.v1.git.GitService/GetGitRepo"
 const OperationGitServiceGetGitSettings = "/api.v1.git.GitService/GetGitSettings"
 const OperationGitServiceListBranches = "/api.v1.git.GitService/ListBranches"
 const OperationGitServiceListCommits = "/api.v1.git.GitService/ListCommits"
+const OperationGitServiceListGitRepos = "/api.v1.git.GitService/ListGitRepos"
+const OperationGitServiceUpdateGitRepo = "/api.v1.git.GitService/UpdateGitRepo"
 
 type GitServiceHTTPServer interface {
-	ApplyGitSettings(context.Context, *ApplyGitSettingsRequest) (*emptypb.Empty, error)
+	CreateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error)
+	DeleteGitRepo(context.Context, *IdentityRequest) (*emptypb.Empty, error)
+	GetGitRepo(context.Context, *IdentityRequest) (*GitRepo, error)
 	GetGitSettings(context.Context, *application.IdentityRequest) (*GitSettings, error)
 	ListBranches(context.Context, *application.IdentityRequest) (*ListBranchesResponse, error)
 	ListCommits(context.Context, *ListCommitsRequest) (*ListCommitsResponse, error)
+	ListGitRepos(context.Context, *ListGitReposRequest) (*ListGitReposResponse, error)
+	UpdateGitRepo(context.Context, *GitRepo) (*emptypb.Empty, error)
 }
 
 func RegisterGitServiceHTTPServer(s *http.Server, srv GitServiceHTTPServer) {
 	r := s.Route("/")
-	r.PUT("/api/v1/app/{name}/git", _GitService_ApplyGitSettings0_HTTP_Handler(srv))
+	r.GET("/api/v1/git/repo/{name}", _GitService_GetGitRepo0_HTTP_Handler(srv))
+	r.GET("/api/v1/git/repo", _GitService_ListGitRepos0_HTTP_Handler(srv))
+	r.POST("/api/v1/git/repo", _GitService_CreateGitRepo0_HTTP_Handler(srv))
+	r.PUT("/api/v1/git/repo/{name}", _GitService_UpdateGitRepo0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/git/repo/{name}", _GitService_DeleteGitRepo0_HTTP_Handler(srv))
 	r.GET("/api/v1/app/{name}/git", _GitService_GetGitSettings0_HTTP_Handler(srv))
 	r.GET("/api/v1/app/{name}/git/branch", _GitService_ListBranches0_HTTP_Handler(srv))
 	r.GET("/api/v1/app/{name}/git/branch/{branch_name}/commit", _GitService_ListCommits0_HTTP_Handler(srv))
 }
 
-func _GitService_ApplyGitSettings0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
+func _GitService_GetGitRepo0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in ApplyGitSettingsRequest
-		if err := ctx.Bind(&in.GitSettings); err != nil {
+		var in IdentityRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGitServiceGetGitRepo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetGitRepo(ctx, req.(*IdentityRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GitRepo)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GitService_ListGitRepos0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListGitReposRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGitServiceListGitRepos)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListGitRepos(ctx, req.(*ListGitReposRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListGitReposResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GitService_CreateGitRepo0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GitRepo
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGitServiceCreateGitRepo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateGitRepo(ctx, req.(*GitRepo))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GitService_UpdateGitRepo0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GitRepo
+		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
@@ -53,9 +128,31 @@ func _GitService_ApplyGitSettings0_HTTP_Handler(srv GitServiceHTTPServer) func(c
 		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationGitServiceApplyGitSettings)
+		http.SetOperation(ctx, OperationGitServiceUpdateGitRepo)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ApplyGitSettings(ctx, req.(*ApplyGitSettingsRequest))
+			return srv.UpdateGitRepo(ctx, req.(*GitRepo))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GitService_DeleteGitRepo0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in IdentityRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGitServiceDeleteGitRepo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteGitRepo(ctx, req.(*IdentityRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -133,10 +230,14 @@ func _GitService_ListCommits0_HTTP_Handler(srv GitServiceHTTPServer) func(ctx ht
 }
 
 type GitServiceHTTPClient interface {
-	ApplyGitSettings(ctx context.Context, req *ApplyGitSettingsRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	CreateGitRepo(ctx context.Context, req *GitRepo, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteGitRepo(ctx context.Context, req *IdentityRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetGitRepo(ctx context.Context, req *IdentityRequest, opts ...http.CallOption) (rsp *GitRepo, err error)
 	GetGitSettings(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *GitSettings, err error)
 	ListBranches(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *ListBranchesResponse, err error)
 	ListCommits(ctx context.Context, req *ListCommitsRequest, opts ...http.CallOption) (rsp *ListCommitsResponse, err error)
+	ListGitRepos(ctx context.Context, req *ListGitReposRequest, opts ...http.CallOption) (rsp *ListGitReposResponse, err error)
+	UpdateGitRepo(ctx context.Context, req *GitRepo, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type GitServiceHTTPClientImpl struct {
@@ -147,13 +248,39 @@ func NewGitServiceHTTPClient(client *http.Client) GitServiceHTTPClient {
 	return &GitServiceHTTPClientImpl{client}
 }
 
-func (c *GitServiceHTTPClientImpl) ApplyGitSettings(ctx context.Context, in *ApplyGitSettingsRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *GitServiceHTTPClientImpl) CreateGitRepo(ctx context.Context, in *GitRepo, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/api/v1/app/{name}/git"
+	pattern := "/api/v1/git/repo"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationGitServiceApplyGitSettings))
+	opts = append(opts, http.Operation(OperationGitServiceCreateGitRepo))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "PUT", path, in.GitSettings, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *GitServiceHTTPClientImpl) DeleteGitRepo(ctx context.Context, in *IdentityRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/git/repo/{name}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGitServiceDeleteGitRepo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *GitServiceHTTPClientImpl) GetGitRepo(ctx context.Context, in *IdentityRequest, opts ...http.CallOption) (*GitRepo, error) {
+	var out GitRepo
+	pattern := "/api/v1/git/repo/{name}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGitServiceGetGitRepo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -193,6 +320,32 @@ func (c *GitServiceHTTPClientImpl) ListCommits(ctx context.Context, in *ListComm
 	opts = append(opts, http.Operation(OperationGitServiceListCommits))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *GitServiceHTTPClientImpl) ListGitRepos(ctx context.Context, in *ListGitReposRequest, opts ...http.CallOption) (*ListGitReposResponse, error) {
+	var out ListGitReposResponse
+	pattern := "/api/v1/git/repo"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGitServiceListGitRepos))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *GitServiceHTTPClientImpl) UpdateGitRepo(ctx context.Context, in *GitRepo, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/git/repo/{name}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGitServiceUpdateGitRepo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

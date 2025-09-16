@@ -25,12 +25,14 @@ import (
 
 type GitSettings struct {
 	// +required
-	Url string `json:"url"`
+	RepoName string `json:"repo_name"`
+	// +required
+	RepoPath string `json:"repo_path"`
 }
 
 type ImageSettings struct {
 	// +required
-	Url string `json:"url"`
+	RepoName string `json:"repo_name"`
 }
 
 // BuildSettingsSpec defines the desired state of BuildSettings

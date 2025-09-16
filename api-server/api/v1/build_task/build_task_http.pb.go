@@ -25,19 +25,19 @@ const OperationBuildTaskServiceCreate = "/api.v1.build.task.BuildTaskService/Cre
 const OperationBuildTaskServiceList = "/api.v1.build.task.BuildTaskService/List"
 
 type BuildTaskServiceHTTPServer interface {
-	Create(context.Context, *application.IdentityRequest) (*emptypb.Empty, error)
+	Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error)
 	List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error)
 }
 
 func RegisterBuildTaskServiceHTTPServer(s *http.Server, srv BuildTaskServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/v1/app/{name}/build/task", _BuildTaskService_Create0_HTTP_Handler(srv))
+	r.POST("/api/v1/app/{appName}/build/task", _BuildTaskService_Create0_HTTP_Handler(srv))
 	r.GET("/api/v1/app/{name}/build/task", _BuildTaskService_List0_HTTP_Handler(srv))
 }
 
 func _BuildTaskService_Create0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in application.IdentityRequest
+		var in CreateBuildTaskRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
@@ -49,7 +49,7 @@ func _BuildTaskService_Create0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func
 		}
 		http.SetOperation(ctx, OperationBuildTaskServiceCreate)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.Create(ctx, req.(*application.IdentityRequest))
+			return srv.Create(ctx, req.(*CreateBuildTaskRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -83,7 +83,7 @@ func _BuildTaskService_List0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func(c
 }
 
 type BuildTaskServiceHTTPClient interface {
-	Create(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	Create(ctx context.Context, req *CreateBuildTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	List(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *ListBuildTaskResponse, err error)
 }
 
@@ -95,9 +95,9 @@ func NewBuildTaskServiceHTTPClient(client *http.Client) BuildTaskServiceHTTPClie
 	return &BuildTaskServiceHTTPClientImpl{client}
 }
 
-func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *application.IdentityRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/api/v1/app/{name}/build/task"
+	pattern := "/api/v1/app/{appName}/build/task"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBuildTaskServiceCreate))
 	opts = append(opts, http.PathTemplate(pattern))

@@ -29,7 +29,6 @@ type ClusterManager struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	db        *data.Data
 	clusterID uint64
 	updateAt  time.Time
 
@@ -37,7 +36,7 @@ type ClusterManager struct {
 	mgr    manager.Manager
 }
 
-func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, error) {
+func NewClusterManager(conn *generated.ClusterConnection, db *data.Data) (*ClusterManager, error) {
 	config := &rest.Config{
 		Host: conn.Address,
 		TLSClientConfig: rest.TLSClientConfig{
@@ -66,7 +65,7 @@ func NewClusterManager(conn *generated.ClusterConnection) (*ClusterManager, erro
 	if err != nil {
 		return nil, err
 	}
-	if err = kube.RegisterControllers(mgr); err != nil {
+	if err = kube.RegisterControllers(mgr, db); err != nil {
 		return nil, err
 	}
 
@@ -172,7 +171,7 @@ func (c *ClusterManagers) Refresh() error {
 			}
 
 			// 创建新manager
-			newMgr, err := NewClusterManager(conn)
+			newMgr, err := NewClusterManager(conn, c.db)
 			if err != nil {
 				log.Error().
 					Err(err).
