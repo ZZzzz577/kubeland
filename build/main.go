@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
+	"github.com/go-git/go-git/v6/plumbing/transport/http"
 	"io"
 	"os"
 	"os/exec"
@@ -17,7 +18,7 @@ func main() {
 	imageTag := "crpi-mgl4ujhwwhrsi5e3.cn-hangzhou.personal.cr.aliyuncs.com/kubeland/test:v1"
 	cloneCode(codePath)
 	buildImage(imageTag)
-	//pushImage(imageTag)
+	pushImage(imageTag)
 	//time.Sleep(time.Hour)
 }
 func cloneCode(codePath string) {
@@ -39,20 +40,20 @@ func cloneCode(codePath string) {
 	gitToken := ""
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		gitToken += scanner.Text() + "\n"
+		gitToken += scanner.Text()
 	}
 	if err = scanner.Err(); err != nil {
 		panic(err)
 	}
-	fmt.Println("GIT_TOKEN:", gitToken)
+	fmt.Printf("GIT_TOKEN:%s\n", gitToken)
 
 	fmt.Printf("clone code from %s\n", gitUrl)
 	repository, err := git.PlainClone(codePath, &git.CloneOptions{
 		URL: gitUrl,
-		//Auth: &http.BasicAuth{
-		//	Username: "token",
-		//	Password: gitToken,
-		//},
+		Auth: &http.BasicAuth{
+			Username: "token",
+			Password: gitToken,
+		},
 		Progress: os.Stdout,
 	})
 	if err != nil {
@@ -113,34 +114,34 @@ func buildImage(imageTag string) {
 func pushImage(imageTag string) {
 	fmt.Println("###### Step3: Push image")
 
-	//cmd := exec.Command("buildah", "push",
-	//	imageTag,
-	//)
-	//stdoutPipe, err := cmd.StdoutPipe()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//stderrPipe, err := cmd.StderrPipe()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//if err = cmd.Start(); err != nil {
-	//	panic(err)
-	//}
-	//var wg sync.WaitGroup
-	//wg.Add(2)
-	//go func() {
-	//	defer wg.Done()
-	//	printOutput(stdoutPipe)
-	//}()
-	//go func() {
-	//	defer wg.Done()
-	//	printOutput(stderrPipe)
-	//}()
-	//wg.Wait()
-	//if err = cmd.Wait(); err != nil {
-	//	panic(err)
-	//}
+	cmd := exec.Command("buildah", "push",
+		imageTag,
+	)
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		panic(err)
+	}
+	if err = cmd.Start(); err != nil {
+		panic(err)
+	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		printOutput(stdoutPipe)
+	}()
+	go func() {
+		defer wg.Done()
+		printOutput(stderrPipe)
+	}()
+	wg.Wait()
+	if err = cmd.Wait(); err != nil {
+		panic(err)
+	}
 
 }
 

@@ -12,13 +12,18 @@ RUN go mod download &&  \
 FROM docker.io/library/debian:stable-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates  \
+		ca-certificates \
         netbase \
         netavark \
         buildah \
+        fuse-overlayfs \
         && rm -rf /var/lib/apt/lists/ \
         && apt-get autoremove -y && apt-get autoclean -y \
-        && echo 'unqualified-search-registries = ["docker.io"]' > /etc/containers/registries.conf
+        && echo 'unqualified-search-registries = ["docker.io"]' > /etc/containers/registries.conf \
+        && echo '[storage]' > /etc/containers/storage.conf \
+        && echo 'driver = "overlay"' >> /etc/containers/storage.conf \
+        && echo '[storage.options.overlay]' >> /etc/containers/storage.conf \
+        && echo 'mount_program = "/usr/bin/fuse-overlayfs"' >> /etc/containers/storage.conf
 
 COPY --from=builder /src/bin /app
 
