@@ -45,7 +45,7 @@ func cloneCode(codePath string) {
 	if err = scanner.Err(); err != nil {
 		panic(err)
 	}
-	fmt.Printf("GIT_TOKEN:%s\n", gitToken)
+	// fmt.Printf("GIT_TOKEN:%s\n", gitToken)
 
 	fmt.Printf("clone code from %s\n", gitUrl)
 	repository, err := git.PlainClone(codePath, &git.CloneOptions{
@@ -114,7 +114,43 @@ func buildImage(imageTag string) {
 func pushImage(imageTag string) {
 	fmt.Println("###### Step3: Push image")
 
-	cmd := exec.Command("buildah", "push",
+	imageUsernameFile := "/app/config/image/IMAGE_USERNAME"
+	file, err := os.Open(imageUsernameFile)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+	imageUsername := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		imageUsername += scanner.Text()
+	}
+	if err = scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	imagePasswordFile := "/app/config/image/IMAGE_PASSWORD"
+	file, err = os.Open(imagePasswordFile)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+	imagePassword := ""
+	scanner = bufio.NewScanner(file)
+	for scanner.Scan() {
+		imagePassword += scanner.Text()
+	}
+	if err = scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	cmd := exec.Command("buildah",
+		"push",
+		"--creds", fmt.Sprintf("%s:%s", imageUsername, imagePassword),
 		imageTag,
 	)
 	stdoutPipe, err := cmd.StdoutPipe()
