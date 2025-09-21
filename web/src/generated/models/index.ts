@@ -7,6 +7,7 @@ export * from './ApiV1BuildSettingsBuildSettingsGitSettings';
 export * from './ApiV1BuildSettingsBuildSettingsImageSettings';
 export * from './ApiV1BuildTaskBuildTask';
 export * from './ApiV1BuildTaskCreateBuildTaskRequest';
+export * from './ApiV1BuildTaskCreateBuildTaskResponse';
 export * from './ApiV1BuildTaskListBuildTaskResponse';
 export * from './ApiV1ClusterCluster';
 export * from './ApiV1ClusterConnection';

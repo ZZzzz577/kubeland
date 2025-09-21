@@ -78,8 +78,7 @@ export default function ApplicationDetail() {
     return (
         <>
             <Card
-                variant="borderless"
-                styles={{ header: { padding: "12px 24px" }, body: { padding: 0 } }}
+                styles={{ body: { padding: 0 } }}
                 title={<div className={"text-3xl"}>{name}</div>}
                 extra={
                     <Space>

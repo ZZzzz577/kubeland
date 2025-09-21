@@ -12,7 +12,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -29,7 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BuildTaskServiceClient interface {
-	Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*CreateBuildTaskResponse, error)
 	List(ctx context.Context, in *application.IdentityRequest, opts ...grpc.CallOption) (*ListBuildTaskResponse, error)
 }
 
@@ -41,9 +40,9 @@ func NewBuildTaskServiceClient(cc grpc.ClientConnInterface) BuildTaskServiceClie
 	return &buildTaskServiceClient{cc}
 }
 
-func (c *buildTaskServiceClient) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *buildTaskServiceClient) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...grpc.CallOption) (*CreateBuildTaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(CreateBuildTaskResponse)
 	err := c.cc.Invoke(ctx, BuildTaskService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -65,7 +64,7 @@ func (c *buildTaskServiceClient) List(ctx context.Context, in *application.Ident
 // All implementations must embed UnimplementedBuildTaskServiceServer
 // for forward compatibility.
 type BuildTaskServiceServer interface {
-	Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error)
+	Create(context.Context, *CreateBuildTaskRequest) (*CreateBuildTaskResponse, error)
 	List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error)
 	mustEmbedUnimplementedBuildTaskServiceServer()
 }
@@ -77,7 +76,7 @@ type BuildTaskServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBuildTaskServiceServer struct{}
 
-func (UnimplementedBuildTaskServiceServer) Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error) {
+func (UnimplementedBuildTaskServiceServer) Create(context.Context, *CreateBuildTaskRequest) (*CreateBuildTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedBuildTaskServiceServer) List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error) {

@@ -16,11 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   ApiV1BuildTaskCreateBuildTaskRequest,
+  ApiV1BuildTaskCreateBuildTaskResponse,
   ApiV1BuildTaskListBuildTaskResponse,
 } from '../models/index';
 import {
     ApiV1BuildTaskCreateBuildTaskRequestFromJSON,
     ApiV1BuildTaskCreateBuildTaskRequestToJSON,
+    ApiV1BuildTaskCreateBuildTaskResponseFromJSON,
+    ApiV1BuildTaskCreateBuildTaskResponseToJSON,
     ApiV1BuildTaskListBuildTaskResponseFromJSON,
     ApiV1BuildTaskListBuildTaskResponseToJSON,
 } from '../models/index';
@@ -41,7 +44,7 @@ export class BuildTaskServiceApi extends runtime.BaseAPI {
 
     /**
      */
-    async buildTaskServiceCreateRaw(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async buildTaskServiceCreateRaw(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiV1BuildTaskCreateBuildTaskResponse>> {
         if (requestParameters['appName'] == null) {
             throw new runtime.RequiredError(
                 'appName',
@@ -74,13 +77,14 @@ export class BuildTaskServiceApi extends runtime.BaseAPI {
             body: ApiV1BuildTaskCreateBuildTaskRequestToJSON(requestParameters['apiV1BuildTaskCreateBuildTaskRequest']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiV1BuildTaskCreateBuildTaskResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async buildTaskServiceCreate(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.buildTaskServiceCreateRaw(requestParameters, initOverrides);
+    async buildTaskServiceCreate(requestParameters: BuildTaskServiceCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiV1BuildTaskCreateBuildTaskResponse> {
+        const response = await this.buildTaskServiceCreateRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

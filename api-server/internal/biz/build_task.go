@@ -9,7 +9,6 @@ import (
 	"api-server/internal/kube/commons/job"
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -19,6 +18,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/watch"
 	"net/http"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,12 +47,12 @@ func NewBuildTaskBiz(
 	}
 }
 
-func (b *BuildTaskBiz) Create(ctx context.Context, request *task.CreateBuildTaskRequest) error {
+func (b *BuildTaskBiz) Create(ctx context.Context, request *task.CreateBuildTaskRequest) (*task.CreateBuildTaskResponse, error) {
 	appName := request.GetAppName()
 	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
 		log.Error().Err(err).Msg("get cluster client error")
-		return err
+		return nil, err
 	}
 
 	namespace := "default"
@@ -63,22 +63,25 @@ func (b *BuildTaskBiz) Create(ctx context.Context, request *task.CreateBuildTask
 	}, &buildSettings)
 	if err != nil {
 		log.Error().Err(err).Msg("get build settings error")
-		return err
+		return nil, err
 	}
 
 	buildTask := b.createBuildTask(ctx, request, &buildSettings)
 	if err = controllerruntime.SetControllerReference(&buildSettings, buildTask, client.Scheme); err != nil {
 		log.Error().Err(err).Msg("set controller reference error")
-		return err
+		return nil, err
 	}
 
 	err = client.Create(ctx, buildTask)
 	if err != nil {
 		log.Error().Err(err).Msg("create build task error")
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &task.CreateBuildTaskResponse{
+		AppName: appName,
+		JobName: buildTask.Name,
+	}, nil
 }
 
 func (b *BuildTaskBiz) createBuildTask(ctx context.Context, request *task.CreateBuildTaskRequest, buildSettings *appv1.BuildSettings) *batchv1.Job {
@@ -215,41 +218,70 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 
 	ctx := request.Context()
 	vars := mux.Vars(request)
-
+	namespace := "default"
 	appName := vars["appName"]
+	jobName := vars["jobName"]
+
 	client, err := b.cm.GetClient(ctx, appName)
 	if err != nil {
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("get cluster client error: %s\n", err.Error())))
 		log.Error().Err(err).Msg("get cluster client error")
 		return
 	}
 
-	jobName := vars["jobName"]
-	namespace := "default"
-
-	labelSelector := fmt.Sprintf("job-name=%s", jobName)
-	podList, err := client.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: labelSelector,
+	watcher, err := client.CoreV1().Pods(namespace).Watch(ctx, metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("job-name=%s", jobName),
 	})
 	if err != nil {
-		log.Error().Err(err).Str("labelSelector", labelSelector).Msg("list pods error")
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("watch pod error: %s\n", err.Error())))
+		log.Error().Err(err).Str("jobName", jobName).Msg("watch pod error")
+		return
+	}
+	defer watcher.Stop()
+
+	podReady := false
+	var pod *corev1.Pod
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case event := <-watcher.ResultChan():
+			if curPod, ok := event.Object.(*corev1.Pod); !ok {
+				continue
+			} else {
+				pod = curPod
+			}
+
+			switch event.Type {
+			case watch.Added, watch.Modified:
+				switch pod.Status.Phase {
+				case corev1.PodPending:
+					_ = conn.WriteMessage(websocket.TextMessage, []byte("pod is pending...Wait for the pod to start\n"))
+				default:
+					podReady = true
+				}
+			}
+		}
+
+		if podReady {
+			break
+		}
+	}
+
+	if pod == nil {
+		_ = conn.WriteMessage(websocket.TextMessage, []byte("pod not found\n"))
+		log.Error().Str("jobName", jobName).Msg("pod not found")
 		return
 	}
 
-	if len(podList.Items) != 1 {
-		err = errors.New("pods num is valid")
-		log.Error().Err(err).Str("labelSelector", labelSelector).Msg("pods num is valid")
-		return
-	}
-
-	pod := podList.Items[0]
-	req := client.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetName(),
+	resp := client.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetName(),
 		&corev1.PodLogOptions{
 			Follow:     true,
 			Timestamps: true,
 		})
-	stream, err := req.Stream(ctx)
+	stream, err := resp.Stream(ctx)
 	if err != nil {
-		log.Error().Err(err).Msg("get pod logs error")
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("get pod logs error: %s\n", err.Error())))
 		return
 	}
 	defer func() {
@@ -258,14 +290,10 @@ func (b *BuildTaskBiz) Log(writer http.ResponseWriter, request *http.Request) {
 
 	scanner := bufio.NewScanner(stream)
 	for scanner.Scan() {
-		if err = conn.WriteMessage(websocket.TextMessage, []byte(scanner.Text()+"\n")); err != nil {
-			log.Error().Err(err).Msg("write to response error")
-			return
-		}
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(scanner.Text()+"\n"))
 	}
 	if err = scanner.Err(); err != nil {
-		log.Error().Err(err).Msg("scan pod logs error")
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("scan pod logs error: %s\n", err.Error())))
 		return
 	}
-
 }

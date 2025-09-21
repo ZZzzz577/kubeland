@@ -5,7 +5,7 @@ import { buildSettingsApi } from "@/api";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "antd/es/form/Form";
 import type { ApiV1BuildSettingsBuildSettings } from "@/generated";
-import { Button, Card, Form, Input, Space, Spin } from "antd";
+import { Button, Card, Form, Input, Space } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
 import type { ReactNode } from "react";
 import GitEdit from "@/views/application/modify/build/components/GitEdit.tsx";
@@ -70,34 +70,32 @@ export default function BuildSettingsEdit() {
 
 
     return (
-        <Card>
-            <Spin spinning={loading}>
-                <Form
-                    form={form}
-                    onFinish={submitForm}
-                    labelWrap={true}
-                    labelAlign={"left"}
-                    labelCol={{
-                        flex: "100px"
-                    }}
-                >
+        <Card loading={loading} title={<div className={"text-3xl"}>{name}</div>}>
+            <Form
+                form={form}
+                onFinish={submitForm}
+                labelWrap={true}
+                labelAlign={"left"}
+                labelCol={{
+                    flex: "100px"
+                }}
+            >
 
-                    <GitEdit />
-                    <ImageEdit />
+                <GitEdit />
+                <ImageEdit />
 
-                    <Title>{t`Dockerfile`}</Title>
-                    <Item name={"dockerfile"} rules={[{ required: true }]}>
-                        <Input.TextArea rows={8} />
-                    </Item>
-                </Form>
-                <Space className={"ml-25"} size={"large"}>
-                    <Button icon={<SaveOutlined />} type="primary" onClick={() => form.submit()}
-                            loading={updateLoading}>
-                        {t`Save`}
-                    </Button>
-                    <Button onClick={() => navigate(next)}>{t`Cancel`}</Button>
-                </Space>
-            </Spin>
+                <Title>{t`Dockerfile`}</Title>
+                <Item name={"dockerfile"} rules={[{ required: true }]}>
+                    <Input.TextArea rows={8} />
+                </Item>
+            </Form>
+            <Space className={"ml-25"} size={"large"}>
+                <Button icon={<SaveOutlined />} type="primary" onClick={() => form.submit()}
+                        loading={updateLoading}>
+                    {t`Save`}
+                </Button>
+                <Button onClick={() => navigate(next)}>{t`Cancel`}</Button>
+            </Space>
         </Card>
     );
 }

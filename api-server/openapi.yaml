@@ -26,7 +26,10 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content: {}
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.build.task.CreateBuildTaskResponse'
     /api/v1/app/{name}/build/settings:
         get:
             tags:
@@ -656,6 +659,13 @@ components:
                 appName:
                     type: string
                 commit:
+                    type: string
+        api.v1.build.task.CreateBuildTaskResponse:
+            type: object
+            properties:
+                appName:
+                    type: string
+                jobName:
                     type: string
         api.v1.build.task.ListBuildTaskResponse:
             type: object

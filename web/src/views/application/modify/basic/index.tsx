@@ -1,6 +1,6 @@
 import type { ApiV1ApplicationApplication } from "@/generated";
 import { useLingui } from "@lingui/react/macro";
-import { App, Button, Form, Input, Space, Spin } from "antd";
+import { App, Button, Card, Form, Input, Space, Spin } from "antd";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "antd/es/form/Form";
 import { SaveOutlined } from "@ant-design/icons";
@@ -66,7 +66,7 @@ export default function BasicInfoEdit() {
     };
 
     return (
-        <Spin spinning={loading}>
+        <Card loading={loading} title={<div className={"text-3xl"}>{name}</div>}>
             <Form
                 form={form}
                 onFinish={submitForm}
@@ -94,6 +94,6 @@ export default function BasicInfoEdit() {
                     <Button onClick={() => navigate(next)}>{t`Cancel`}</Button>
                 </Space>
             </Form>
-        </Spin>
+        </Card>
     );
 }

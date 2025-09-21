@@ -11,7 +11,6 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,7 +24,7 @@ const OperationBuildTaskServiceCreate = "/api.v1.build.task.BuildTaskService/Cre
 const OperationBuildTaskServiceList = "/api.v1.build.task.BuildTaskService/List"
 
 type BuildTaskServiceHTTPServer interface {
-	Create(context.Context, *CreateBuildTaskRequest) (*emptypb.Empty, error)
+	Create(context.Context, *CreateBuildTaskRequest) (*CreateBuildTaskResponse, error)
 	List(context.Context, *application.IdentityRequest) (*ListBuildTaskResponse, error)
 }
 
@@ -55,7 +54,7 @@ func _BuildTaskService_Create0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func
 		if err != nil {
 			return err
 		}
-		reply := out.(*emptypb.Empty)
+		reply := out.(*CreateBuildTaskResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -83,7 +82,7 @@ func _BuildTaskService_List0_HTTP_Handler(srv BuildTaskServiceHTTPServer) func(c
 }
 
 type BuildTaskServiceHTTPClient interface {
-	Create(ctx context.Context, req *CreateBuildTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	Create(ctx context.Context, req *CreateBuildTaskRequest, opts ...http.CallOption) (rsp *CreateBuildTaskResponse, err error)
 	List(ctx context.Context, req *application.IdentityRequest, opts ...http.CallOption) (rsp *ListBuildTaskResponse, err error)
 }
 
@@ -95,8 +94,8 @@ func NewBuildTaskServiceHTTPClient(client *http.Client) BuildTaskServiceHTTPClie
 	return &BuildTaskServiceHTTPClientImpl{client}
 }
 
-func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
-	var out emptypb.Empty
+func (c *BuildTaskServiceHTTPClientImpl) Create(ctx context.Context, in *CreateBuildTaskRequest, opts ...http.CallOption) (*CreateBuildTaskResponse, error) {
+	var out CreateBuildTaskResponse
 	pattern := "/api/v1/app/{appName}/build/task"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBuildTaskServiceCreate))

@@ -3,10 +3,10 @@ import { useRequest } from "ahooks";
 import { buildTaskApi } from "@/api";
 import useApp from "antd/es/app/useApp";
 import { useLingui } from "@lingui/react/macro";
-import { Button, Card, Space, Table } from "antd";
-import type { ApiV1BuildTaskBuildTask } from "@/generated";
+import { Button, Card, Space, Table, Tag } from "antd";
+import { type ApiV1BuildTaskBuildTask, ApiV1BuildTaskBuildTaskStatusEnum } from "@/generated";
 import type { ColumnsType } from "antd/es/table";
-import { SyncOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, SyncOutlined } from "@ant-design/icons";
 import CreateBuildTask from "@/views/application/detail/task/components/CreateBuildTask.tsx";
 
 export default function BuildTask() {
@@ -32,6 +32,38 @@ export default function BuildTask() {
         {
             title: t`status`,
             dataIndex: "status",
+            render: (value?: ApiV1BuildTaskBuildTaskStatusEnum) => {
+                switch (value) {
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusRunning:
+                        return (
+                            <Tag icon={<SyncOutlined spin />} color="processing">
+                                Running
+                            </Tag>
+                        );
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusComplete:
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusSuccessCriteriaMet:
+                        return (
+                            <Tag icon={<CheckCircleOutlined />} color="success">
+                                Complete
+                            </Tag>
+                        );
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusFailed:
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusFailureTarget:
+                        return (
+                            <Tag icon={<CloseCircleOutlined />} color="error">
+                                Failed
+                            </Tag>
+                        );
+                    case ApiV1BuildTaskBuildTaskStatusEnum.StatusSuspended:
+                        return (
+                            <Tag icon={<ExclamationCircleOutlined />} color="warning">
+                                Suspended
+                            </Tag>
+                        );
+                    default:
+                        return <Tag color="default">Unknown</Tag>;
+                }
+            },
         },
         {
             title: t`created at`,

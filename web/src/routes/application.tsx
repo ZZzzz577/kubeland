@@ -11,6 +11,7 @@ import BuildSettingsEdit from "@/views/application/modify/build";
 import BuildTask from "@/views/application/detail/task";
 import BuildTaskDetail from "@/views/application/detail/task/detail";
 import GitRepo from "@/views/application/detail/git";
+import BasicInfoEdit from "@/views/application/modify/basic";
 
 export const Application: Route = {
     path: "/app",
@@ -26,13 +27,11 @@ export const Application: Route = {
             menu: {},
             element: <ApplicationList />,
         },
-
         {
             path: "create",
             name: <Trans>Create</Trans>,
             element: <ApplicationCreate />,
         },
-
         {
             path: ":name",
             name: <Trans>Detail</Trans>,
@@ -60,16 +59,20 @@ export const Application: Route = {
                 },
             ],
         },
-
         {
-            path: ":name/task/:task",
-            element: <BuildTaskDetail />,
+            path: ":name/edit",
+            name: <Trans>Edit</Trans>,
+            element: <BasicInfoEdit />,
         },
-
         {
             path: ":name/edit/build",
             name: <Trans>Edit</Trans>,
             element: <BuildSettingsEdit />,
+        },
+
+        {
+            path: ":name/task/:task",
+            element: <BuildTaskDetail />,
         },
     ],
 };

@@ -18,7 +18,7 @@ func main() {
 	imageTag := "crpi-mgl4ujhwwhrsi5e3.cn-hangzhou.personal.cr.aliyuncs.com/kubeland/test:v1"
 	cloneCode(codePath)
 	buildImage(imageTag)
-	pushImage(imageTag)
+	//pushImage(imageTag)
 	//time.Sleep(time.Hour)
 }
 func cloneCode(codePath string) {

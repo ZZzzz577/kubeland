@@ -7,7 +7,6 @@ import (
 	"context"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type BuildTaskService struct {
@@ -29,8 +28,8 @@ func (b *BuildTaskService) Register(gs *kgrpc.Server, hs *http.Server) {
 	task.RegisterBuildTaskServiceHTTPServer(hs, b)
 }
 
-func (b *BuildTaskService) Create(ctx context.Context, request *task.CreateBuildTaskRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, b.biz.Create(ctx, request)
+func (b *BuildTaskService) Create(ctx context.Context, request *task.CreateBuildTaskRequest) (*task.CreateBuildTaskResponse, error) {
+	return b.biz.Create(ctx, request)
 }
 
 func (b *BuildTaskService) List(ctx context.Context, request *application.IdentityRequest) (*task.ListBuildTaskResponse, error) {
